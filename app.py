@@ -1,0 +1,36 @@
+import pygame as pg
+import pygame.freetype
+
+from modules.singleton import singleton
+
+APPLICATION_NAME = "Game Prototype"
+APPLICATION_RESOLUTION = (1600, 900)
+APPLICATION_TARGET_FPS = 120
+
+@singleton
+class Application:
+    def __init__(self):
+        pg.init()
+        self.screen = pg.display.set_mode(APPLICATION_RESOLUTION)
+        pg.display.set_caption(APPLICATION_NAME)
+        self.clock = pg.time.Clock()
+        self.is_running = True
+
+        self.current_events = pg.event.get()
+
+    def run(self):
+        while self.is_running:
+            self.current_events = pg.event.get()
+            for event in self.current_events:
+                if event.type == pg.QUIT:
+                    self.is_running = False
+
+            self.screen.fill((20, 20, 20))
+
+            pg.display.flip()
+            self.clock.tick(APPLICATION_TARGET_FPS)
+
+        pg.quit()
+
+if __name__ == "__main__":
+    Application().run()
