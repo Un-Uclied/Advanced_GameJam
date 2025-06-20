@@ -22,7 +22,12 @@ class Application:
         self.scenes = {
             "test_scene" : TestScene()
         }
-        self.current_scene = self.scenes["test_scene"]
+        self.current_scene = None
+        self.change_scene("test_scene")
+    
+    def change_scene(self, scene_name : str):
+        self.current_scene.
+        self.current_scene = self.scenes[scene_name]
     
 
     def run(self):
@@ -33,8 +38,9 @@ class Application:
                     self.is_running = False
             self.current_scene.update()
 
-            self.current_scene.draw()
             self.screen.fill((20, 20, 20))
+            self.current_scene.draw()
+            
 
             pg.display.flip()
             self.clock.tick(APPLICATION_TARGET_FPS)

@@ -2,7 +2,13 @@ from abc import ABC, abstractmethod
 
 class Scene(ABC):
     @abstractmethod
-    def __init__(self):
+    def __init__(self): #여기엔 게임이 시작될때. 이미지나 다른 에
+        pass
+    @abstractmethod
+    def scene_start(self):
+        pass
+    @abstractmethod
+    def scene_end(self):
         pass
     @abstractmethod
     def update(self):
@@ -11,7 +17,6 @@ class Scene(ABC):
     def draw(self):
         pass
 
-from render import RenderManager
 from camera import Camera
 from appplication import Application
 
@@ -20,7 +25,6 @@ class TestScene(Scene):
         super().__init__()
         self.app = Application()
         self.camera = Camera(self.app.screen.get_size())
-        self.render_manager = RenderManager()
 
     def update(self):
         super().update()
