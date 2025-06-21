@@ -3,6 +3,7 @@ import pygame.freetype
 from abc import ABC, abstractmethod
 
 from .camera import Camera2D
+from .user_interface import TextRenderer
 
 class Scene(ABC):
     @abstractmethod
@@ -33,21 +34,17 @@ class MainMenuScene(Scene):
         super().scene_enter()
         self.camera : Camera2D = Camera2D()
         self.font = pygame.freetype.Font("assets/fonts/Galmuri11.ttf")
-        self.font.pad = True
+        
+        self.text_render_ugui = TextRenderer(self.font, "이건 카메라 스페이스 UI", pg.Vector2(0, 0), "white", None, 0, 50, False)
+        self.text_render_world = TextRenderer(self.font, "이건 월드 스페이스 UI ㅇㅇ", pg.Vector2(0, 0), "red", "yellow", 0, 50, True)
 
-        self.pos = pg.Vector2(100, 200)
-        self.rot = 0
-        self.size = 1
         self.moving = [False, False, False, False]
-
+        
     def scene_exit(self):
         super().scene_exit()
 
     def update(self, delta_time):
         super().update(delta_time)
-        self.rot += int(delta_time)
-
-        
 
         events : list[pg.event.Event] = self.app.events
         for event in events:
@@ -75,15 +72,12 @@ class MainMenuScene(Scene):
         self.camera.offset.y += delta_time * 500 if self.moving[2] else 0
         self.camera.offset.x += delta_time * 500 if self.moving[3] else 0
 
-        print(self.camera.offset)
 
 
     def draw(self, main_screen : pg.surface.Surface):
         super().draw(main_screen)
-        # surf, rect = self.font.render("테스트 글!! english too.", rotation=self.rot, size=self.size, fgcolor="white")
-        # rect.centerx = self.pos.x - self.camera.offset.x
-        # rect.centery = self.pos.y - self.camera.offset.y
-        self.font.render_to(main_screen, pg.rect.Rect(self.pos.x - self.camera.offset.x, self.pos.y - self.camera.offset.y, 0, 0), " oi oi oi 오마에와 모신데이루", "white", rotation=self.rot, size = 50)
+        self.text_render_ugui.draw(main_screen)
+        self.text_render_world.draw(main_screen, self.camera)
     
 class DialogueScene(Scene):pass
 
