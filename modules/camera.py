@@ -6,6 +6,11 @@ class Camera2D:
         self.scale = 1.0
         self.screen_size = pg.Vector2(screen_size)
         self.anchor = pg.Vector2(0.5, 0.5)
+    
+    def reset(self):
+        self.offset = pg.Vector2(0, 0)
+        self.scale = 1.0
+        self.anchor = pg.Vector2(0.5, 0.5)
 
     def world_to_screen(self, world_pos: pg.Vector2) -> pg.Vector2:
         anchor_pixel = pg.Vector2(

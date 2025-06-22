@@ -1,10 +1,17 @@
+#외부 라이브러리
 import pygame as pg
 import pygame.freetype
 from typing import Callable
-from abc import ABC, abstractmethod
 
-from .camera import Camera2D
-# from .application import Application 점마 임포트하면 무한 임포트 가니깐 임포트 안해야함;
+#내부 라이브러리
+from .application import Camera
+
+class RectObject():
+    def __init__(self, app, scene):
+        self.app = app
+        self.scene = scene
+
+    def update(self)
 
 class UserInterface(ABC):
     @abstractmethod
