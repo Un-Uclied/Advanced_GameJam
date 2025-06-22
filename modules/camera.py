@@ -5,14 +5,7 @@ class Camera2D:
         self.offset = pg.Vector2(0, 0)
         self.scale = 1.0
         self.screen_size = pg.Vector2(screen_size)
-        self.anchor = pg.Vector2(0.5, 0.5)  # 👉 앵커 기본값: 화면 중심
-
-        self.sprite_groups: dict[str, pg.sprite.Group] = {
-            "background": pg.sprite.Group(),
-            "objects": pg.sprite.Group(),
-            "entities": pg.sprite.Group(),
-            "light": pg.sprite.Group(),
-        }
+        self.anchor = pg.Vector2(0.5, 0.5)
 
     def world_to_screen(self, world_pos: pg.Vector2) -> pg.Vector2:
         anchor_pixel = pg.Vector2(
@@ -43,29 +36,3 @@ class Camera2D:
 
         # 줌으로 생긴 시차 보정
         self.offset += world_before - world_after
-
-    def draw(self, surface: pg.Surface):
-        for layer_name in ["background", "objects", "entities", "light"]:
-            group = self.sprite_groups.get(layer_name, [])
-            for sprite in group:
-                if not hasattr(sprite, "image") or not hasattr(sprite, "rect"):
-                    continue
-
-                # 중심 기준으로 월드 좌표를 가져옴
-                world_center = pg.Vector2(sprite.rect.center)
-                screen_center = self.world_to_screen(world_center)
-
-                image = sprite.image
-                if self.scale != 1:
-                    w, h = image.get_size()
-                    image = pg.transform.smoothscale(image, (int(w * self.scale), int(h * self.scale)))
-                else:
-                    w, h = image.get_size()
-
-                # 중심 기준이니까 다시 좌상단으로 보정
-                screen_topleft = (round(screen_center.x - w / 2), round(screen_center.y - h / 2))
-
-                if layer_name == "light":
-                    surface.blit(image, screen_topleft, special_flags=pg.BLEND_RGB_ADD)
-                else:
-                    surface.blit(image, screen_topleft)

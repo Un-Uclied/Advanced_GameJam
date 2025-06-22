@@ -42,9 +42,9 @@ class Application:
                 if event.type == pg.QUIT:
                     self.is_running = False #창 끄기
 
-            self.current_scene.update(self.delta_time) #현재씬의 업데이트 함수 부르기
+            self.current_scene.update() #현재씬의 업데이트 함수 부르기
 
-            self.screen.fill((20, 20, 20)) #창 클리어
+            self.screen.fill("grey") #창 클리어
             self.current_scene.draw(self.screen) #후에 그리기
             
 
