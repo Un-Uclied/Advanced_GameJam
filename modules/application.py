@@ -2,7 +2,7 @@
 import pygame as pg
 import pygame.freetype
 #내부 라이브러리 임포트
-from modules.scenes import MainMenuScene
+from .scenes import MainMenuScene
 
 #윈도우 설정
 APPLICATION_NAME = "Game Prototype"
@@ -13,7 +13,7 @@ class Application:
     def __init__(self):
         #초기화
         pg.init()
-        self.screen = pg.display.set_mode(APPLICATION_RESOLUTION)
+        self.screen = pg.display.set_mode(APPLICATION_RESOLUTION, vsync=1) #이거 하면 수직동기화 될라나
         pg.display.set_caption(APPLICATION_NAME)
 
         self.clock = pg.time.Clock()
@@ -50,6 +50,5 @@ class Application:
 
             pg.display.flip() #업뎃
             self.delta_time = self.clock.tick(APPLICATION_TARGET_FPS) / 1000 #델타타임 얻으면서 FPS기달
-            print(self.clock.get_fps())
 
         pg.quit()

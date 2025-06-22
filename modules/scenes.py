@@ -3,7 +3,8 @@ import pygame.freetype
 from abc import ABC, abstractmethod
 
 from .camera import Camera2D
-from .user_interface import TextRenderer
+from .user_interface import TextRenderer, TextButton
+from .user_interface import UserInterfaceManager
 
 class Scene(ABC):
     @abstractmethod
@@ -33,51 +34,51 @@ class MainMenuScene(Scene):
     def scene_enter(self):
         super().scene_enter()
         self.camera : Camera2D = Camera2D()
+        self.camera_speed = 500
         self.font = pygame.freetype.Font("assets/fonts/Galmuri11.ttf")
         
-        self.text_render_ugui = TextRenderer(self.font, "이건 카메라 스페이스 UI", pg.Vector2(0, 0), "white", None, 0, 50, False)
-        self.text_render_world = TextRenderer(self.font, "이건 월드 스페이스 UI ㅇㅇ", pg.Vector2(0, 0), "red", "yellow", 0, 50, True)
+        self.ui_manager = UserInterfaceManager(self.app, self.camera)
 
-        self.moving = [False, False, False, False]
-        
+        self.ui_manager.add_world_ui(TextRenderer(self.font, "이건 월드 스페이스 UI ㅇㅇ", pg.Vector2(0, 0), "red", "yellow", 0, 50, True))
+        self.ui_manager.add_world_ui(TextRenderer(self.font, "스키스키 다이스키", pg.Vector2(0, 200), "white", None, 0, 50, True))
+
+        self.ui_manager.add_screen_ui(TextRenderer(self.font, "이건 카메라 스페이스 UI", pg.Vector2(0, 0), "white", None, 0, 50, False))
+
+        button = TextButton(self.font, "이건 카메라 스페이스 버튼!!!", pg.Vector2(0, 200), "white", None, 0, 50, False)
+        self.ui_manager.add_screen_ui(button)
+        button.add_listener(lambda: print("클릭 된다!!"))
+
     def scene_exit(self):
         super().scene_exit()
 
+    def move_camera(self, delta_time):
+        keys = pg.key.get_pressed()
+        if keys[pg.K_w]:
+            self.camera.move(pg.Vector2(0, -delta_time * self.camera_speed))
+        if keys[pg.K_a]:
+            self.camera.move(pg.Vector2(-delta_time * self.camera_speed, 0))
+        if keys[pg.K_s]:
+            self.camera.move(pg.Vector2(0, delta_time * self.camera_speed))
+        if keys[pg.K_d]:
+            self.camera.move(pg.Vector2(delta_time * self.camera_speed, 0))
+
+        if keys[pg.K_q]:
+            self.camera.set_zoom_from_anchor(self.camera.scale - delta_time)
+        if keys[pg.K_e]:
+            self.camera.set_zoom_from_anchor(self.camera.scale + delta_time)
+
     def update(self, delta_time):
         super().update(delta_time)
+        self.move_camera(delta_time)
 
-        events : list[pg.event.Event] = self.app.events
-        for event in events:
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_w:
-                    self.moving[0] = True
-                if event.key == pg.K_a:
-                    self.moving[1] = True
-                if event.key == pg.K_s:
-                    self.moving[2] = True
-                if event.key == pg.K_d:
-                    self.moving[3] = True
-            elif event.type == pg.KEYUP:
-                if event.key == pg.K_w:
-                    self.moving[0] = False
-                if event.key == pg.K_a:
-                    self.moving[1] = False
-                if event.key == pg.K_s:
-                    self.moving[2] = False
-                if event.key == pg.K_d:
-                    self.moving[3] = False
+        self.ui_manager.update()
         
-        self.camera.offset.y -= delta_time * 500 if self.moving[0] else 0
-        self.camera.offset.x -= delta_time * 500 if self.moving[1] else 0
-        self.camera.offset.y += delta_time * 500 if self.moving[2] else 0
-        self.camera.offset.x += delta_time * 500 if self.moving[3] else 0
-
-
-
     def draw(self, main_screen : pg.surface.Surface):
         super().draw(main_screen)
-        self.text_render_ugui.draw(main_screen)
-        self.text_render_world.draw(main_screen, self.camera)
+
+        self.ui_manager.draw(main_screen)
+        
+        
     
 class DialogueScene(Scene):pass
 
