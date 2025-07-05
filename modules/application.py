@@ -1,29 +1,20 @@
 #외부 라이브러리 임포트
 import pygame as pg
-import pygame.freetype
 
 #내부 라이브러리 임포트
-from .camera import Camera2D
 from .scenes import MainMenuScene
+from .constants import APPLICATION_RESOLUTION, APPLICATION_NAME, APPLICATION_TARGET_FPS
 
-#윈도우 설정
-APPLICATION_NAME = "Game Prototype"
-APPLICATION_RESOLUTION = (1600, 900)
-APPLICATION_TARGET_FPS = 120
-
-class Time:
-    delta_time : float = 0.0
-    delta_time_unscaled : float = 0.0
-    time_scale : float = 0.0
-
-class Events:
-    events : list[pg.event.Event] = []
-
-class Camera:
-    current : Camera2D = Camera2D(APPLICATION_RESOLUTION)
+from .time import Time
+from .events import Events
 
 class Application:
+    singleton = None # from .application import Application을 함수나 메소드 밖에서 쓰면 순환참조 일어나니깐 조심
     def __init__(self):
+        if Application.singleton is not None:
+            raise Exception("어허 싱글톤 클래스인데 또 생성하려고 하네? Application()말고 Application.singleton ㄱㄱ")
+        Application.singleton = self
+
         #초기화
         pg.init()
         self.screen = pg.display.set_mode(APPLICATION_RESOLUTION, vsync=1)
@@ -44,17 +35,20 @@ class Application:
     
     #시간 업데이트
     def update_time(self):
-        Time.delta_time_unscaled = self.clock.tick(APPLICATION_TARGET_FPS) / 1000
-        Time.delta_time = Time.delta_time_unscaled * Time.time_scale
+        dt = self.clock.tick(APPLICATION_TARGET_FPS) / 1000
+        Time.delta_time_unscaled = dt
+        Time.delta_time = dt * Time.time_scale
+
+        Time.elapsed_time += Time.delta_time
+        Time.elapsed_time_unscaled += Time.delta_time_unscaled
 
     #이벤트 업데이트
     def update_events(self):
-        Events.events = pg.event.get()
+        Events.events = pg.event.get() #얘가 한 프레임에 여러번 부르면 좀 렉? 걸려서 Events에 저장해서 재활용 하는 방법으로 갈거
 
     #씬 변경 (나중에 씬 트랜지션도 필요함)
     def change_scene(self, scene_name : str):
         self.scene.scene_exit() #기존씬 나가는 함수
-        Camera.current.reset() #카메라 리셋 안하면 바뀐 씬에서 원래씬 위치나 그런게 보존 됨. 이건 좀 스파게티긴 한데 접근성 하나만큼은 쩔어서 이거 써야함 ㅇㅇ ^^
         self.scene = self.scenes_registered[scene_name]
         self.scene.scene_enter() #새씬 들어오는 함수
 
