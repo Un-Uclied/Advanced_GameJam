@@ -3,3 +3,7 @@ import pygame as pg
 
 class Events:
     events : list[pg.event.Event] = []
+
+    @classmethod
+    def keys_pressed(cls):
+        return pg.key.get_pressed()

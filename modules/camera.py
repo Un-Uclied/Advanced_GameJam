@@ -28,20 +28,3 @@ class Camera2D:
             cls.screen_size.y * cls.anchor.y
         )
         return (screen_pos - anchor_pixel) / cls.scale + cls.offset
-
-    @classmethod
-    def move(cls, delta: pg.Vector2):
-        cls.offset += delta / cls.scale
-
-    @classmethod
-    def set_zoom_from_anchor(cls, new_scale: float):
-        """앵커 기준으로 줌 조정"""
-        new_scale = max(0.1, new_scale)
-        anchor_pixel = cls.screen_size.elementwise() * cls.anchor
-
-        world_before = cls.screen_to_world(anchor_pixel)
-        cls.scale = new_scale
-        world_after = cls.screen_to_world(anchor_pixel)
-
-        # 줌으로 생긴 시차 보정
-        cls.offset += world_before - world_after

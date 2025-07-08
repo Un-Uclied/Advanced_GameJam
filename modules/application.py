@@ -1,5 +1,6 @@
 #외부 라이브러리 임포트
 import pygame as pg
+import pygame.freetype
 
 #내부 라이브러리 임포트
 from .scenes import MainMenuScene
@@ -17,6 +18,7 @@ class Application:
 
         #초기화
         pg.init()
+        pygame.freetype.init()
         self.screen = pg.display.set_mode(APPLICATION_RESOLUTION, vsync=1)
         pg.display.set_caption(APPLICATION_NAME)
 
@@ -28,7 +30,7 @@ class Application:
         
         #씬
         self.scenes_registered = {
-            "main_menu_scene" : MainMenuScene(self)
+            "main_menu_scene" : MainMenuScene()
         }
         self.scene = self.scenes_registered["main_menu_scene"]
         self.scene.scene_enter()
@@ -66,7 +68,7 @@ class Application:
             self.scene.update()
 
             self.screen.fill("grey")
-            self.scene.draw(self.screen)
+            self.scene.draw()
             
             pg.display.flip() #업뎃
             self.update_time()

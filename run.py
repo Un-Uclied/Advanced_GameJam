@@ -1,3 +1,3 @@
 if __name__ == "__main__":
-    from modules.application import Application
+    from modules.core import Application
     Application().run()
