@@ -63,6 +63,8 @@ class MainMenuScene(Scene):
 
         Camera2D.offset = pg.Vector2.lerp(Camera2D.offset, self.player.position, Time.delta_time * 7)
 
+        self.player.angle += 40 * Time.delta_time #플레이어 회전
+
         print(f"Camera Scale: {Camera2D.scale}, Offset: {Camera2D.offset}, Anchor: {Camera2D.anchor}")
 
     def update(self):
