@@ -2,8 +2,9 @@ import pygame as pg
 import math
 
 class Component:
+    '''컴포넌트 베이스 클래스'''
     def __init__(self):
-        self.object = None
+        self.object = None # 컴포넌트가 속한 오브젝트를 저장하는 변수
 
     def on_start(self):
         pass
@@ -27,7 +28,8 @@ class SpriteRenderer(Component):
         if not self.image or not self.object:
             return
         
-        from .core import Camera2D, GameObject
+        from .camera import Camera2D #이렇게 함수에서 임포트하면 순환참조 문제를 피할 수 있음
+        from .objects import GameObject #솔직히 좀 구리긴 한데 접근성 하나만큼은 끝장남 ㅇㅇ; 성능 문제 없으니깐 됐져
 
         pos = self.object.position
         rotation = self.object.rotation
