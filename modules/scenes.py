@@ -35,10 +35,13 @@ class MainMenuScene(Scene):
 
         self.grid = GameObject(position=pg.Vector2(0, 0), rotation=0.0, tag="background")
         self.grid.add_component(SpriteRenderer(load_image("grid.jpg"))) #이렇게 이미지 로드해서 컴포넌트로 추가
+        self.grid.add_component(Collider(size=pg.Vector2(self.grid.get_component(SpriteRenderer).image.get_size()))) #트리거 콜라이더 추가
 
         self.player = GameObject(position=pg.Vector2(0, 0), rotation=0.0, tag="entities")
         self.player.add_component(SpriteRenderer(load_image()))
+        self.player.add_component(Collider(size=pg.Vector2(self.player.get_component(SpriteRenderer).image.get_size()))) #트리거 콜라이더 추가
         self.player.add_component(ObjectDebugger()) #디버거 컴포넌트 추가
+        self.player.add_component(TextRenderer("플레이어!!", font_size=30, color=(0, 0, 0))) #텍스트 렌더러 컴포넌트 추가
 
         Camera2D.scale = 0.5
 
@@ -62,10 +65,9 @@ class MainMenuScene(Scene):
         if keys[pg.K_e]:
             Camera2D.scale /= 1.01
 
-        Camera2D.offset = pg.Vector2.lerp(Camera2D.offset, self.player.position, Time.delta_time * 7)
+        Camera2D.offset = pg.Vector2.lerp(Camera2D.offset, self.player.position, Time.delta_time * 3)
 
-        self.player.angle -= 20 * Time.delta_time #플레이어 회전
-        print(f"Camera Scale: {Camera2D.scale}, Offset: {Camera2D.offset}, Anchor: {Camera2D.anchor}")
+        self.player.angle += 50 * Time.delta_time #플레이어 회전
 
     def update(self):
         super().update()

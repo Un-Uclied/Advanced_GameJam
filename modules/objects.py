@@ -48,7 +48,7 @@ class Object:
         rotation: 오브젝트의 회전 (라디안 단위)
         '''
         self.position = position
-        self.rotation = rotation #얘를 직접 바꾸는건 radian 단위로 바꿔야함 그래서 anlge 프로퍼티를 만들어서 도 단위로 바꿀 수 있게 함
+        self.rotation = rotation # 임마는 private로 !! 회전 관련은 다 anlge쓰도록 !! 얘를 직접 바꾸는건 radian 단위로 바꿔야함 그래서 anlge 프로퍼티를 만들어서 도 단위로 바꿀 수 있게 함
         self.tag = tag
         self.components = {}
 
@@ -79,6 +79,7 @@ class Object:
         return comp
 
     def get_component(self, comp_type):
+        '''if 오브젝트.get_component(SpriteRenderer) is not None: 이렇게 해도 됨'''
         return self.components.get(comp_type)
     
     def destroy(self):
