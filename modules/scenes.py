@@ -19,8 +19,8 @@ class Scene:
     def draw(self):
         pass
 
-from .objects import GameObject, Object
-from .components import SpriteRenderer
+from .objects import *
+from .components import *
 from .camera import Camera2D
 from .events import Events
 from .load_image import load_image
@@ -38,6 +38,7 @@ class MainMenuScene(Scene):
 
         self.player = GameObject(position=pg.Vector2(0, 0), rotation=0.0, tag="entities")
         self.player.add_component(SpriteRenderer(load_image()))
+        self.player.add_component(ObjectDebugger()) #디버거 컴포넌트 추가
 
         Camera2D.scale = 0.5
 
@@ -63,8 +64,7 @@ class MainMenuScene(Scene):
 
         Camera2D.offset = pg.Vector2.lerp(Camera2D.offset, self.player.position, Time.delta_time * 7)
 
-        self.player.angle += 40 * Time.delta_time #플레이어 회전
-
+        self.player.angle -= 20 * Time.delta_time #플레이어 회전
         print(f"Camera Scale: {Camera2D.scale}, Offset: {Camera2D.offset}, Anchor: {Camera2D.anchor}")
 
     def update(self):

@@ -35,7 +35,7 @@ class SpriteRenderer(Component):
         rotation = self.object.rotation
 
         # 이미지 회전 (라디안 -> 도 변환)
-        rotated_img = pg.transform.rotate(self.image, -rotation * 180 / math.pi)
+        rotated_img = pg.transform.rotate(self.image, self.object.angle)  # object.angle은 도 단위로 가정
 
         # 카메라 스케일 적용해서 이미지 크기 조절
         scale = Camera2D.scale
@@ -54,3 +54,23 @@ class SpriteRenderer(Component):
         surface = Application.singleton.screen
 
         surface.blit(scaled_img, draw_pos)
+
+class ObjectDebugger(Component):
+    '''오브젝트 디버거 컴포넌트'''
+    def __init__(self):
+        super().__init__()
+
+    def draw(self):
+        if not self.object:
+            return
+        
+        from .camera import Camera2D
+        from .application import Application
+
+        pg.draw.line(Application.singleton.screen, pg.Color(255, 0, 0), 
+                     Camera2D.world_to_screen(self.object.position), 
+                     Camera2D.world_to_screen(self.object.position + self.object.up * 500), 20)
+        
+        pg.draw.line(Application.singleton.screen, pg.Color(0, 255, 0),
+                        Camera2D.world_to_screen(self.object.position), 
+                        Camera2D.world_to_screen(self.object.position + self.object.right * 500), 20)
