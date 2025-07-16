@@ -9,3 +9,4 @@ Application 클래스는 pygame 초기화, 화면 설정, Time 클래스 처리,
 if __name__ == "__main__":
     from modules.application import Application
     Application().run() # 여기서 Application() 싱글톤 만들고 run() 메소드 실행
+    

@@ -3,24 +3,10 @@ import pygame as pg
 import pygame.freetype
 
 # 내부 라이브러리 임포트
-from .scenes import *  # 씬 클래스들
+from .scenes import TestScene  # 씬 클래스들
 from .constants import *  # 상수들
-
-class Time:
-    elapsed_time : float = 0.0
-    elapsed_time_unscaled : float = 0.0
-
-    delta_time : float = 0.0
-    delta_time_unscaled : float = 0.0
-
-    time_scale : float = 1.0
-
-#외부 라이브러리 임포트
-import pygame as pg
-
-class Events:
-    events : list[pg.event.Event] = []
-
+from .time import *
+from .events import *
 
 class Application:
     '''
@@ -42,7 +28,7 @@ class Application:
     def __init__(self):
         # 싱글톤 중복 생성 방지
         if Application.singleton is not None:
-            raise Exception("Application은 싱글톤이야! Application.singleton 써라!")
+            raise Exception("싱글톤인뎅 ㅠㅠ")
 
         Application.singleton = self
 
@@ -50,7 +36,7 @@ class Application:
         pg.init()
         pygame.freetype.init()
 
-        self.screen = pg.display.set_mode(APPLICATION_RESOLUTION, vsync=1)
+        self.screen = pg.display.set_mode(APPLICATION_RESOLUTION, pygame.HWSURFACE | pygame.DOUBLEBUF)
         pg.display.set_caption(APPLICATION_NAME)
 
         self.clock = pg.time.Clock()
@@ -76,6 +62,8 @@ class Application:
         Time.delta_time = dt * Time.time_scale
         Time.elapsed_time += Time.delta_time
         Time.elapsed_time_unscaled += Time.delta_time_unscaled
+
+        Time.fps = self.clock.get_fps()
 
     # === 이벤트 업데이트 ===
     def update_events(self):
