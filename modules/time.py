@@ -1,7 +1,8 @@
-class Time:
-    elapsed_time : float = 0.0
-    elapsed_time_unscaled : float = 0.0
+import pygame as pg
 
+class Time:
+    clock : pg.time.Clock = None
+    
     delta_time : float = 0.0
     delta_time_unscaled : float = 0.0
 

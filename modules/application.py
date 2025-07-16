@@ -1,6 +1,7 @@
 # 외부 라이브러리 임포트
 import pygame as pg
 import pygame.freetype
+import pymunk as pm
 
 # 내부 라이브러리 임포트
 from .scenes import TestScene  # 씬 클래스들
@@ -26,17 +27,13 @@ class Application:
     singleton = None  # 싱글톤 인스턴스 저장
 
     def __init__(self):
-        # 싱글톤 중복 생성 방지
-        if Application.singleton is not None:
-            raise Exception("싱글톤인뎅 ㅠㅠ")
-
         Application.singleton = self
 
         # === 초기화 ===
         pg.init()
         pygame.freetype.init()
 
-        self.screen = pg.display.set_mode(APPLICATION_RESOLUTION, pygame.HWSURFACE | pygame.DOUBLEBUF)
+        self.screen = pg.display.set_mode(APPLICATION_RESOLUTION)
         pg.display.set_caption(APPLICATION_NAME)
 
         self.clock = pg.time.Clock()
@@ -58,10 +55,9 @@ class Application:
         매 프레임 시간 업데이트 (Time 클래스에 기록됨)
         '''
         dt = self.clock.tick(APPLICATION_TARGET_FPS) / 1000
+
         Time.delta_time_unscaled = dt
         Time.delta_time = dt * Time.time_scale
-        Time.elapsed_time += Time.delta_time
-        Time.elapsed_time_unscaled += Time.delta_time_unscaled
 
         Time.fps = self.clock.get_fps()
 

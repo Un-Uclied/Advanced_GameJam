@@ -1,5 +1,6 @@
 #외부 라이브러리 임포트
 import pygame as pg
+from .constants import *
 
 class Camera2D:
     '''
@@ -7,7 +8,7 @@ class Camera2D:
     인스턴스를 만들지 않고 클래스 메소드로 사용함
     (스태틱 클래스)
     '''
-    screen_size = pg.Vector2(1600, 900)
+    screen_size = pg.Vector2(APPLICATION_RESOLUTION)
     scale = 1.0
     offset = pg.Vector2(0, 0)
     anchor = pg.Vector2(0.5, 0.5)  # 화면의 중심을 기준으로 줌 조정

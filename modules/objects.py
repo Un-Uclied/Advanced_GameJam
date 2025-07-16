@@ -107,7 +107,7 @@ class GameObject:
         if comp:
             comp.on_destroy()
         return comp
-    
+
     def get_component(self, comp_type):
         '''
         오브젝트에서 컴포넌트 가져오기
