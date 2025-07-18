@@ -12,11 +12,13 @@ class TextRenderer(GameObject):
                  color: pg.Color = pg.Color(255, 255, 255),
                  use_camera : bool =  True,
                  font_name : str | None =  None):
+        
         super().__init__()
         self.txt = text_value
         self._pos = position
         self._color = color
         self._use_camera = use_camera
+    
         if font_name is None:
             self._font = pygame.freetype.Font(f"{BASE_FONT_PATH}/{DEFAULT_FONT_NAME}", font_size)
         else:

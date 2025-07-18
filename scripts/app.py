@@ -38,10 +38,9 @@ class App:
 
     def load_assets(self):
         self.ASSET_TILEMAP = {
-            "tiles" : {
-                "grass" : load_images("tiles/grass"),
-                "stone"  : load_images("tiles/stone")
-            },
+            "grass" : load_images("tiles/tiles/grass"),
+            "stone"  : load_images("tiles/tiles/stone"),
+            
         }
 
     def _update_time(self):
