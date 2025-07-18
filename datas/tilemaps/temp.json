@@ -1,0 +1,22 @@
+{
+  "tile_size": 32,
+  "tiles": {
+    "0,0": {"pos" : [0, 0], "type": "stone", "variant": 0, "can_collide": false},
+    "0,1": {"pos" : [0, 1], "type": "grass", "variant": 0, "can_collide": false}
+  },
+  "objects": [
+     {
+      "pos": [0.5, 1],
+      "type": "stone",
+      "variant": 1
+    },
+    {
+      "pos": [0.5,  1.2],
+      "type": "grass",
+      "variant": 1
+    }
+  ],
+  "spawn_points" : {
+    "player" : {"pos" : [0, 2]}
+  }
+}
