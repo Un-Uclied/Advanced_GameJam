@@ -55,7 +55,7 @@ class TileMapEditScene(Scene):
         TextRenderer("[B] 오토 타일", pg.Vector2(10, 110), color="black",use_camera=False)
         TextRenderer("[엔터] 타일 종류 변경 | [휠] 타일 인덱스 변경", pg.Vector2(10, 135), color="black",use_camera=False)
         TextRenderer(self.current_tile_text, pg.Vector2(10, 165), color="red", use_camera=False)
-
+        TextRenderer("[O] 저장하기 (temp.json에 저장됨.)", pg.Vector2(10, 190), color="black",use_camera=False)
 
         self.mouse_world_pos = pg.Vector2(0, 0)
         self.tile_pos = pg.Vector2(0, 0)
@@ -89,6 +89,8 @@ class TileMapEditScene(Scene):
                 if event.key == pg.K_RETURN:
                     self.current_tile_type_index = (self.current_tile_type_index + 1) % len(self.tile_types)
                     self.current_tile_variant = 0
+                if event.key == pg.K_o:
+                    self.tilemap.save_file()
 
             if event.type == pg.MOUSEBUTTONDOWN and not self.in_grid_mode:
                 if event.button == 1:
