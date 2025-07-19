@@ -56,16 +56,13 @@ class Tilemap(GameObject):
         screen = App.singleton.screen
         tile_asset = App.singleton.ASSET_TILEMAP
 
-        scaled_tile_size = int(self.tile_size * camera.scale)
-
         for obj_data in self._objects.copy():
             world_pos = pg.Vector2(obj_data["pos"][0] * self.tile_size, obj_data["pos"][1] * self.tile_size)
             screen_pos = camera.world_to_screen(world_pos)
 
             original_image = tile_asset[obj_data["type"]][obj_data["variant"]]
-            scaled_image = pg.transform.scale(original_image, (scaled_tile_size, scaled_tile_size))
-
-            screen.blit(scaled_image, screen_pos)
+        
+            screen.blit(camera.get_scaled_surface(original_image), screen_pos)
         
         for key in self._tiles.keys():
             tile_data = self._tiles[key]
@@ -73,6 +70,7 @@ class Tilemap(GameObject):
             world_pos = pg.Vector2(tile_data["pos"][0] * self.tile_size, tile_data["pos"][1] * self.tile_size)
             screen_pos = camera.world_to_screen(world_pos)
 
+            scaled_tile_size = int(self.tile_size * camera.scale)
             original_image = tile_asset[tile_data["type"]][tile_data["variant"]]
             scaled_image = pg.transform.scale(original_image, (scaled_tile_size, scaled_tile_size))
 

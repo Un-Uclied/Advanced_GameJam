@@ -22,3 +22,8 @@ class Camera2D:
             self.screen_size.y * self.anchor.y
         )
         return (screen_pos - anchor_pixel) / self.scale + self.offset
+    
+    def get_scaled_surface(self, surface : pg.Surface, original_size : pg.Vector2 | None) -> pg.Surface:
+        original_size = surface.get_size()
+        transform_size = (original_size[0] * self.scale, original_size[1] * self.scale)
+        return pg.transform.scale(surface, transform_size)

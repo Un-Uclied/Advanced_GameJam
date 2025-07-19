@@ -1,5 +1,5 @@
 {
-  "tile_size": 32,
+  "tile_size": 16,
   "tiles": {
     "0,0": {"pos" : [0, 0], "type": "stone", "variant": 0, "can_collide": false},
     "0,1": {"pos" : [0, 1], "type": "grass", "variant": 0, "can_collide": false}

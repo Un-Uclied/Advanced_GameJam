@@ -40,7 +40,7 @@ class App:
         self.ASSET_TILEMAP = {
             "grass" : load_images("tiles/tiles/grass"),
             "stone"  : load_images("tiles/tiles/stone"),
-            
+            "environment" : load_images("tiles/objects/environment")
         }
 
     def _update_time(self):

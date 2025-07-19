@@ -46,10 +46,16 @@ class TileMapEditScene(Scene):
         self.in_collision_view = False
         self.view_mode_text = StringValue("[V] 현재 : 일반 뷰")
 
+        self.current_tile_text = StringValue(f"{self.tile_types[self.current_tile_type_index]} : [{self.current_tile_variant}]")
+
         TextRenderer("[WASD] 움직이기 | [Q,E]로 줌 인,아웃", pg.Vector2(10, 10), color="black",use_camera=False)
         TextRenderer(self.collide_mode_text, pg.Vector2(10, 35), color="black",use_camera=False)
         TextRenderer(self.grid_mode_text, pg.Vector2(10, 60), color="black",use_camera=False)
         TextRenderer(self.view_mode_text, pg.Vector2(10, 85), color="black", use_camera=False)
+        TextRenderer("[B] 오토 타일", pg.Vector2(10, 110), color="black",use_camera=False)
+        TextRenderer("[엔터] 타일 종류 변경 | [휠] 타일 인덱스 변경", pg.Vector2(10, 135), color="black",use_camera=False)
+        TextRenderer(self.current_tile_text, pg.Vector2(10, 165), color="red", use_camera=False)
+
 
         self.mouse_world_pos = pg.Vector2(0, 0)
         self.tile_pos = pg.Vector2(0, 0)
@@ -78,6 +84,11 @@ class TileMapEditScene(Scene):
                         self.can_collide = False
                 if event.key == pg.K_v:
                     self.in_collision_view = not self.in_collision_view
+                if event.key == pg.K_b:
+                    self.tilemap.autotile()
+                if event.key == pg.K_RETURN:
+                    self.current_tile_type_index = (self.current_tile_type_index + 1) % len(self.tile_types)
+                    self.current_tile_variant = 0
 
             if event.type == pg.MOUSEBUTTONDOWN and not self.in_grid_mode:
                 if event.button == 1:
@@ -124,6 +135,7 @@ class TileMapEditScene(Scene):
         self.collide_mode_text.value = "[C] 현재 : 충돌 가능" if self.can_collide else "[C] 현재 : 충돌 X"
         self.grid_mode_text.value = "[Tab] 현재: 그리드" if self.in_grid_mode else "[Tab] 현재: 자유"
         self.view_mode_text.value = "[V] 현재 : 충돌범위 뷰" if self.in_collision_view else "[V] 현재 : 일반 뷰"
+        self.current_tile_text.value = f"{self.tile_types[self.current_tile_type_index]} : [{self.current_tile_variant}]"
 
     def _draw_grid(self):
         from .app import App
@@ -185,7 +197,7 @@ class TileMapEditScene(Scene):
 
         # 미리보기 이미지 가져오기 및 스케일링
         preview_image = App.singleton.ASSET_TILEMAP[current_tile_type][current_tile_variant].copy()
-        preview_image = pg.transform.scale(preview_image, (scaled_tile_size, scaled_tile_size))
+        preview_image = self.camera.get_scaled_surface(preview_image)
 
         # 미리보기 이미지에 투명도 적용 (선택된 타일임을 시각적으로 나타냄)
         preview_image.set_alpha(150) # 0 (완전 투명) ~ 255 (완전 불투명)
