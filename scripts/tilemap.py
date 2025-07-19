@@ -63,6 +63,23 @@ class Tilemap(GameObject):
             if tile["can_collide"]:
                 rects.append(pg.Rect(tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size, self.tile_size, self.tile_size))
         return rects
+
+    def get_colliding_tiles(self, rect: pg.Rect) -> list[pg.Rect]:
+        # 주어진 Rect와 겹치는 모든 충돌 타일 Rect를 반환함.
+        colliding_tiles = []
+        # 검사할 범위를 엔티티 크기에 맞게 타일 단위로 계산함.
+        start_x = int(rect.left // self.tile_size)
+        end_x = int(rect.right // self.tile_size)
+        start_y = int(rect.top // self.tile_size)
+        end_y = int(rect.bottom // self.tile_size)
+
+        for y in range(start_y, end_y + 1):
+            for x in range(start_x, end_x + 1):
+                key = f"{x},{y}"
+                if key in self.in_grid and self.in_grid[key]["can_collide"]:
+                    tile_rect = pg.Rect(x * self.tile_size, y * self.tile_size, self.tile_size, self.tile_size)
+                    colliding_tiles.append(tile_rect)
+        return colliding_tiles
     
     def autotile(self):
         for loc in self.in_grid:
@@ -95,6 +112,6 @@ class Tilemap(GameObject):
         file = open(BASE_TILEMAP_PATH + '/' + json_file_name, 'w')
         json.dump({
             'tile_size' : self.tile_size,
-            'in_grid' : self._in_grid, 
+            'in_grid' : self.in_grid, 
             'off_grid' : self.off_grid}, file)
         file.close()

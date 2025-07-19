@@ -6,6 +6,7 @@ from .ui import *
 from .values import *
 from .objects import *
 from .camera import *
+from .entities import Player
 
 class Scene:
     def __init__(self):
@@ -47,20 +48,14 @@ class MainGameScene(Scene):
         super().on_scene_start()
         self.tilemap = Tilemap()
 
+        spawn_pos_list = self.tilemap.get_pos_by_data("spawners", 0)
+        player_spawn_pos = spawn_pos_list[0] if spawn_pos_list else pg.Vector2(100, 100)
+        self.player = Player(player_spawn_pos, pg.Vector2(16, 16)) # 플레이어 사이즈는 임시값
+
     def on_update(self):
         super().on_update()
-        keys = pg.key.get_pressed()
-        dt = self.app.dt
-
-        move_speed = 300 * dt / self.camera.scale
-        if keys[pg.K_w]:
-            self.camera.offset += pg.Vector2(0, -move_speed)
-        if keys[pg.K_s]:
-            self.camera.offset += pg.Vector2(0, +move_speed)
-        if keys[pg.K_a]:
-            self.camera.offset += pg.Vector2(-move_speed, 0)
-        if keys[pg.K_d]:
-            self.camera.offset += pg.Vector2(+move_speed, 0)
+        # 카메라가 플레이어를 따라가도록 설정
+        self.camera.offset = self.player.pos
     
     def on_draw(self):
         super().on_draw()
