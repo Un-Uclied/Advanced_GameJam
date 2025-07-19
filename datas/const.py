@@ -1,8 +1,8 @@
 import pygame as pg
 
-SCREEN_SIZE = (720*2, 480*2)
-TARGET_FPS = 0
-SCREEN_FLAGS = pg.SCALED
+SCREEN_SIZE = pg.Vector2(1720, 880)
+TARGET_FPS = 144
+SCREEN_FLAGS = 0 #pg.SCALED
 GAME_NAME = "GAME NAME"
 
 BASE_IMAGE_PATH = "assets/images/"

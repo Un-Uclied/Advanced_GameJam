@@ -1,7 +1,7 @@
 import pygame as pg
 import json
 
-from .game_objects import *
+from .objects import *
 from datas.const import *
 
 AUTOTILE_MAP = {
@@ -15,7 +15,9 @@ AUTOTILE_MAP = {
     tuple(sorted([(1, 0), (0, -1), (0, 1)])): 7,
     tuple(sorted([(1, 0), (-1, 0), (0, 1), (0, -1)])): 8,
 }
-AUTOTILE_TYPES = {"grass", "stone"}
+AUTO_TILE_TILES = ["grass", "stone"]
+IN_GRID_TILES = ["grass", "stone"]
+OFF_GRID_TILES = ["environment"]
 
 NEIGHBOR_OFFSETS = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (0, 0), (-1, 1), (0, 1), (1, 1)]
 
@@ -27,18 +29,33 @@ class Tilemap(GameObject):
         file.close()
 
         self.tile_size : int = json_data["tile_size"]
-        self._tiles = json_data["tiles"]
-        self._objects = json_data["objects"]
-        self._spawn_points = json_data["spawn_points"]
+        self.in_grid = json_data["in_grid"]
+        self.off_grid = json_data["off_grid"]
+
+    def get_pos_by_data(self, tile_type: str, variant: int = 0) -> list[pg.Vector2]:
+        matched_positions = []
+
+        for tile in self.in_grid.values():
+            if tile["type"] == tile_type and tile.get("variant", 0) == variant:
+                world_pos = pg.Vector2(tile["pos"][0] * self.tile_size, tile["pos"][1] * self.tile_size)
+                matched_positions.append(world_pos)
+
+        for tile in self.off_grid:
+            if tile["type"] == tile_type and tile.get("variant", 0) == variant:
+                world_pos = pg.Vector2(tile["pos"][0] * self.tile_size, tile["pos"][1] * self.tile_size)
+                matched_positions.append(world_pos)
+
+        return matched_positions
+
 
     def tiles_around(self, pos : pg.Vector2):
-        around_tiles = []
+        around_in_grid = []
         tile_loc = (int(pos.x // self.tile_size), int(pos.y // self.tile_size))
         for offset in NEIGHBOR_OFFSETS:
             current_check_location = f"{int(tile_loc[0] + offset[0])},{int(tile_loc[1] + offset[1])}"
-            if current_check_location in self._tiles:
-                around_tiles.append(self._tiles[current_check_location])
-        return around_tiles
+            if current_check_location in self.in_grid:
+                around_in_grid.append(self.in_grid[current_check_location])
+        return around_in_grid
     
     def physic_tiles_around(self, pos : pg.Vector2) -> list[pg.Rect]:
         rects = []
@@ -47,53 +64,37 @@ class Tilemap(GameObject):
                 rects.append(pg.Rect(tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size, self.tile_size, self.tile_size))
         return rects
     
-    def on_draw(self):
-        super().on_draw()
-        
-        from .app import App #순환 참조 무서웡...
-
-        camera = GameObject.current_scene.camera
-        screen = App.singleton.screen
-        tile_asset = App.singleton.ASSET_TILEMAP
-
-        for obj_data in self._objects.copy():
-            world_pos = pg.Vector2(obj_data["pos"][0] * self.tile_size, obj_data["pos"][1] * self.tile_size)
-            screen_pos = camera.world_to_screen(world_pos)
-
-            original_image = tile_asset[obj_data["type"]][obj_data["variant"]]
-        
-            screen.blit(camera.get_scaled_surface(original_image), screen_pos)
-        
-        for key in self._tiles.keys():
-            tile_data = self._tiles[key]
-
-            world_pos = pg.Vector2(tile_data["pos"][0] * self.tile_size, tile_data["pos"][1] * self.tile_size)
-            screen_pos = camera.world_to_screen(world_pos)
-
-            scaled_tile_size = int(self.tile_size * camera.scale)
-            original_image = tile_asset[tile_data["type"]][tile_data["variant"]]
-            scaled_image = pg.transform.scale(original_image, (scaled_tile_size, scaled_tile_size))
-
-            App.singleton.screen.blit(scaled_image, screen_pos)
-        
     def autotile(self):
-        for loc in self._tiles:
-            tile = self._tiles[loc]
+        for loc in self.in_grid:
+            tile = self.in_grid[loc]
             neighbors = set()
             for shift in [(1, 0), (-1, 0), (0, -1), (0, 1)]:
                 check_loc = f"{tile['pos'][0]+shift[0]},{tile['pos'][1] + shift[1]}"
-                if check_loc in self._tiles:
-                    if self._tiles[check_loc]['type'] == tile['type']:
+                if check_loc in self.in_grid:
+                    if self.in_grid[check_loc]['type'] == tile['type']:
                         neighbors.add(shift)
             neighbors = tuple(sorted(neighbors))
-            if (tile['type'] in AUTOTILE_TYPES) and (neighbors in AUTOTILE_MAP):
+            if (tile['type'] in AUTO_TILE_TILES) and (neighbors in AUTOTILE_MAP):
                 tile['variant'] = AUTOTILE_MAP[neighbors]
+
+    def on_draw(self):
+        camera = self.app.scene.camera
+        tile_asset = self.app.singleton.ASSET_TILEMAP
+
+        for data in self.off_grid:
+            world_pos = pg.Vector2(data["pos"][0] * self.tile_size, data["pos"][1] * self.tile_size)
+            image = tile_asset[data["type"]][data["variant"]]
+            camera.blit(image, world_pos, layer=0)
+
+        for data in self.in_grid.values():
+            world_pos = pg.Vector2(data["pos"][0] * self.tile_size, data["pos"][1] * self.tile_size)
+            image = tile_asset[data["type"]][data["variant"]]
+            camera.blit(image, world_pos, layer=1)
 
     def save_file(self, json_file_name : str = "temp.json"):
         file = open(BASE_TILEMAP_PATH + '/' + json_file_name, 'w')
         json.dump({
             'tile_size' : self.tile_size,
-            'tiles' : self._tiles, 
-            'objects' : self._objects,
-            "spawn_points" :self._spawn_points}, file)
+            'in_grid' : self._in_grid, 
+            'off_grid' : self.off_grid}, file)
         file.close()

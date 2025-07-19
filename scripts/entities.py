@@ -1,5 +1,7 @@
 import pygame, math, random
 
+from .objects import GameObject
+
 class PhsyicsEntity:
     def __init__(self, game, entity_type, pos, size):
         self.anim_offset = [0,0]
