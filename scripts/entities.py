@@ -1,6 +1,12 @@
-import pygame, math, random
+import pygame as pg
 
-from .objects import GameObject
+from .objects import *
+from .animation import *
+from .load_image import *
+
+class Entity(GameObject):
+    def __init__(self, world_position : pg.Vector2 = pg.Vector2(0, 0), size : pg.Vector2 = pg.Vector2(16, 16), animation : Animation = Animation(load_images("entities/player/idle"), 6, True)):
+        
 
 class PhsyicsEntity:
     def __init__(self, game, entity_type, pos, size):

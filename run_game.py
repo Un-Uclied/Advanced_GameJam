@@ -1,2 +1,2 @@
 from scripts.app import App
-App('test_scene').run()
+App('main_game_scene').run()

@@ -9,12 +9,15 @@ from .camera import *
 
 class Scene:
     def __init__(self):
+        #메소드 내에서 계속 임포트 할 필요없이 멤버로 만들어버리기~~
         from .app import App
         self.app = App.singleton
     
     def on_scene_start(self):
-        self.camera = Camera2D(1, pg.Vector2(0, 0))
+        #모든 씬엔 카메라가 있음
+        self.camera = Camera2D(scale=4.5, offset=pg.Vector2(0, 0))
 
+        #현재 fps보여주는건데 릴리스할때는 없애든가 말든가 해야할듯
         self._fps_text = StringValue("")
         TextRenderer(self._fps_text, pg.Vector2(SCREEN_SIZE.x - 55, 10), color="green", use_camera=False)
 
@@ -25,9 +28,10 @@ class Scene:
         GameObject.object_list.clear()
     
     #얘네 둘이는 굳이 먼저 부를필요 없음 자울적으로 하면 됨.
+    #근데 부르는 순서는 필요 없다는거지 안 부르면 안됨!!
     def on_update(self):
-        GameObject.update_all()
         self._update_fps_text()
+        GameObject.update_all()
         UserInterface.update_all()
 
     def on_draw(self):
@@ -35,7 +39,7 @@ class Scene:
         self.camera.on_draw()
         UserInterface.draw_all()
 
-class TestScene(Scene):
+class MainGameScene(Scene):
     def __init__(self):
         super().__init__()
     

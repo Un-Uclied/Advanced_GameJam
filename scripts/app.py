@@ -35,7 +35,7 @@ class App:
 
         #저장된 씬
         self._registered_scenes = {
-            "test_scene" : TestScene(),
+            "main_game_scene" : MainGameScene(),
             "editor_scene" : TileMapEditScene()
         }
         #__init__() 에 들어온 씬 이름 먼저 시작됨
