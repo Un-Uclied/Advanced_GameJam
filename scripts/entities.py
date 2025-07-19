@@ -1,154 +1,147 @@
 import pygame as pg
 
-from .objects import GameObject
-from .animation import Animation
+from .animation import *
+from .objects import *
 
 class Entity(GameObject):
-    # 월드에 존재하는 모든 객체의 기반 클래스임.
-    # 위치, 크기, 애니메이션을 가짐.
-    def __init__(self, pos: pg.Vector2, size: pg.Vector2, animation: Animation = None):
+    def __init__(self, name : str, rect : pg.Rect):
         super().__init__()
-        self.pos = pos.copy()
-        self.size = size.copy()
-        self.animation = animation
-        self.flipx = False
-        self.flipy = False
+        self.name = name
+        self.rect = rect
 
-    def rect(self) -> pg.Rect:
-        # 충돌 박스를 반환함.
-        return pg.Rect(self.pos.x, self.pos.y, self.size.x, self.size.y)
+        self.velocity = pg.Vector2()
+        self.frame_movement = pg.Vector2()
 
-    def set_action(self, action_name: str):
-        # 새로운 액션으로 애니메이션을 변경함.
-        # NOTE: 자식 클래스에서 이 메소드를 구현해야 함.
-        pass
+        self.current_action = ""
+        self.set_action("idle")
 
+    def set_action(self, action_name):
+        if self.current_action == action_name : return
+        self.current_action = action_name
+        self.anim = self.app.ANIMATIONS[self.name][action_name].copy()
+
+    def get_center_pos(self):
+        return pg.Vector2(self.rect.x + self.rect.width / 2, self.rect.y + self.rect.height / 2)
+    
     def on_update(self):
-        # 매 프레임 애니메이션을 업데이트함.
-        if self.animation:
-            self.animation.update()
+        super().on_update()
+        self.anim.update()
 
     def on_draw(self):
-        # 화면에 현재 애니메이션 프레임을 그림.
-        if self.animation:
-            image = self.animation.img()
-            flipped_image = pg.transform.flip(image, self.flipx, self.flipy)
-            self.app.scene.camera.blit(flipped_image, self.pos)
+        super().on_draw()
+        self.app.scene.camera.blit(self.anim.img(), pg.Vector2(self.rect.x, self.rect.y), 2)
 
 class PhysicsEntity(Entity):
-    # 중력과 속도 등 물리 효과의 영향을 받는 객체임.
-    def __init__(self, pos: pg.Vector2, size: pg.Vector2, animation: Animation = None):
-        super().__init__(pos, size, animation)
-        self.velocity = pg.Vector2(0, 0)
-        self.gravity_scale = 1.0
-        self.collisions = {'up': False, 'down': False, 'right': False, 'left': False}
+    def __init__(self, name, rect : pg.Rect):
+        super().__init__(name, rect)
 
-    def on_update(self):
-        # 물리 계산을 먼저 수행하고, 그 다음에 애니메이션을 업데이트함.
-        self._update_physics()
-        super().on_update()
+        self.collisions = {"left" : False, "right" : False, "up" : False, "down" : False}
 
-    def _update_physics(self):
-        # 물리 계산 및 충돌 처리를 수행함.
-        self.collisions = {'up': False, 'down': False, 'right': False, 'left': False}
+        self.max_gravtity = 18
+        self.gravity_strength = 12
 
-        # 중력 적용
-        gravity_accel = 450 # 픽셀/초^2
-        self.velocity.y += gravity_accel * self.app.dt * self.gravity_scale
-        
-        # 프레임에 따른 이동량 계산
-        frame_movement = self.velocity.copy() * self.app.dt
+        self.isAccel = False
 
-        # X축 이동 및 충돌 처리
-        self.pos.x += frame_movement.x
-        entity_rect = self.rect()
-        for tile_rect in self.app.scene.tilemap.get_colliding_tiles(entity_rect):
-            if frame_movement.x > 0: # 오른쪽으로 이동 중
-                entity_rect.right = tile_rect.left
-                self.collisions['right'] = True
-            elif frame_movement.x < 0: # 왼쪽으로 이동 중
-                entity_rect.left = tile_rect.right
-                self.collisions['left'] = True
-            self.pos.x = entity_rect.x
+    def _physics_collistion(self):
+        self.collisions = {"left" : False, "right" : False, "up" : False, "down" : False}
+        #충돌
+        self.rect.x += self.frame_movement.x
+        for rect in self.app.scene.tilemap.physic_tiles_around(self.get_center_pos()):
+            if rect.colliderect(self.rect):
+                #right
+                if (self.frame_movement.x > 0):
+                    self.collisions["right"] = True
+                    self.rect.x = rect.x - rect.width
+                #left
+                if (self.frame_movement.x < 0):
+                    self.collisions["left"] = True
+                    self.rect.x = rect.x + self.rect.width
 
-        # Y축 이동 및 충돌 처리
-        self.pos.y += frame_movement.y
-        entity_rect = self.rect()
-        for tile_rect in self.app.scene.tilemap.get_colliding_tiles(entity_rect):
-            if frame_movement.y > 0: # 아래로 이동 중
-                entity_rect.bottom = tile_rect.top
-                self.collisions['down'] = True
-            elif frame_movement.y < 0: # 위로 이동 중
-                entity_rect.top = tile_rect.bottom
-                self.collisions['up'] = True
-            self.pos.y = entity_rect.y
-        
-        # y축 충돌 시 y축 속도를 0으로 리셋함.
-        if self.collisions['down'] or self.collisions['up']:
+        self.rect.y += self.frame_movement.y
+        for rect in self.app.scene.tilemap.physic_tiles_around(self.get_center_pos()):
+            if rect.colliderect(self.rect):
+                #down
+                if (self.frame_movement.y > 0):
+                    self.collisions["down"] = True
+                    self.rect.y = rect.y - self.rect.height
+                #up
+                if (self.frame_movement.y < 0):
+                    self.collisions["up"] = True
+                    self.rect.y = rect.y + rect.height
+       
+    def _physics_gravity(self):   
+        #중력
+        if (self.collisions["down"]):
+            self.velocity.y = .001
+            self.current_jump_count = 0
+        else:
+            self.velocity.y = min(self.max_gravtity, self.velocity.y + self.app.dt * self.gravity_strength)
+            
+        #머리박으면 빠르게 나올수 있음
+        if (self.collisions["up"]):
             self.velocity.y = 0
 
-class Player(PhysicsEntity):
-    # 플레이어가 직접 조종하는 객체임.
-    def __init__(self, pos: pg.Vector2, size: pg.Vector2):
-        super().__init__(pos, size)
-        self.speed = 200
-        self.jump_power = -5
-        self.airtime = 0
-        self.jumps = 2
-        self.set_action('idle')
-
-    def set_action(self, action_name: str):
-        # 현재 액션과 다를 경우에만 애니메이션을 새로 불러옴.
-        if not hasattr(self, 'action') or self.action != action_name:
-            self.action = action_name
-            self.animation = self.app.ASSET_PLAYER[action_name].copy()
+    def _physics_movement(self):
+        self.frame_movement = pg.Vector2(self.velocity.x, self.velocity.y)
 
     def on_update(self):
-        # 입력 처리
-        self._handle_input()
-
-        # 물리 및 충돌 처리 (부모 클래스 호출)
         super().on_update()
+        self._physics_movement()
+        self._physics_collistion()
+        self._physics_gravity()
 
-        # 충돌 결과에 따른 상태 업데이트
-        if self.collisions['down']:
-            self.airtime = 0
-            self.jumps = 2
-        else:
-            self.airtime += 1
+class Player(PhysicsEntity):
+    def __init__(self, name : str = "player", rect : pg.Rect = pg.Rect(18, 24, 0, 0)):
+        super().__init__(name, rect)
+        self.input_drection = pg.Vector2()
+
+        self.move_speed = 4.2
+        self.jump_power = -12
+        self.jump_count = 2
+        self.current_jump_count = 0
         
-        # 상태에 따른 애니메이션 업데이트
-        self._update_animation()
+        self.move_accel = 12
+        self.move_deccel = 7
+        self.lerpedMovement = pg.Vector2()
 
-    def _handle_input(self):
-        # 키 입력에 따라 속도를 조절함.
-        keys = pg.key.get_pressed()
+    def _get_input(self):
+        key = pg.key.get_pressed()
+        if (key[pg.K_a]):
+            self.input_drection.x = -1
+            self.isAccel = True
+        if (key[pg.K_d]):
+            self.input_drection.x = 1
+            self.isAccel = True
+        if (not key[pg.K_a] and not key[pg.K_d]):
+            self.input_drection.x = 0
+            self.isAccel = False
+
+        if (key[pg.K_w]):
+            self.input_drection.y = -1
+        if (key[pg.K_s]):
+            self.input_drection.y = 1
+        if (not key[pg.K_w] and not key[pg.K_s]):
+            self.input_drection.y = 0
         
-        self.velocity.x = 0
-        if keys[pg.K_a]:
-            self.velocity.x = -self.speed
-            self.flipx = True
-        if keys[pg.K_d]:
-            self.velocity.x = self.speed
-            self.flipx = False
-
-        # 점프
         for event in self.app.events:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE:
                     self.jump()
 
-    def _update_animation(self):
-        # 현재 상태에 따라 애니메이션 액션을 변경함.
-        if self.airtime > 1:
-            self.set_action('jump')
-        elif self.velocity.x != 0:
-            self.set_action('run')
-        else:
-            self.set_action('idle')
-
     def jump(self):
-        if self.jumps > 0:
-            self.velocity.y = self.jump_power
-            self.jumps -= 1
-            self.airtime = 2 # 점프 직후 바로 점프 애니메이션으로 변경하기 위함
+        if (self.current_jump_count >= self.jump_count): return
+        self.velocity.y = self.jump_power
+        self.current_jump_count += 1
+
+    def _physics_movement(self):
+        # 가속 감속
+        if self.isAccel:
+            self.lerpedMovement.lerp(pg.Vector2(self.input_drection.x * self.move_speed, 0), self.app.dt * self.move_accel)
+        else:
+            self.lerpedMovement.lerp(pg.Vector2(self.input_drection.x * self.move_speed, 0), self.app.dt * self.move_deccel)
+
+        self.frame_movement = pg.Vector2(self.lerpedMovement.x + self.velocity.x, self.velocity.y)
+
+    def on_update(self):
+        self._get_input()
+        super().on_update()

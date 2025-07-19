@@ -50,10 +50,18 @@ class App:
             "spawners" : load_images("tiles/spawners")
         }
         self.ASSET_PLAYER = {
-            "idle" : Animation(load_images("entities/player/idle"), 6, True),
-            "run" : Animation(load_images("entities/player/run"), 6, True),
-            "jump" : Animation(load_images("entities/player/jump"), 4, False)
+           
         }
+        self.ANIMATIONS = {
+            "player" : {
+                "idle" : Animation(load_images("entities/player/idle"), 6, True),
+                "run" : Animation(load_images("entities/player/run"), 6, True),
+                "jump" : Animation(load_images("entities/player/jump"), 4, False)
+            }
+        }
+        # self.ASSET_ENEMIES = {
+        #     "one_alpha" : {}
+        # }
 
     def _update_time(self):
         self.dt = self.clock.tick(TARGET_FPS) / 1000

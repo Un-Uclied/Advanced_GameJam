@@ -50,12 +50,12 @@ class MainGameScene(Scene):
 
         spawn_pos_list = self.tilemap.get_pos_by_data("spawners", 0)
         player_spawn_pos = spawn_pos_list[0] if spawn_pos_list else pg.Vector2(100, 100)
-        self.player = Player(player_spawn_pos, pg.Vector2(16, 16)) # 플레이어 사이즈는 임시값
+        self.player = Player(rect=pg.Rect(player_spawn_pos[0], player_spawn_pos[1], 16, 19)) # 플레이어 사이즈는 임시값
 
     def on_update(self):
         super().on_update()
         # 카메라가 플레이어를 따라가도록 설정
-        self.camera.offset = self.player.pos
+        self.camera.offset = self.player.get_center_pos()
     
     def on_draw(self):
         super().on_draw()
