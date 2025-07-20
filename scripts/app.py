@@ -16,7 +16,15 @@ class App:
         pg.display.set_caption(GAME_NAME, GAME_NAME)
 
         #메인 화면
-        self.screen = pg.display.set_mode(SCREEN_SIZE, SCREEN_FLAGS)
+        self._screen = pg.display.set_mode(SCREEN_SIZE, SCREEN_FLAGS)
+        self.surfaces = {
+            LAYER_BG : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
+            LAYER_OBJ : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
+            LAYER_ENTITY : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
+            LAYER_DYNAMIC : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
+            LAYER_VOLUME : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
+            LAYER_INTERFACE : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
+        }
 
         #에셋 전부 로드
         self.load_assets()
@@ -83,17 +91,31 @@ class App:
             if event.type == pg.QUIT:
                 self._window_should_be_closed = True
 
+    def _clear_screen(self):
+        self._screen.fill("brown")
+        for layer_name, surface in self.surfaces.items():
+            surface.fill(pg.Color(0, 0, 0, 0))
+
+    def _draw_surfaces(self):
+        for layer_name, surface in self.surfaces.items():
+            self._screen.blit(surface, (0, 0))
+
     #메인 게임 루프
     def run(self):
         while not self._window_should_be_closed:
+            # update
             self._update_event()
             self._check_for_quit()
-
             self._scene.on_update()
 
-            self.screen.fill("grey")
+            #screen clear
+            self._clear_screen()
+            
+            #screen draw
             self._scene.on_draw()
+            self._draw_surfaces()
 
+            #display update
             pg.display.flip()
             self._update_time()
 

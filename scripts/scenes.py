@@ -16,7 +16,7 @@ class Scene:
     
     def on_scene_start(self):
         #모든 씬엔 카메라가 있음
-        self.camera = Camera2D(scale=4.5, offset=pg.Vector2(0, 0))
+        self.camera = Camera2D(scale=1, offset=pg.Vector2(0, 0))
 
         #현재 fps보여주는건데 릴리스할때는 없애든가 말든가 해야할듯
         self._fps_text = StringValue("")
@@ -45,7 +45,6 @@ class MainGameScene(Scene):
     
     def on_scene_start(self):
         super().on_scene_start()
-        self.camera.scale = 1
         self.tilemap = Tilemap()
 
         spawn_pos_list = self.tilemap.get_pos_by_data("spawners", 0)
@@ -191,13 +190,13 @@ class TileMapEditScene(Scene):
             world_x_coord = x * tile_size
             screen_start = self.camera.world_to_screen(pg.Vector2(world_x_coord, top_left_world.y))
             screen_end = self.camera.world_to_screen(pg.Vector2(world_x_coord, bottom_right_world.y))
-            pg.draw.line(self.app.screen, grid_color, screen_start, screen_end)
+            pg.draw.line(self.app.surfaces[LAYER_INTERFACE], grid_color, screen_start, screen_end)
 
         for y in range(start_y, end_y + 1):
             world_y_coord = y * tile_size
             screen_start = self.camera.world_to_screen(pg.Vector2(top_left_world.x, world_y_coord))
             screen_end = self.camera.world_to_screen(pg.Vector2(bottom_right_world.x, world_y_coord))
-            pg.draw.line(self.app.screen, grid_color, screen_start, screen_end)
+            pg.draw.line(self.app.surfaces[LAYER_INTERFACE], grid_color, screen_start, screen_end)
 
     def _draw_collision(self):
         if not self.in_collision_view:
@@ -213,7 +212,7 @@ class TileMapEditScene(Scene):
             screen_pos = self.camera.world_to_screen(world_pos)
 
             rect = pg.FRect(screen_pos.x, screen_pos.y, scaled_tile_size, scaled_tile_size)
-            pg.draw.rect(self.app.screen, "blue", rect)
+            pg.draw.rect(self.app.surfaces[LAYER_INTERFACE], "blue", rect)
 
     def _draw_preview(self):
         tile_size = self.tilemap.tile_size
@@ -227,11 +226,11 @@ class TileMapEditScene(Scene):
         preview_image = self.camera.get_scaled_surface(self.app.ASSET_TILEMAP[current_tile_type][current_tile_variant].copy())
         preview_image.set_alpha(150)
 
-        self.app.screen.blit(preview_image, preview_screen_pos)
+        self.app.surfaces[LAYER_INTERFACE].blit(preview_image, preview_screen_pos)
 
         # 충돌 여부 표시 (빨간색 테두리)
         if self.can_collide:
-            pg.draw.rect(self.app.screen, (255, 0, 0, 100), pg.FRect(preview_screen_pos.x, preview_screen_pos.y, scaled_tile_size, scaled_tile_size), 2)
+            pg.draw.rect(self.app.surfaces[LAYER_INTERFACE], (255, 0, 0, 100), pg.FRect(preview_screen_pos.x, preview_screen_pos.y, scaled_tile_size, scaled_tile_size), 2)
 
     def _place_tile_grid(self):
         if not self.in_grid_mode:

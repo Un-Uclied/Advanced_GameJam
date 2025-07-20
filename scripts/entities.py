@@ -1,5 +1,6 @@
 import pygame as pg
 
+from datas.const import *
 from .animation import *
 from .objects import *
 
@@ -37,12 +38,22 @@ class Entity(GameObject):
         elif self.frame_movement.x > 0:
             self.flip_x = False
 
+    def _debug_draw(self):
+        pos = self.app.scene.camera.world_to_screen(pg.Vector2(self.rect.x, self.rect.y))
+
+        screen = self.app.surfaces[LAYER_ENTITY]
+        pg.draw.rect(screen, "red", pg.FRect(pos.x, pos.y, self.rect.w * self.app.scene.camera.scale, self.rect.h * self.app.scene.camera.scale), width=2)
+
     def on_draw(self):
         super().on_draw()
         camera = self.app.scene.camera
         surface = pg.transform.flip(self.anim.img(), self.flip_x, False)
         world_position = pg.Vector2(self.rect.x + self.flip_offset[self.flip_x].x, self.rect.y + self.flip_offset[self.flip_x].y)
-        self.app.screen.blit(camera.get_scaled_surface(surface), camera.world_to_screen(world_position))
+
+        screen = self.app.surfaces[LAYER_ENTITY]
+        screen.blit(camera.get_scaled_surface(surface), camera.world_to_screen(world_position))
+
+        self._debug_draw()
 
 class PhysicsEntity(Entity):
     def __init__(self, name, rect : pg.Rect):
@@ -107,7 +118,7 @@ class Player(PhysicsEntity):
         self.input_drection = pg.Vector2()
 
         self.move_speed = 4.2
-        self.jump_power = -12
+        self.jump_power = -8
 
         self.jump_count = 2
         self.current_jump_count = 0
@@ -126,9 +137,9 @@ class Player(PhysicsEntity):
     def _get_input(self):
         key = pg.key.get_pressed()
         self.input_drection.x = 0
-        if (key[pg.K_a]):
+        if key[pg.K_a]:
             self.input_drection.x = -1
-        if (key[pg.K_d]):
+        if key[pg.K_d]:
             self.input_drection.x = 1
         self.is_accel = bool(self.input_drection.x)
         
@@ -162,8 +173,3 @@ class Player(PhysicsEntity):
         self._get_input()
         super().on_update()
         self._control_animation()
-
-    def on_draw(self):
-        super().on_draw()
-        pos = self.app.scene.camera.world_to_screen(pg.Vector2(self.rect.x, self.rect.y))
-        pg.draw.rect(self.app.screen, "red", pg.FRect(pos.x, pos.y, self.rect.w, self.rect.h), width=2)

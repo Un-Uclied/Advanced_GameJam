@@ -2,11 +2,20 @@ import pygame as pg
 from datas.const import *
 
 class Camera2D:
-    def __init__(self, offset : pg.Vector2, scale : float = 1, anchor : pg.Vector2 = pg.Vector2(0.5, 0.5)):
-        self.scale = scale
+    def __init__(self, scale : float, offset : pg.Vector2, anchor : pg.Vector2 = pg.Vector2(0.5, 0.5)):
+        self._scale = round(scale * 2) / 2
         self.offset = offset
         self.anchor = anchor
 
+    #Im a trash coder bro..
+    @property
+    def scale(self):
+        return self._scale
+
+    @scale.setter
+    def scale(self, value):
+        self._scale = max(round(value * 2) / 2, 0.5)
+        
     def world_to_screen(self, world_pos: pg.Vector2) -> pg.Vector2:
         anchor_pixel = pg.Vector2(
             SCREEN_SIZE.x * self.anchor.x,

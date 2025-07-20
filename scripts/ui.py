@@ -32,4 +32,6 @@ class TextRenderer(UserInterface):
         text = self.txt.value if isinstance(self.txt, StringValue) else self.txt
         text_surf = self.font.render(text, True, self.color)
         text_surf = self.app.scene.camera.get_scaled_surface(text_surf) if self.use_camera else text_surf
-        self.app.screen.blit(text_surf, pos)
+
+        screen = self.app.surfaces[LAYER_INTERFACE]
+        screen.blit(text_surf, pos)

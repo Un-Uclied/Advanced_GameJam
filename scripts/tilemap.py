@@ -78,7 +78,7 @@ class Tilemap(GameObject):
                 tile['variant'] = AUTOTILE_MAP[neighbors]
 
     def on_draw(self):
-        screen = self.app.screen
+        screen = self.app.surfaces[LAYER_OBJ]
         camera = self.app.scene.camera
         tile_asset = self.app.singleton.ASSET_TILEMAP
 
