@@ -15,8 +15,8 @@ class App:
         pg.init()
         pg.display.set_caption(GAME_NAME, GAME_NAME)
 
-        #메인 화면 (App.singleton.screen으로 접근 쉽게 가능)
-        self.screen = pg.display.set_mode(SCREEN_SIZE, SCREEN_FLAGS, vsync=1)
+        #메인 화면
+        self.screen = pg.display.set_mode(SCREEN_SIZE, SCREEN_FLAGS)
 
         #에셋 전부 로드
         self.load_assets()
@@ -49,19 +49,16 @@ class App:
             "environment" : load_images("tiles/objects/environment"),
             "spawners" : load_images("tiles/spawners")
         }
-        self.ASSET_PLAYER = {
-           
+        self.ASSET_FONT_PATHS = {
+            "default" : "assets/fonts/PF스타더스트 3.0 Bold.ttf"
         }
-        self.ANIMATIONS = {
+        self.ASSET_ANIMATIONS = {
             "player" : {
                 "idle" : Animation(load_images("entities/player/idle"), 6, True),
                 "run" : Animation(load_images("entities/player/run"), 6, True),
                 "jump" : Animation(load_images("entities/player/jump"), 4, False)
             }
         }
-        # self.ASSET_ENEMIES = {
-        #     "one_alpha" : {}
-        # }
 
     def _update_time(self):
         self.dt = self.clock.tick(TARGET_FPS) / 1000

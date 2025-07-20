@@ -4,21 +4,27 @@ from .animation import *
 from .objects import *
 
 class Entity(GameObject):
-    def __init__(self, name : str, rect : pg.Rect):
+    def __init__(self, name : str, rect : pg.FRect):
         super().__init__()
-        self.name = name
-        self.rect = rect
+        self.name : str = name
+        self.rect : pg.Rect = rect
 
-        self.velocity = pg.Vector2()
-        self.frame_movement = pg.Vector2()
+        self.velocity : pg.Vector2 = pg.Vector2()
+        self.frame_movement : pg.Vector2 = pg.Vector2()
 
-        self.current_action = ""
+        self.current_action : str = ""
         self.set_action("idle")
+
+        self.flip_x : bool = False
+        self.flip_offset : dict[bool, pg.Vector2] = {
+            False : pg.Vector2(0, 0),
+            True : pg.Vector2(0, 0)
+        }
 
     def set_action(self, action_name):
         if self.current_action == action_name : return
         self.current_action = action_name
-        self.anim = self.app.ANIMATIONS[self.name][action_name].copy()
+        self.anim = self.app.ASSET_ANIMATIONS[self.name][action_name].copy()
 
     def get_center_pos(self):
         return pg.Vector2(self.rect.x + self.rect.width / 2, self.rect.y + self.rect.height / 2)
@@ -26,10 +32,17 @@ class Entity(GameObject):
     def on_update(self):
         super().on_update()
         self.anim.update()
+        if self.frame_movement.x < 0:
+            self.flip_x = True
+        elif self.frame_movement.x > 0:
+            self.flip_x = False
 
     def on_draw(self):
         super().on_draw()
-        self.app.scene.camera.blit(self.anim.img(), pg.Vector2(self.rect.x, self.rect.y), 2)
+        camera = self.app.scene.camera
+        surface = pg.transform.flip(self.anim.img(), self.flip_x, False)
+        world_position = pg.Vector2(self.rect.x + self.flip_offset[self.flip_x].x, self.rect.y + self.flip_offset[self.flip_x].y)
+        self.app.screen.blit(camera.get_scaled_surface(surface), camera.world_to_screen(world_position))
 
 class PhysicsEntity(Entity):
     def __init__(self, name, rect : pg.Rect):
@@ -37,15 +50,13 @@ class PhysicsEntity(Entity):
 
         self.collisions = {"left" : False, "right" : False, "up" : False, "down" : False}
 
-        self.max_gravtity = 18
-        self.gravity_strength = 12
+        self.max_gravtity = 28
+        self.gravity_strength = 22
 
-        self.isAccel = False
-
-    def _physics_collistion(self):
+    def _physics_collision(self):
         self.collisions = {"left" : False, "right" : False, "up" : False, "down" : False}
         #충돌
-        self.rect.x += self.frame_movement.x
+        self.rect.x += int(self.frame_movement.x)
         for rect in self.app.scene.tilemap.physic_tiles_around(self.get_center_pos()):
             if rect.colliderect(self.rect):
                 #right
@@ -82,66 +93,77 @@ class PhysicsEntity(Entity):
             self.velocity.y = 0
 
     def _physics_movement(self):
-        self.frame_movement = pg.Vector2(self.velocity.x, self.velocity.y)
+        self.frame_movement = pg.Vector2(self.velocity.x, self.velocity.y)  
 
     def on_update(self):
         super().on_update()
         self._physics_movement()
-        self._physics_collistion()
+        self._physics_collision()
         self._physics_gravity()
 
 class Player(PhysicsEntity):
-    def __init__(self, name : str = "player", rect : pg.Rect = pg.Rect(18, 24, 0, 0)):
+    def __init__(self, name : str = "player", rect : pg.Rect = pg.FRect(0, 0, 80, 100)):
         super().__init__(name, rect)
         self.input_drection = pg.Vector2()
 
         self.move_speed = 4.2
         self.jump_power = -12
+
         self.jump_count = 2
         self.current_jump_count = 0
-        
-        self.move_accel = 12
-        self.move_deccel = 7
-        self.lerpedMovement = pg.Vector2()
+
+        self.is_accel = False
+
+        self.accel_power = 12
+        self.deccel_power = 7
+        self.lerped_movement = pg.Vector2()
+
+        self.flip_offset = {
+            False : pg.Vector2(0, 0),
+            True : pg.Vector2(-40, 0)
+        }
 
     def _get_input(self):
         key = pg.key.get_pressed()
+        self.input_drection.x = 0
         if (key[pg.K_a]):
             self.input_drection.x = -1
-            self.isAccel = True
         if (key[pg.K_d]):
             self.input_drection.x = 1
-            self.isAccel = True
-        if (not key[pg.K_a] and not key[pg.K_d]):
-            self.input_drection.x = 0
-            self.isAccel = False
-
-        if (key[pg.K_w]):
-            self.input_drection.y = -1
-        if (key[pg.K_s]):
-            self.input_drection.y = 1
-        if (not key[pg.K_w] and not key[pg.K_s]):
-            self.input_drection.y = 0
+        self.is_accel = bool(self.input_drection.x)
         
         for event in self.app.events:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE:
-                    self.jump()
+                    self._jump()
 
-    def jump(self):
+    def _control_animation(self):
+        if not self.collisions["down"]:
+            self.set_action("jump")
+        else:
+            if self.is_accel:
+                self.set_action("run")
+            else : self.set_action("idle")
+
+    def _jump(self):
         if (self.current_jump_count >= self.jump_count): return
         self.velocity.y = self.jump_power
         self.current_jump_count += 1
 
     def _physics_movement(self):
-        # 가속 감속
-        if self.isAccel:
-            self.lerpedMovement.lerp(pg.Vector2(self.input_drection.x * self.move_speed, 0), self.app.dt * self.move_accel)
-        else:
-            self.lerpedMovement.lerp(pg.Vector2(self.input_drection.x * self.move_speed, 0), self.app.dt * self.move_deccel)
+        self.lerped_movement = self.lerped_movement.lerp(
+            pg.Vector2(self.input_drection.x * self.move_speed, 0),
+            max(min(self.app.dt * (self.accel_power if self.is_accel else self.deccel_power), 1), 0)
+        )
 
-        self.frame_movement = pg.Vector2(self.lerpedMovement.x + self.velocity.x, self.velocity.y)
+        self.frame_movement = pg.Vector2(self.lerped_movement.x, self.velocity.y)
 
     def on_update(self):
         self._get_input()
         super().on_update()
+        self._control_animation()
+
+    def on_draw(self):
+        super().on_draw()
+        pos = self.app.scene.camera.world_to_screen(pg.Vector2(self.rect.x, self.rect.y))
+        pg.draw.rect(self.app.screen, "red", pg.FRect(pos.x, pos.y, self.rect.w, self.rect.h), width=2)

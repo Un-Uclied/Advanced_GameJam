@@ -5,6 +5,7 @@ from datas.const import *
 
 def load_image(path : str) -> pg.Surface:
     img = pg.image.load(BASE_IMAGE_PATH + path).convert()
+    img = pg.transform.scale_by(img, ASSET_SCALE_BY)
     img.set_colorkey((0,0,0))
     return img
 

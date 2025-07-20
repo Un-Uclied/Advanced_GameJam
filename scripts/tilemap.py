@@ -18,6 +18,7 @@ AUTOTILE_MAP = {
 AUTO_TILE_TILES = ["grass", "stone"]
 IN_GRID_TILES = ["grass", "stone"]
 OFF_GRID_TILES = ["environment"]
+DO_NOT_RENDER_TILES = ["spawners"]
 
 NEIGHBOR_OFFSETS = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (0, 0), (-1, 1), (0, 1), (1, 1)]
 
@@ -46,8 +47,7 @@ class Tilemap(GameObject):
                 matched_positions.append(world_pos)
 
         return matched_positions
-
-
+    
     def tiles_around(self, pos : pg.Vector2):
         around_in_grid = []
         tile_loc = (int(pos.x // self.tile_size), int(pos.y // self.tile_size))
@@ -61,25 +61,8 @@ class Tilemap(GameObject):
         rects = []
         for tile in self.tiles_around(pg.Vector2(int(pos.x), int(pos.y))):
             if tile["can_collide"]:
-                rects.append(pg.Rect(tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size, self.tile_size, self.tile_size))
+                rects.append(pg.FRect(tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size, self.tile_size, self.tile_size))
         return rects
-
-    def get_colliding_tiles(self, rect: pg.Rect) -> list[pg.Rect]:
-        # 주어진 Rect와 겹치는 모든 충돌 타일 Rect를 반환함.
-        colliding_tiles = []
-        # 검사할 범위를 엔티티 크기에 맞게 타일 단위로 계산함.
-        start_x = int(rect.left // self.tile_size)
-        end_x = int(rect.right // self.tile_size)
-        start_y = int(rect.top // self.tile_size)
-        end_y = int(rect.bottom // self.tile_size)
-
-        for y in range(start_y, end_y + 1):
-            for x in range(start_x, end_x + 1):
-                key = f"{x},{y}"
-                if key in self.in_grid and self.in_grid[key]["can_collide"]:
-                    tile_rect = pg.Rect(x * self.tile_size, y * self.tile_size, self.tile_size, self.tile_size)
-                    colliding_tiles.append(tile_rect)
-        return colliding_tiles
     
     def autotile(self):
         for loc in self.in_grid:
@@ -95,18 +78,21 @@ class Tilemap(GameObject):
                 tile['variant'] = AUTOTILE_MAP[neighbors]
 
     def on_draw(self):
+        screen = self.app.screen
         camera = self.app.scene.camera
         tile_asset = self.app.singleton.ASSET_TILEMAP
 
         for data in self.off_grid:
+            if data["type"] in DO_NOT_RENDER_TILES: continue
             world_pos = pg.Vector2(data["pos"][0] * self.tile_size, data["pos"][1] * self.tile_size)
             image = tile_asset[data["type"]][data["variant"]]
-            camera.blit(image, world_pos, layer=0)
+            screen.blit(camera.get_scaled_surface(image), camera.world_to_screen(world_pos))
 
         for data in self.in_grid.values():
+            if data["type"] in DO_NOT_RENDER_TILES: continue
             world_pos = pg.Vector2(data["pos"][0] * self.tile_size, data["pos"][1] * self.tile_size)
             image = tile_asset[data["type"]][data["variant"]]
-            camera.blit(image, world_pos, layer=1)
+            screen.blit(camera.get_scaled_surface(image), camera.world_to_screen(world_pos))
 
     def save_file(self, json_file_name : str = "temp.json"):
         file = open(BASE_TILEMAP_PATH + '/' + json_file_name, 'w')

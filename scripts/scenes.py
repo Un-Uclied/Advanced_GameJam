@@ -37,7 +37,6 @@ class Scene:
 
     def on_draw(self):
         GameObject.draw_all()
-        self.camera.on_draw()
         UserInterface.draw_all()
 
 class MainGameScene(Scene):
@@ -46,16 +45,17 @@ class MainGameScene(Scene):
     
     def on_scene_start(self):
         super().on_scene_start()
+        self.camera.scale = 1
         self.tilemap = Tilemap()
 
         spawn_pos_list = self.tilemap.get_pos_by_data("spawners", 0)
         player_spawn_pos = spawn_pos_list[0] if spawn_pos_list else pg.Vector2(100, 100)
-        self.player = Player(rect=pg.Rect(player_spawn_pos[0], player_spawn_pos[1], 16, 19)) # 플레이어 사이즈는 임시값
+        self.player = Player(rect=pg.FRect(player_spawn_pos[0], player_spawn_pos[1], 80, 100)) # 플레이어 사이즈는 임시값
 
     def on_update(self):
         super().on_update()
         # 카메라가 플레이어를 따라가도록 설정
-        self.camera.offset = self.player.get_center_pos()
+        self.camera.offset = self.camera.offset.lerp(self.player.get_center_pos(), self.app.dt * 5)
     
     def on_draw(self):
         super().on_draw()
@@ -212,7 +212,7 @@ class TileMapEditScene(Scene):
             world_pos = pg.Vector2(tile_data["pos"][0] * self.tilemap.tile_size, tile_data["pos"][1] * self.tilemap.tile_size)
             screen_pos = self.camera.world_to_screen(world_pos)
 
-            rect = pg.Rect(screen_pos.x, screen_pos.y, scaled_tile_size, scaled_tile_size)
+            rect = pg.FRect(screen_pos.x, screen_pos.y, scaled_tile_size, scaled_tile_size)
             pg.draw.rect(self.app.screen, "blue", rect)
 
     def _draw_preview(self):
@@ -231,7 +231,7 @@ class TileMapEditScene(Scene):
 
         # 충돌 여부 표시 (빨간색 테두리)
         if self.can_collide:
-            pg.draw.rect(self.app.screen, (255, 0, 0, 100), pg.Rect(preview_screen_pos.x, preview_screen_pos.y, scaled_tile_size, scaled_tile_size), 2)
+            pg.draw.rect(self.app.screen, (255, 0, 0, 100), pg.FRect(preview_screen_pos.x, preview_screen_pos.y, scaled_tile_size, scaled_tile_size), 2)
 
     def _place_tile_grid(self):
         if not self.in_grid_mode:
@@ -263,7 +263,7 @@ class TileMapEditScene(Scene):
             for object_data in self.tilemap.off_grid.copy():
                 original_image = self.app.ASSET_TILEMAP[object_data["type"]][self.current_tile_variant]
                 size = original_image.get_size()
-                rect = pg.Rect(object_data["pos"][0] * self.tilemap.tile_size, object_data["pos"][1] * self.tilemap.tile_size, size[0], size[1])
+                rect = pg.FRect(object_data["pos"][0] * self.tilemap.tile_size, object_data["pos"][1] * self.tilemap.tile_size, size[0], size[1])
                 if rect.collidepoint(self.mouse_world_pos):
                     self.tilemap.off_grid.remove(object_data)
 
