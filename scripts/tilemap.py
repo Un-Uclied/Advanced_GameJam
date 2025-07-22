@@ -57,7 +57,7 @@ class Tilemap(GameObject):
         rects = []
         for tile in self.tiles_around(pg.Vector2(int(pos.x), int(pos.y))):
             if tile["can_collide"]:
-                rects.append(pg.FRect(tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size, self.tile_size, self.tile_size))
+                rects.append(pg.Rect(tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size, self.tile_size, self.tile_size))
         return rects
     
     def autotile(self):

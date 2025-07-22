@@ -3,12 +3,11 @@ import math
 
 from .tilemap import *
 from .ui import *
-from .values import *
 from .objects import *
 from .sky import *
 from .volume import *
 from .camera import *
-from .entities import Player
+from .entities import *
 
 class Scene:
     def __init__(self):
@@ -22,7 +21,7 @@ class Scene:
 
         #현재 fps보여주는건데 릴리스할때는 없애든가 말든가 해야할듯
         self._fps_text = StringValue("")
-        TextRenderer(self._fps_text, pg.Vector2(SCREEN_SIZE.x - 55, 10), color="green", use_camera=False)
+        TextRenderer(self._fps_text, pg.Vector2(SCREEN_SIZE.x - 55, 10), color="green")
 
     def _update_fps_text(self):
         self._fps_text.value = str(round(self.app.clock.get_fps()))
@@ -35,11 +34,21 @@ class Scene:
     def on_update(self):
         self._update_fps_text()
         GameObject.update_all()
-        UserInterface.update_all()
 
     def on_draw(self):
         GameObject.draw_all()
-        UserInterface.draw_all()
+
+class MainMenuScene(Scene):
+    
+
+    def on_scene_start(self):
+        super().on_scene_start()
+        Sky()
+
+        def callback():
+            self.app.scene = "main_game_scene"
+
+        ImageButton("temp", pg.Vector2(400, 400), callback)
 
 class MainGameScene(Scene):
     def on_scene_start(self):
@@ -51,20 +60,26 @@ class MainGameScene(Scene):
         
         spawn_pos_list = self.tilemap.get_pos_by_data("spawners", 0)
         player_spawn_pos = spawn_pos_list[0] if spawn_pos_list else pg.Vector2(100, 100)
-        self.player = Player(rect=pg.FRect(player_spawn_pos[0], player_spawn_pos[1], 48, 128)) # 플레이어 사이즈는 임시값
+        self.player = Player(rect=pg.Rect(player_spawn_pos[0], player_spawn_pos[1], 48, 128)) # 플레이어 사이즈는 임시값
         self.plr_light = Light2D(360, pg.Vector2(self.player.rect.center))
 
     def on_update(self):
         super().on_update()
         # 카메라가 플레이어를 따라가도록 설정
-        self.camera.offset = self.camera.offset.lerp(self.player.rect.center, max(min(0.008 * 5, 1), 0))
-        self.plr_light.position = self.plr_light.position.lerp(self.player.rect.center, max(min(0.008 * 3, 1), 0))
+        self.camera.offset = self.camera.offset.lerp(self.player.rect.center, max(min(self.app.dt * 5, 1), 0))
+        self.plr_light.position = self.plr_light.position.lerp(self.player.rect.center, max(min(self.app.dt * 3, 1), 0))
 
         keys = pg.key.get_pressed()
         if keys[pg.K_q]:
-            self.plr_light.radius -= 0.008 * 100
-        elif keys[pg.K_e]:
-            self.plr_light.radius += 0.008 * 100
+            self.app.time_scale = 0
+        else : self.app.time_scale = 1
+        if keys[pg.K_r]:
+            self.camera.shake(20)
+        
+        for event in self.app.events:
+            if event.type == pg.KEYDOWN and event.key == pg.K_LSHIFT:
+                self.player.velocity.y = 0
+                self.player.velocity.x += self.player.input_drection.x * 2000
     
     def on_draw(self):
         super().on_draw()
@@ -93,14 +108,22 @@ class TileMapEditScene(Scene):
 
         self.current_tile_text = StringValue(f"{self.tile_types[self.current_tile_type_index]} : [{self.current_tile_variant}]")
 
-        TextRenderer("[WASD] 움직이기 | [Q,E]로 줌 인,아웃", pg.Vector2(10, 10), color="black", use_camera=False)
-        TextRenderer(self.collide_mode_text, pg.Vector2(10, 35), color="blue", use_camera=False)
-        TextRenderer(self.grid_mode_text, pg.Vector2(10, 60), color="black", use_camera=False)
-        TextRenderer(self.view_mode_text, pg.Vector2(10, 85), color="black", use_camera=False)
-        TextRenderer("[B] 오토 타일", pg.Vector2(10, 110), color="black", use_camera=False)
-        TextRenderer("[엔터] 타일 종류 변경 | [휠] 타일 인덱스 변경", pg.Vector2(10, 135), color="black", use_camera=False)
-        TextRenderer(self.current_tile_text, pg.Vector2(10, 165), color="red", use_camera=False)
-        TextRenderer("[O] 저장하기 (temp.json에 저장됨.)", pg.Vector2(10, 190), color="black", use_camera=False)
+        TextRenderer(StringValue("[WASD] 움직이기 | [Q,E]로 줌 인,아웃"),
+                      pg.Vector2(10, 10), color="black")
+        TextRenderer(self.collide_mode_text,
+                      pg.Vector2(10, 35), color="blue")
+        TextRenderer(self.grid_mode_text,
+                      pg.Vector2(10, 60), color="black")
+        TextRenderer(self.view_mode_text,
+                      pg.Vector2(10, 85), color="black")
+        TextRenderer(StringValue("[B] 오토 타일"),
+                      pg.Vector2(10, 110), color="black")
+        TextRenderer(StringValue("[휠] 타일 종류 변경 | [SHIFT + 휠] 타일 인덱스 변경"),
+                      pg.Vector2(10, 135), color="black")
+        TextRenderer(self.current_tile_text,
+                      pg.Vector2(10, 165), color="red")
+        TextRenderer(StringValue("[O] 저장하기 (temp.json에 저장됨.)"),
+                      pg.Vector2(10, 190), color="black")
 
         self.mouse_world_pos = pg.Vector2(0, 0)
         self.tile_pos = pg.Vector2(0, 0)
@@ -117,36 +140,43 @@ class TileMapEditScene(Scene):
             self.tile_pos = pg.Vector2(self.mouse_world_pos.x / self.tilemap.tile_size, self.mouse_world_pos.y / self.tilemap.tile_size)
 
     def _handle_input(self):
+        keys = pg.key.get_pressed()
         for event in self.app.events:
             if event.type == pg.KEYUP:
+                #콜리션 토글
                 if event.key == pg.K_c:
                     if self.in_grid_mode:
                         self.can_collide = not self.can_collide
+                #그리드 모드 토글 (오프 그리드 모드 진입시 자동으로 콜리션 끔, 그리드 모드 진입시 그의 반대)
                 if event.key == pg.K_TAB:
                     self.in_grid_mode = not self.in_grid_mode
-                    if not self.in_grid_mode:
-                        self.can_collide = False
+                    self.can_collide = self.in_grid_mode
+                    
+                # 콜리션 뷰 토글
                 if event.key == pg.K_v:
                     self.in_collision_view = not self.in_collision_view
+                #오토 타일
                 if event.key == pg.K_b:
                     self.tilemap.autotile()
-                if event.key == pg.K_RETURN:
-                    self.current_tile_type_index = (self.current_tile_type_index + 1) % len(self.tile_types)
-                    self.current_tile_variant = 0
+                #저장
                 if event.key == pg.K_o:
                     self.tilemap.save_file()
 
             if event.type == pg.MOUSEBUTTONDOWN and not self.in_grid_mode:
                 if event.button == 1:
                     self._place_tile_offgrid()
-
+            
             if event.type == pg.MOUSEWHEEL:
-                tile_type_name = self.tile_types[self.current_tile_type_index]
-                tile_variant_len = len(self.app.ASSET_TILEMAP[tile_type_name])
-                if event.y > 0:
-                    self.current_tile_variant = (self.current_tile_variant + 1) % tile_variant_len
-                elif event.y < 0:
-                    self.current_tile_variant = (self.current_tile_variant - 1) % tile_variant_len
+                if keys[pg.K_LSHIFT]:
+                    tile_type_name = self.tile_types[self.current_tile_type_index]
+                    tile_variant_len = len(self.app.ASSET_TILEMAP[tile_type_name])
+                    if event.y > 0:
+                        self.current_tile_variant = (self.current_tile_variant + 1) % tile_variant_len
+                    elif event.y < 0:
+                        self.current_tile_variant = (self.current_tile_variant - 1) % tile_variant_len
+                else:
+                    self.current_tile_type_index = (self.current_tile_type_index + int(event.y)) % len(self.tile_types)
+                    self.current_tile_variant = 0
 
         left, _, right = pg.mouse.get_pressed()
         if left:
@@ -157,7 +187,7 @@ class TileMapEditScene(Scene):
     def _move_camera(self):
         keys = pg.key.get_pressed()
 
-        move_speed = 300 * 0.008 / self.camera.scale
+        move_speed = 300 * self.app.dt / self.camera.scale
         if keys[pg.K_w]:
             self.camera.offset += pg.Vector2(0, -move_speed)
         if keys[pg.K_s]:
@@ -221,7 +251,7 @@ class TileMapEditScene(Scene):
             world_pos = pg.Vector2(tile_data["pos"][0] * self.tilemap.tile_size, tile_data["pos"][1] * self.tilemap.tile_size)
             screen_pos = self.camera.world_to_screen(world_pos)
 
-            rect = pg.FRect(screen_pos.x, screen_pos.y, scaled_tile_size, scaled_tile_size)
+            rect = pg.Rect(screen_pos.x, screen_pos.y, scaled_tile_size, scaled_tile_size)
             pg.draw.rect(self.app.surfaces[LAYER_INTERFACE], "blue", rect)
 
     def _draw_preview(self):
@@ -240,7 +270,7 @@ class TileMapEditScene(Scene):
 
         # 충돌 여부 표시 (빨간색 테두리)
         if self.can_collide:
-            pg.draw.rect(self.app.surfaces[LAYER_INTERFACE], (255, 0, 0, 100), pg.FRect(preview_screen_pos.x, preview_screen_pos.y, scaled_tile_size, scaled_tile_size), 2)
+            pg.draw.rect(self.app.surfaces[LAYER_INTERFACE], (255, 0, 0, 100), pg.Rect(preview_screen_pos.x, preview_screen_pos.y, scaled_tile_size, scaled_tile_size), 2)
 
     def _place_tile_grid(self):
         if not self.in_grid_mode:
@@ -272,7 +302,7 @@ class TileMapEditScene(Scene):
             for object_data in self.tilemap.off_grid.copy():
                 original_image = self.app.ASSET_TILEMAP[object_data["type"]][object_data["variant"]]
                 size = original_image.get_size()
-                rect = pg.FRect(object_data["pos"][0] * self.tilemap.tile_size, object_data["pos"][1] * self.tilemap.tile_size, size[0], size[1])
+                rect = pg.Rect(object_data["pos"][0] * self.tilemap.tile_size, object_data["pos"][1] * self.tilemap.tile_size, size[0], size[1])
                 if rect.collidepoint(self.mouse_world_pos):
                     self.tilemap.off_grid.remove(object_data)
 

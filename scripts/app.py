@@ -35,6 +35,8 @@ class App:
 
         #이벤트 리스트
         self.events : list[pg.event.Event] = []
+        self.dt : float = 0
+        self.time_scale : float = 1
 
         #이벤트, (이벤트는 update마다 가장 먼저 업데이트 됨)
         self._update_time()
@@ -42,6 +44,7 @@ class App:
 
         #저장된 씬
         self._registered_scenes = {
+            "main_menu_scene" : MainMenuScene(),
             "main_game_scene" : MainGameScene(),
             "editor_scene" : TileMapEditScene()
         }
@@ -70,9 +73,17 @@ class App:
         self.ASSET_BACKGROUND = {
             "sky" : load_image("skys/night_sky.png", 1)
         }
+        self.ASSET_UI = {
+            "image_button" : {
+                "temp" : {
+                    "on_hover" : load_image("ui/buttons/temp/on_hover.png"),
+                    "on_not_hover" : load_image("ui/buttons/temp/on_not_hover.png")
+                }
+            }
+        }
 
     def _update_time(self):
-        self.clock.tick(TARGET_FPS)
+        self.dt = self.clock.tick(TARGET_FPS) / 1000 * self.time_scale
 
     def _update_event(self):
         self.events = pg.event.get()
