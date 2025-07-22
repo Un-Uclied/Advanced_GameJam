@@ -1,11 +1,11 @@
 import pygame as pg
 
-SCREEN_SIZE = pg.Vector2(1720, 880)
+SCREEN_SIZE = pg.Vector2(1480, 920)
 TARGET_FPS = 120
-SCREEN_FLAGS = pg.DOUBLEBUF
+SCREEN_FLAGS = pg.SCALED
 GAME_NAME = "GAME NAME"
 
-ASSET_SCALE_BY = 5
+ASSET_SCALE_BY = 2
 
 BASE_IMAGE_PATH = "assets/images/"
 BASE_TILEMAP_PATH = "datas/tilemaps/"
@@ -19,3 +19,8 @@ LAYER_ENTITY = "entities"
 LAYER_DYNAMIC = "dynamics"
 LAYER_VOLUME = "volume"
 LAYER_INTERFACE = "interface"
+
+AUTO_TILE_TILES = ["dirt"]
+IN_GRID_TILES = ["dirt"]
+OFF_GRID_TILES = ["props", "folliage", "statues"]
+DO_NOT_RENDER_TILES = ["spawners"]

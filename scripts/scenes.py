@@ -5,6 +5,8 @@ from .tilemap import *
 from .ui import *
 from .values import *
 from .objects import *
+from .sky import *
+from .volume import *
 from .camera import *
 from .entities import Player
 
@@ -28,7 +30,7 @@ class Scene:
     def on_scene_end(self):
         GameObject.object_list.clear()
     
-    #얘네 둘이는 굳이 먼저 부를필요 없음 자울적으로 하면 됨.
+    #얘네 둘이는 굳이 먼저 부를필요 없음 자율적으로 하면 됨.
     #근데 부르는 순서는 필요 없다는거지 안 부르면 안됨!!
     def on_update(self):
         self._update_fps_text()
@@ -40,31 +42,40 @@ class Scene:
         UserInterface.draw_all()
 
 class MainGameScene(Scene):
-    def __init__(self):
-        super().__init__()
-    
     def on_scene_start(self):
         super().on_scene_start()
-        self.tilemap = Tilemap()
+        Sky()
+        Fog()
 
+        self.tilemap = Tilemap()
+        
         spawn_pos_list = self.tilemap.get_pos_by_data("spawners", 0)
         player_spawn_pos = spawn_pos_list[0] if spawn_pos_list else pg.Vector2(100, 100)
-        self.player = Player(rect=pg.FRect(player_spawn_pos[0], player_spawn_pos[1], 80, 100)) # 플레이어 사이즈는 임시값
+        self.player = Player(rect=pg.FRect(player_spawn_pos[0], player_spawn_pos[1], 48, 128)) # 플레이어 사이즈는 임시값
+        self.plr_light = Light2D(360, pg.Vector2(self.player.rect.center))
 
     def on_update(self):
         super().on_update()
         # 카메라가 플레이어를 따라가도록 설정
-        self.camera.offset = self.camera.offset.lerp(self.player.get_center_pos(), self.app.dt * 5)
+        self.camera.offset = self.camera.offset.lerp(self.player.rect.center, max(min(0.008 * 5, 1), 0))
+        self.plr_light.position = self.plr_light.position.lerp(self.player.rect.center, max(min(0.008 * 3, 1), 0))
+
+        keys = pg.key.get_pressed()
+        if keys[pg.K_q]:
+            self.plr_light.radius -= 0.008 * 100
+        elif keys[pg.K_e]:
+            self.plr_light.radius += 0.008 * 100
     
     def on_draw(self):
         super().on_draw()
 
-class TileMapEditScene(Scene):
-    def __init__(self):
-        super().__init__()
+        pg.draw.line(self.app.surfaces[LAYER_INTERFACE], "blue", self.camera.world_to_screen(self.player.rect.center), pg.mouse.get_pos(), 2)
 
+class TileMapEditScene(Scene):
     def on_scene_start(self):
         super().on_scene_start()
+        Sky()
+
         self.tilemap = Tilemap("temp.json")
 
         self.tile_types = list(self.app.ASSET_TILEMAP.keys())
@@ -145,9 +156,8 @@ class TileMapEditScene(Scene):
 
     def _move_camera(self):
         keys = pg.key.get_pressed()
-        dt = self.app.dt
 
-        move_speed = 300 * dt / self.camera.scale
+        move_speed = 300 * 0.008 / self.camera.scale
         if keys[pg.K_w]:
             self.camera.offset += pg.Vector2(0, -move_speed)
         if keys[pg.K_s]:
@@ -260,7 +270,7 @@ class TileMapEditScene(Scene):
                 del self.tilemap.in_grid[key]
         else:
             for object_data in self.tilemap.off_grid.copy():
-                original_image = self.app.ASSET_TILEMAP[object_data["type"]][self.current_tile_variant]
+                original_image = self.app.ASSET_TILEMAP[object_data["type"]][object_data["variant"]]
                 size = original_image.get_size()
                 rect = pg.FRect(object_data["pos"][0] * self.tilemap.tile_size, object_data["pos"][1] * self.tilemap.tile_size, size[0], size[1])
                 if rect.collidepoint(self.mouse_world_pos):

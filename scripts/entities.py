@@ -27,8 +27,11 @@ class Entity(GameObject):
         self.current_action = action_name
         self.anim = self.app.ASSET_ANIMATIONS[self.name][action_name].copy()
 
-    def get_center_pos(self):
-        return pg.Vector2(self.rect.x + self.rect.width / 2, self.rect.y + self.rect.height / 2)
+    def get_rect_points(self):
+        points = []
+        for point in [self.rect.topleft, self.rect.topright, self.rect.bottomleft, self.rect.bottomright]:
+            points.append(pg.Vector2(point))
+        return points
     
     def on_update(self):
         super().on_update()
@@ -66,30 +69,30 @@ class PhysicsEntity(Entity):
 
     def _physics_collision(self):
         self.collisions = {"left" : False, "right" : False, "up" : False, "down" : False}
-        #충돌
-        self.rect.x += int(self.frame_movement.x)
-        for rect in self.app.scene.tilemap.physic_tiles_around(self.get_center_pos()):
-            if rect.colliderect(self.rect):
-                #right
-                if (self.frame_movement.x > 0):
-                    self.collisions["right"] = True
-                    self.rect.x = rect.x - rect.width
-                #left
-                if (self.frame_movement.x < 0):
-                    self.collisions["left"] = True
-                    self.rect.x = rect.x + self.rect.width
+
+        self.rect.x += self.frame_movement.x
+        for point in self.get_rect_points():
+            for rect in self.app.scene.tilemap.physic_tiles_around(point):
+                if rect.colliderect(self.rect):
+                    if (self.frame_movement.x > 0):
+                        self.collisions["right"] = True
+                        self.rect.right = rect.x
+                    if (self.frame_movement.x < 0):
+                        self.collisions["left"] = True
+                        self.rect.x = rect.right
 
         self.rect.y += self.frame_movement.y
-        for rect in self.app.scene.tilemap.physic_tiles_around(self.get_center_pos()):
-            if rect.colliderect(self.rect):
-                #down
-                if (self.frame_movement.y > 0):
-                    self.collisions["down"] = True
-                    self.rect.y = rect.y - self.rect.height
-                #up
-                if (self.frame_movement.y < 0):
-                    self.collisions["up"] = True
-                    self.rect.y = rect.y + rect.height
+        for point in self.get_rect_points():
+            for rect in self.app.scene.tilemap.physic_tiles_around(point):
+                if rect.colliderect(self.rect):
+                    if (self.frame_movement.y > 0):
+                        self.collisions["down"] = True
+                        self.rect.bottom =rect.y
+
+                    if (self.frame_movement.y < 0):
+                        self.collisions["up"] = True
+                        self.rect.top = rect.bottom
+                    
        
     def _physics_gravity(self):   
         #중력
@@ -97,7 +100,7 @@ class PhysicsEntity(Entity):
             self.velocity.y = .001
             self.current_jump_count = 0
         else:
-            self.velocity.y = min(self.max_gravtity, self.velocity.y + self.app.dt * self.gravity_strength)
+            self.velocity.y = min(self.max_gravtity, self.velocity.y + 0.008 * self.gravity_strength)
             
         #머리박으면 빠르게 나올수 있음
         if (self.collisions["up"]):
@@ -117,7 +120,7 @@ class Player(PhysicsEntity):
         super().__init__(name, rect)
         self.input_drection = pg.Vector2()
 
-        self.move_speed = 4.2
+        self.move_speed = 4.6
         self.jump_power = -8
 
         self.jump_count = 2
@@ -125,8 +128,8 @@ class Player(PhysicsEntity):
 
         self.is_accel = False
 
-        self.accel_power = 12
-        self.deccel_power = 7
+        self.accel_power = 7
+        self.deccel_power = 5
         self.lerped_movement = pg.Vector2()
 
         self.flip_offset = {
@@ -164,7 +167,7 @@ class Player(PhysicsEntity):
     def _physics_movement(self):
         self.lerped_movement = self.lerped_movement.lerp(
             pg.Vector2(self.input_drection.x * self.move_speed, 0),
-            max(min(self.app.dt * (self.accel_power if self.is_accel else self.deccel_power), 1), 0)
+            max(min((self.accel_power if self.is_accel else self.deccel_power) * 0.008, 1), 0) #wtf??
         )
 
         self.frame_movement = pg.Vector2(self.lerped_movement.x, self.velocity.y)

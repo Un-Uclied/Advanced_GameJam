@@ -7,7 +7,7 @@ class Camera2D:
         self.offset = offset
         self.anchor = anchor
 
-    #Im a trash coder bro..
+    #Im a trash coder bro.. 그냥 scale은 1로 나두는게 젤 좋을듯 최적화 하기 귀찮기도 한데 scale이 1이면 연산 안해서 성능에 더 좋음
     @property
     def scale(self):
         return self._scale
@@ -31,4 +31,5 @@ class Camera2D:
         return (screen_pos - anchor_pixel) / self.scale + self.offset
     
     def get_scaled_surface(self, surface : pg.Surface) -> pg.Surface:
+        if self.scale == 1: return surface
         return pg.transform.scale_by(surface, self.scale)

@@ -18,7 +18,6 @@ class TextRenderer(UserInterface):
         self.pos = position
         self.color = color
         self.font = pg.font.Font(self.app.ASSET_FONT_PATHS[font_name], font_size)
-        self.use_camera = use_camera
 
     def on_update(self):
         pass
@@ -30,7 +29,7 @@ class TextRenderer(UserInterface):
             pos = self.pos
 
         text = self.txt.value if isinstance(self.txt, StringValue) else self.txt
-        text_surf = self.font.render(text, True, self.color)
+        text_surf = self.font.render(text, False, self.color)
         text_surf = self.app.scene.camera.get_scaled_surface(text_surf) if self.use_camera else text_surf
 
         screen = self.app.surfaces[LAYER_INTERFACE]

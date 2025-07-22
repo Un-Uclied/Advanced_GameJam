@@ -8,7 +8,7 @@ from .scenes import *
 
 class App:
     singleton : 'App' = None
-    def __init__(self, start_scene_name : str ='test_scene'):
+    def __init__(self, start_scene_name : str):
         App.singleton = self
 
         #파이게임 라이브러리 초기화
@@ -33,11 +33,10 @@ class App:
 
         self._window_should_be_closed = False
 
-        #이벤트 리스트, 델타타임 초기화
+        #이벤트 리스트
         self.events : list[pg.event.Event] = []
-        self.dt : float = 0
 
-        #이벤트, 델타타임 업데이트 (이벤트는 update마다 가장 먼저 업데이트 됨)
+        #이벤트, (이벤트는 update마다 가장 먼저 업데이트 됨)
         self._update_time()
         self._update_event()
 
@@ -52,9 +51,10 @@ class App:
 
     def load_assets(self):
         self.ASSET_TILEMAP = {
-            "grass" : load_images("tiles/tiles/grass"),
-            "stone"  : load_images("tiles/tiles/stone"),
-            "environment" : load_images("tiles/objects/environment"),
+            "dirt" : load_images("tiles/tiles/dirt"),
+            "folliage" : load_images("tiles/objects/folliage"),
+            "props" : load_images("tiles/objects/props"),
+            "statues" : load_images("tiles/objects/statues"),
             "spawners" : load_images("tiles/spawners")
         }
         self.ASSET_FONT_PATHS = {
@@ -67,9 +67,12 @@ class App:
                 "jump" : Animation(load_images("entities/player/jump"), 4, False)
             }
         }
+        self.ASSET_BACKGROUND = {
+            "sky" : load_image("skys/night_sky.png", 1)
+        }
 
     def _update_time(self):
-        self.dt = self.clock.tick(TARGET_FPS) / 1000
+        self.clock.tick(TARGET_FPS)
 
     def _update_event(self):
         self.events = pg.event.get()
@@ -120,5 +123,3 @@ class App:
             self._update_time()
 
         pg.quit()
-
-    

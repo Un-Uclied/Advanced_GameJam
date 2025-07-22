@@ -15,10 +15,6 @@ AUTOTILE_MAP = {
     tuple(sorted([(1, 0), (0, -1), (0, 1)])): 7,
     tuple(sorted([(1, 0), (-1, 0), (0, 1), (0, -1)])): 8,
 }
-AUTO_TILE_TILES = ["grass", "stone"]
-IN_GRID_TILES = ["grass", "stone"]
-OFF_GRID_TILES = ["environment"]
-DO_NOT_RENDER_TILES = ["spawners"]
 
 NEIGHBOR_OFFSETS = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (0, 0), (-1, 1), (0, 1), (1, 1)]
 
@@ -82,14 +78,17 @@ class Tilemap(GameObject):
         camera = self.app.scene.camera
         tile_asset = self.app.singleton.ASSET_TILEMAP
 
+        #에디터 씬에선 모두 그림.
+        from .scenes import TileMapEditScene
+
         for data in self.off_grid:
-            if data["type"] in DO_NOT_RENDER_TILES: continue
+            if data["type"] in DO_NOT_RENDER_TILES and not isinstance(self.app.scene, TileMapEditScene): continue
             world_pos = pg.Vector2(data["pos"][0] * self.tile_size, data["pos"][1] * self.tile_size)
             image = tile_asset[data["type"]][data["variant"]]
             screen.blit(camera.get_scaled_surface(image), camera.world_to_screen(world_pos))
-
+        
         for data in self.in_grid.values():
-            if data["type"] in DO_NOT_RENDER_TILES: continue
+            if data["type"] in DO_NOT_RENDER_TILES and not isinstance(self.app.scene, TileMapEditScene): continue
             world_pos = pg.Vector2(data["pos"][0] * self.tile_size, data["pos"][1] * self.tile_size)
             image = tile_asset[data["type"]][data["variant"]]
             screen.blit(camera.get_scaled_surface(image), camera.world_to_screen(world_pos))
