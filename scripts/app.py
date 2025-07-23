@@ -65,9 +65,15 @@ class App:
         }
         self.ASSET_ANIMATIONS = {
             "player" : {
-                "idle" : Animation(load_images("entities/player/idle"), 6, True),
-                "run" : Animation(load_images("entities/player/run"), 6, True),
-                "jump" : Animation(load_images("entities/player/jump"), 4, False)
+                "idle" : Animation(load_images("entities/player/idle"), .05, True),
+                "run" : Animation(load_images("entities/player/run"), .08, True),
+                "jump" : Animation(load_images("entities/player/jump"), 1, False)
+            },
+            "soul" : {
+                "idle" : Animation(load_images("entities/soul/idle", 2), .05, True)
+            },
+            "portal" : {
+                "idle" : Animation(load_images("entities/portal/idle", 2), .05, True)
             }
         }
         self.ASSET_BACKGROUND = {

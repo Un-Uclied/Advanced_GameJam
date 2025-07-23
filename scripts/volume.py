@@ -22,14 +22,18 @@ class Light2D(GameObject):
         self.make_surface()
 
     def make_surface(self):
-        self.light_surf = pg.Surface([self.radius, self.radius], pg.SRCALPHA)
-        
+        self.light_surf = pg.Surface((self.radius, self.radius), pg.SRCALPHA)
         for i in range(LIGHT_SEGMENTS):
-            pg.draw.circle(self.light_surf, pg.Color(0, 0, 0, min(i * self.strength, 255)), [self.radius/2, self.radius/2], self.radius / 2 - i * LIGHT_FADE_OUT)
+            alpha = min(i * self.strength, 255)
+            pg.draw.circle(
+                self.light_surf,
+                (255, 255, 255, alpha),  # 밝은 영역만 뚫리게
+                (self.radius / 2, self.radius / 2),
+                self.radius / 2 - i * LIGHT_FADE_OUT
+            )
 
     def on_update(self):
         super().on_update()
-        
         if not self._radius_cache == self.radius:
             self.make_surface()
 
@@ -39,15 +43,42 @@ class Light2D(GameObject):
         super().destroy()
         Light2D.light_list.remove(self)
 
-class Fog(GameObject):
-    def __init__(self, fog_color : pg.Color = pg.Color(70, 70, 70, 240)):
+#비교적 연산은 가볍지만 그래도 못 생김;;
+class LightFog(GameObject):
+    def __init__(self, fog_alpha=250):
         super().__init__()
-        self.fog_color = fog_color
+        self.fog_alpha = fog_alpha  # 어두움 정도
 
     def on_draw(self):
-        self.app.surfaces[LAYER_VOLUME].fill(self.fog_color)
+        self.app.surfaces[LAYER_VOLUME].fill(pg.Color(0, 0, 0, self.fog_alpha))
 
         for light in Light2D.light_list:
             surf = light.light_surf
             pos = self.app.scene.camera.world_to_screen(pg.Vector2(light.position.x - light.radius/2, light.position.y - light.radius/2))
             self.app.surfaces[LAYER_VOLUME].blit(surf, pos, special_flags=pg.BLEND_RGBA_SUB)
+
+#엄청 나게 무거운!!!!
+class HeavyFog(GameObject):
+    def __init__(self, fog_alpha=250):
+        super().__init__()
+        self.fog_alpha = fog_alpha
+
+    def on_draw(self):
+        self.object_mask = self.app.surfaces[LAYER_OBJ].copy()
+        entity_mask = self.app.surfaces[LAYER_ENTITY].copy()
+
+        self.object_mask.fill((0, 0, 0, self.fog_alpha), special_flags=pg.BLEND_RGBA_MULT)
+        entity_mask.fill((0, 0, 0, self.fog_alpha), special_flags=pg.BLEND_RGBA_MULT)
+
+        camera = self.app.scene.camera
+
+        for light in Light2D.light_list:
+            screen_pos = camera.world_to_screen(light.position) - pg.Vector2(light.radius / 2, light.radius / 2)
+            self.object_mask.blit(light.light_surf, screen_pos, special_flags=pg.BLEND_RGBA_SUB)
+            entity_mask.blit(light.light_surf, screen_pos, special_flags=pg.BLEND_RGBA_SUB)
+
+        # (4) 최종적으로 LAYER_VOLUME에 그림자 뿌림
+        self.app.surfaces[LAYER_VOLUME].blit(self.object_mask, (0, 0))
+        self.app.surfaces[LAYER_VOLUME].blit(entity_mask, (0, 0))
+
+

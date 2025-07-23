@@ -53,10 +53,12 @@ class MainGameScene(Scene):
         super().on_scene_start()
 
         Sky("red_sky") #EZ 한 오브젝트 추가 ㅇㅇ
-        Fog()
+        
 
         self.tilemap = Tilemap()
         TilemapSpawner.spawn_all(self.tilemap) #EZ한 타일맵과 엔티티
+
+        HeavyFog()
 
 class TileMapEditScene(Scene):
     def on_scene_start(self):
@@ -68,6 +70,8 @@ class TileMapEditScene(Scene):
         self.tile_types = list(self.app.ASSET_TILEMAP.keys())
         self.current_tile_type_index = 0
         self.current_tile_variant = 0
+
+        self.undo_stack = []
 
         self.can_collide = True
         self.collide_mode_text = StringValue("[C] 현재 : 충돌 가능")
@@ -96,9 +100,27 @@ class TileMapEditScene(Scene):
                       pg.Vector2(10, 165), color="red")
         TextRenderer(StringValue("[O] 저장하기 (temp.json에 저장됨.)"),
                       pg.Vector2(10, 190), color="black")
+        TextRenderer(StringValue("[컨트롤 Z] 되돌리기 (인 그리드는 잘 안됨)"),
+                      pg.Vector2(10, 215), color="black")
 
         self.mouse_world_pos = pg.Vector2(0, 0)
         self.tile_pos = pg.Vector2(0, 0)
+
+    def _save_undo_state(self):
+        self.undo_stack.append({
+            "in_grid": self.tilemap.in_grid.copy(),
+            "off_grid": self.tilemap.off_grid.copy()
+        })
+
+        if len(self.undo_stack) > 50:
+            self.undo_stack.pop(0)
+
+    def _undo(self):
+        if not self.undo_stack:
+            return
+        last_state = self.undo_stack.pop()
+        self.tilemap.in_grid = last_state["in_grid"].copy()
+        self.tilemap.off_grid = last_state["off_grid"].copy()
 
     def _update_mouse_position(self):
         self.mouse_world_pos = self.camera.screen_to_world(pg.mouse.get_pos())
@@ -133,6 +155,9 @@ class TileMapEditScene(Scene):
                 #저장
                 if event.key == pg.K_o:
                     self.tilemap.save_file()
+                #되돌리기
+                if event.key == pg.K_z and keys[pg.K_LCTRL]:
+                    self._undo()
 
             if event.type == pg.MOUSEBUTTONDOWN and not self.in_grid_mode:
                 if event.button == 1:
@@ -249,6 +274,7 @@ class TileMapEditScene(Scene):
             return
         if self.tile_types[self.current_tile_type_index] not in IN_GRID_TILES:
             return
+        self._save_undo_state()
         self.tilemap.in_grid[f"{int(self.tile_pos.x)},{int(self.tile_pos.y)}"] = {
             "pos": [int(self.tile_pos.x), int(self.tile_pos.y)],
             "type": self.tile_types[self.current_tile_type_index],
@@ -259,6 +285,7 @@ class TileMapEditScene(Scene):
     def _place_tile_offgrid(self):
         if self.in_grid_mode:
             return
+        self._save_undo_state() 
         self.tilemap.off_grid.append({
             "pos": [self.tile_pos.x, self.tile_pos.y],
             "type": self.tile_types[self.current_tile_type_index],
@@ -269,6 +296,7 @@ class TileMapEditScene(Scene):
         if self.in_grid_mode:
             key = f"{int(self.tile_pos.x)},{int(self.tile_pos.y)}"
             if key in self.tilemap.in_grid:
+                self._save_undo_state()
                 del self.tilemap.in_grid[key]
         else:
             for object_data in self.tilemap.off_grid.copy():
@@ -276,6 +304,7 @@ class TileMapEditScene(Scene):
                 size = original_image.get_size()
                 rect = pg.Rect(object_data["pos"][0] * self.tilemap.tile_size, object_data["pos"][1] * self.tilemap.tile_size, size[0], size[1])
                 if rect.collidepoint(self.mouse_world_pos):
+                    self._save_undo_state()
                     self.tilemap.off_grid.remove(object_data)
 
     def on_update(self):
