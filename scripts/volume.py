@@ -27,8 +27,6 @@ class Light2D(GameObject):
         for i in range(LIGHT_SEGMENTS):
             pg.draw.circle(self.light_surf, pg.Color(0, 0, 0, min(i * self.strength, 255)), [self.radius/2, self.radius/2], self.radius / 2 - i * LIGHT_FADE_OUT)
 
-        
-
     def on_update(self):
         super().on_update()
         
@@ -42,7 +40,7 @@ class Light2D(GameObject):
         Light2D.light_list.remove(self)
 
 class Fog(GameObject):
-    def __init__(self, fog_color : pg.Color = pg.Color(70, 70, 70, 250)):
+    def __init__(self, fog_color : pg.Color = pg.Color(70, 70, 70, 240)):
         super().__init__()
         self.fog_color = fog_color
 

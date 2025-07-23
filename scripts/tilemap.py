@@ -18,6 +18,20 @@ AUTOTILE_MAP = {
 
 NEIGHBOR_OFFSETS = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (0, 0), (-1, 1), (0, 1), (1, 1)]
 
+class TilemapSpawner:
+    @staticmethod
+    def spawn_all(tile_map : 'Tilemap'):
+        #스포너 0번 : 플레이어 | 스포너 1번 : 빛 (상수로 놓기엔 좀 마이너 해서 걍 숫자로 하기로)
+        from .entities import Player
+        from .volume import Light2D #순환 참조 무서웡..
+
+        for pos in tile_map.get_pos_by_data("spawners", 0):
+            Player(rect=pg.Rect(pos.x, pos.y, 48, 128))
+            break #플레이어는 하나만 (혹시 몰라 실수로 플레이어 스포너 여러개 둘수도 있자나)
+
+        for pos in tile_map.get_pos_by_data("spawners", 1):
+            Light2D(360, pos)
+
 class Tilemap(GameObject):
     def __init__(self, json_file_name : str = "temp.json"):
         super().__init__()

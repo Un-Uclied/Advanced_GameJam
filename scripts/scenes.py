@@ -39,8 +39,6 @@ class Scene:
         GameObject.draw_all()
 
 class MainMenuScene(Scene):
-    
-
     def on_scene_start(self):
         super().on_scene_start()
         Sky()
@@ -53,38 +51,12 @@ class MainMenuScene(Scene):
 class MainGameScene(Scene):
     def on_scene_start(self):
         super().on_scene_start()
-        Sky()
+
+        Sky() #EZ 한 오브젝트 추가 ㅇㅇ
         Fog()
 
         self.tilemap = Tilemap()
-        
-        spawn_pos_list = self.tilemap.get_pos_by_data("spawners", 0)
-        player_spawn_pos = spawn_pos_list[0] if spawn_pos_list else pg.Vector2(100, 100)
-        self.player = Player(rect=pg.Rect(player_spawn_pos[0], player_spawn_pos[1], 48, 128)) # 플레이어 사이즈는 임시값
-        self.plr_light = Light2D(360, pg.Vector2(self.player.rect.center))
-
-    def on_update(self):
-        super().on_update()
-        # 카메라가 플레이어를 따라가도록 설정
-        self.camera.offset = self.camera.offset.lerp(self.player.rect.center, max(min(self.app.dt * 5, 1), 0))
-        self.plr_light.position = self.plr_light.position.lerp(self.player.rect.center, max(min(self.app.dt * 3, 1), 0))
-
-        keys = pg.key.get_pressed()
-        if keys[pg.K_q]:
-            self.app.time_scale = 0
-        else : self.app.time_scale = 1
-        if keys[pg.K_r]:
-            self.camera.shake(20)
-        
-        for event in self.app.events:
-            if event.type == pg.KEYDOWN and event.key == pg.K_LSHIFT:
-                self.player.velocity.y = 0
-                self.player.velocity.x += self.player.input_drection.x * 2000
-    
-    def on_draw(self):
-        super().on_draw()
-
-        pg.draw.line(self.app.surfaces[LAYER_INTERFACE], "blue", self.camera.world_to_screen(self.player.rect.center), pg.mouse.get_pos(), 2)
+        TilemapSpawner.spawn_all(self.tilemap) #EZ한 타일맵과 엔티티
 
 class TileMapEditScene(Scene):
     def on_scene_start(self):

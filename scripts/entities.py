@@ -3,6 +3,9 @@ import pygame as pg
 from datas.const import *
 from .animation import *
 from .objects import *
+from .volume import Light2D
+
+DEFAULT_GRAVITY = 300
 
 class Entity(GameObject):
     def __init__(self, name : str, rect : pg.Rect):
@@ -64,11 +67,11 @@ class PhysicsEntity(Entity):
         self.collisions = {"left" : False, "right" : False, "up" : False, "down" : False}
 
         self.velocity : pg.Vector2 = pg.Vector2()
+        self.drag_vel = 10
 
         self.max_gravtity = 1000
         self.gravity_strength = 28
-
-        self.drag_vel = 10
+        self.current_gravity = DEFAULT_GRAVITY
 
     def _physics_collision(self):
         self.collisions = {"left" : False, "right" : False, "up" : False, "down" : False}
@@ -101,20 +104,18 @@ class PhysicsEntity(Entity):
     def _physics_gravity(self):   
         #중력
         if (self.collisions["down"]): #북 따닥 따닥따닥
-            self.velocity.y = 300 #왜 그런건진 모르겠는데 "딱" 125이상이여야 충돌에서 이상하게 안되더라;; 일단 125말고 다른 수로 초반 중력 설정하긴 할건데 진짜 왜이럼;
+            self.current_gravity = DEFAULT_GRAVITY #왜 그런건진 모르겠는데 "딱" 125이상이여야 충돌에서 이상하게 안되더라;; 일단 125말고 다른 수로 초반 중력 설정하긴 할건데 진짜 왜이럼;
             self.current_jump_count = 0 #아 설마 125 * 8이 딱 1000이라서 그런건가
         else:
-            self.velocity.y = min(self.max_gravtity * self.app.dt * 1000, self.velocity.y + self.gravity_strength * self.app.dt * 100)
+            self.current_gravity = min(self.max_gravtity * self.app.dt * 1000, self.current_gravity + self.gravity_strength * self.app.dt * 100)
             
         #머리박으면 빠르게 나올수 있음
         if (self.collisions["up"]):
-            self.velocity.y = 0
+            self.current_gravity = 0
 
     def _physics_movement(self):
-        self.frame_movement = pg.Vector2(self.velocity.x, self.velocity.y)  
-
-        #이건 나중에 필요할때 바꿔야함!! 중력은 그대로 냅두기 (어차피 애들 위로 갑자기 솟구치거나 그럴거 아니자내?)
-        self.velocity = self.velocity.lerp(pg.Vector2(0, self.velocity.y), max(min(self.app.dt * self.drag_vel, 1), 0))
+        self.frame_movement = pg.Vector2(self.velocity.x, self.velocity.y + self.current_gravity)  
+        self.velocity = self.velocity.lerp(pg.Vector2(0, 0), max(min(self.app.dt * self.drag_vel, 1), 0))
 
     def on_update(self):
         super().on_update()
@@ -144,13 +145,22 @@ class Player(PhysicsEntity):
             True : pg.Vector2(-40, 0)
         }
 
+        self.light = Light2D(360, pg.Vector2(self.rect.center))
+
+        self.camera_follow_speed = 5
+        self.light_follow_speed = 3
+
     def _get_input(self):
         key = pg.key.get_pressed()
-        self.input_drection.x = 0
+        self.input_drection = pg.Vector2()
         if key[pg.K_a]:
             self.input_drection.x = -1
         if key[pg.K_d]:
             self.input_drection.x = 1
+        if key[pg.K_w]:
+            self.input_drection.y = 1
+        if key[pg.K_s]:
+            self.input_drection.y = -1
         self.is_accel = bool(self.input_drection.x)
         
         for event in self.app.events:
@@ -168,7 +178,7 @@ class Player(PhysicsEntity):
 
     def _jump(self):
         if (self.current_jump_count >= self.jump_count): return
-        self.velocity.y = self.jump_power * 100
+        self.current_gravity = self.jump_power * 100
         self.current_jump_count += 1
 
     def _physics_movement(self):
@@ -177,10 +187,17 @@ class Player(PhysicsEntity):
             max(min((self.accel_power if self.is_accel else self.deccel_power) * self.app.dt, 1), 0) #wtf??
         )
 
-        self.frame_movement = pg.Vector2(self.lerped_movement.x + self.velocity.x, self.velocity.y)
-        self.velocity = self.velocity.lerp(pg.Vector2(0, self.velocity.y), max(min(self.app.dt * self.drag_vel, 1), 0))
+        self.frame_movement = pg.Vector2(self.velocity.x + self.lerped_movement.x, self.velocity.y + self.current_gravity)
+        self.velocity = self.velocity.lerp(pg.Vector2(0, 0), max(min(self.app.dt * self.drag_vel, 1), 0))
 
     def on_update(self):
         self._get_input()
         super().on_update()
         self._control_animation()
+
+        camera = self.app.scene.camera
+        light = self.light
+        target_pos = self.rect.center
+
+        camera.offset = camera.offset.lerp(target_pos, max(min(self.app.dt * self.camera_follow_speed, 1), 0))
+        light.position = light.position.lerp(target_pos, max(min(self.app.dt * self.light_follow_speed, 1), 0))
