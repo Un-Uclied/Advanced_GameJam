@@ -1,7 +1,7 @@
 import pygame as pg
 
 SCREEN_SIZE = pg.Vector2(1480, 920)
-TARGET_FPS = 0
+TARGET_FPS = 60
 SCREEN_FLAGS = pg.DOUBLEBUF | pg.HWSURFACE 
 GAME_NAME = "GAME NAME"
 

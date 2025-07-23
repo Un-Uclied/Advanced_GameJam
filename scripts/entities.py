@@ -12,7 +12,7 @@ DEFAULT_GRAVITY = 300
 
 class Entity(GameObject):
     all_entities : list['Entity'] = []
-    def __init__(self, name : str, rect : pg.Rect):
+    def __init__(self, name : str, rect : pg.Rect, start_action : str = "idle", debug = False):
         super().__init__()
         Entity.all_entities.append(self)
         self.name : str = name
@@ -21,13 +21,15 @@ class Entity(GameObject):
         self.frame_movement : pg.Vector2 = pg.Vector2()
 
         self.current_action : str = ""
-        self.set_action("idle")
+        self.set_action(start_action)
 
         self.flip_x : bool = False
         self.flip_offset : dict[bool, pg.Vector2] = {
             False : pg.Vector2(0, 0),
             True : pg.Vector2(0, 0)
         }
+
+        self.debug = debug
 
     def destroy(self):
         super().destroy()
@@ -45,6 +47,7 @@ class Entity(GameObject):
         return points
 
     def _debug_draw(self):
+        if not self.debug : return
         pos = self.app.scene.camera.world_to_screen(pg.Vector2(self.rect.x, self.rect.y))
 
         screen = self.app.surfaces[LAYER_ENTITY]
@@ -281,6 +284,8 @@ class Soul(PhysicsEntity):
 
     def _debug_draw(self):
         super()._debug_draw()
+        if not self.debug : return
+
         tile_size = self.app.scene.tilemap.tile_size
         surface = self.app.surfaces[LAYER_ENTITY]
         camera = self.app.scene.camera
@@ -302,6 +307,82 @@ class Soul(PhysicsEntity):
     def on_draw(self):
         self.outline.on_draw()
         return super().on_draw()
+
+class ThreeBeta(Entity):
+    def __init__(self, rect):
+        super().__init__("three_beta", rect, start_action="run")
+
+class FourAlpha(PhysicsEntity):
+    def __init__(self, rect: pg.Rect = pg.Rect(0, 0, 40, 50)):
+        super().__init__("four_alpha", rect)
+        self.flip_offset = {
+            False: pg.Vector2(-20, -20),
+            True: pg.Vector2(-20, -20)
+        }
+
+        self.ai = WanderAI(self, move_speed=1.5)
+
+    def _check_floor(self):
+        tilemap = self.app.scene.tilemap
+        tile_size = tilemap.tile_size
+        check_w = 4
+
+        left = pg.Vector2(self.rect.midbottom[0] - tile_size // 2 + check_w, self.rect.bottom + 1)
+        right = pg.Vector2(self.rect.midbottom[0] + tile_size // 2 - check_w, self.rect.bottom + 1)
+
+        #any()함수는 여 리스트에서 하나라도 True면 True를 반환해주는 좋은 내장 함수여
+        if not any(r.collidepoint(left) for r in tilemap.physic_tiles_around(left)):
+            self.ai.handle_collision_or_fall("fall_left")
+        elif not any(r.collidepoint(right) for r in tilemap.physic_tiles_around(right)):
+            self.ai.handle_collision_or_fall("fall_right")
+
+    def on_update(self):
+        self.ai.on_update()
+        self._check_floor()
+
+        if self.collisions["right"]:
+            self.ai.handle_collision_or_fall("hit_right")
+        elif self.collisions["left"]:
+            self.ai.handle_collision_or_fall("hit_left")
+
+        self.velocity.x = self.ai.direction * self.ai.move_speed * 100
+
+        if self.ai.direction < 0:
+            self.flip_x = True
+            self.set_action("run")
+        elif self.ai.direction > 0:
+            self.flip_x = False
+            self.set_action("run")
+        else:
+            self.set_action("idle")
+
+        super().on_update()
+
+    def destroy(self):
+        super().destroy()
+        self.light.destroy()
+
+    def _debug_draw(self):
+        super()._debug_draw()
+        if not self.debug : return
+
+        tile_size = self.app.scene.tilemap.tile_size
+        surface = self.app.surfaces[LAYER_ENTITY]
+        camera = self.app.scene.camera
+
+        left = pg.Rect(self.rect.bottomleft[0] - tile_size, self.rect.bottom, tile_size, tile_size)
+        right = pg.Rect(self.rect.bottomright[0], self.rect.bottom, tile_size, tile_size)
+
+        left_screen = camera.world_to_screen(pg.Vector2(left.x, left.y))
+        right_screen = camera.world_to_screen(pg.Vector2(right.x, right.y))
+
+        pg.draw.rect(surface, "red", pg.Rect(left_screen, (left.w, left.h)), width=2)
+        pg.draw.rect(surface, "blue", pg.Rect(right_screen, (right.w, right.h)), width=2)
+
+        arrow_color = "green" if self.ai.direction == 1 else "orange" if self.ai.direction == -1 else "gray"
+        center = camera.world_to_screen(pg.Vector2(self.rect.center))
+        arrow_end = center + pg.Vector2(30 * self.ai.direction, 0)
+        pg.draw.line(surface, arrow_color, center, arrow_end, width=3)
 
 class Portal(Entity):
     def __init__(self, rect : pg.Rect = pg.Rect(0, 0, 75, 75)):

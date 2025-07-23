@@ -74,6 +74,13 @@ class App:
             },
             "portal" : {
                 "idle" : Animation(load_images("entities/portal/idle", 2), .05, True)
+            },
+            "three_beta" : {
+                "run" : Animation(load_images("entities/enemies/three_beta/run"), .05, True),
+            },
+            "four_alpha" : {
+                "idle" : Animation(load_images("entities/enemies/four_alpha/idle"), .05, True),
+                "run" : Animation(load_images("entities/enemies/four_alpha/run"), .15, True),
             }
         }
         self.ASSET_BACKGROUND = {

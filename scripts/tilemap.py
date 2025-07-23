@@ -22,7 +22,7 @@ class TilemapSpawner:
     @staticmethod
     def spawn_all(tile_map : 'Tilemap'):
         #스포너 0번 : 플레이어 | 스포너 1번 : 빛 (상수로 놓기엔 좀 마이너 해서 걍 숫자로 하기로)
-        from .entities import Player, Soul, Portal
+        from .entities import Player, Soul, Portal, ThreeBeta, FourAlpha
         from .volume import Light2D #순환 참조 무서웡..
 
         for pos in tile_map.get_pos_by_data("spawners", 3):
@@ -31,6 +31,12 @@ class TilemapSpawner:
 
         for pos in tile_map.get_pos_by_data("spawners", 1):
             Light2D(360, pos)
+
+        for pos in tile_map.get_pos_by_data("spawners", 4):
+            ThreeBeta(pg.Rect(pos.x, pos.y, 120, 120))
+
+        for pos in tile_map.get_pos_by_data("spawners", 5):
+            FourAlpha(pg.Rect(pos.x, pos.y, 80, 165))
 
         for pos in tile_map.get_pos_by_data("spawners", 2):
             Soul(pg.Rect(pos.x, pos.y, 40, 80))
