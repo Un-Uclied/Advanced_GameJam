@@ -52,7 +52,7 @@ class MainGameScene(Scene):
     def on_scene_start(self):
         super().on_scene_start()
 
-        Sky() #EZ 한 오브젝트 추가 ㅇㅇ
+        Sky("red_sky") #EZ 한 오브젝트 추가 ㅇㅇ
         Fog()
 
         self.tilemap = Tilemap()

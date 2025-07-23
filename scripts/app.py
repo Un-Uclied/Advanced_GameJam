@@ -54,10 +54,10 @@ class App:
 
     def load_assets(self):
         self.ASSET_TILEMAP = {
-            "dirt" : load_images("tiles/tiles/dirt"),
-            "folliage" : load_images("tiles/objects/folliage"),
-            "props" : load_images("tiles/objects/props"),
-            "statues" : load_images("tiles/objects/statues"),
+            "dirt" : load_images("tiles/tiles/dirt", tint_color= "grey"),
+            "folliage" : load_images("tiles/objects/folliage", tint_color= "grey"),
+            "props" : load_images("tiles/objects/props", tint_color= "grey"),
+            "statues" : load_images("tiles/objects/statues", tint_color= "grey"),
             "spawners" : load_images("tiles/spawners")
         }
         self.ASSET_FONT_PATHS = {
@@ -71,7 +71,8 @@ class App:
             }
         }
         self.ASSET_BACKGROUND = {
-            "sky" : load_image("skys/night_sky.png", 1)
+            "sky" : load_image("skys/night_sky.png", 1),
+            "red_sky" : load_image("skys/red_sky.png", .75),
         }
         self.ASSET_UI = {
             "image_button" : {
