@@ -1,5 +1,4 @@
 import pygame as pg
-import random
 
 from datas.const import *
 from .animation import *
@@ -7,14 +6,14 @@ from .objects import *
 from .volume import Light2D
 from .outline import *
 from .ai import *
+from .status import *
 
 DEFAULT_GRAVITY = 300
 
 class Entity(GameObject):
     all_entities : list['Entity'] = []
-    debuging = False
 
-    def __init__(self, name : str, rect : pg.Rect, start_action : str = "idle"):
+    def __init__(self, name : str, rect : pg.Rect, start_action : str = "idle", invert_x : bool = False):
         super().__init__()
         Entity.all_entities.append(self)
 
@@ -26,6 +25,7 @@ class Entity(GameObject):
         self.current_action : str = ""
         self.set_action(start_action)
 
+        self.invert_x = invert_x
         self.flip_x : bool = False
         self.flip_offset : dict[bool, pg.Vector2] = {
             False : pg.Vector2(0, 0),
@@ -52,33 +52,27 @@ class Entity(GameObject):
         super().on_update()
         self.anim.update(self.app.dt)
         if self.frame_movement.x < 0:
-            self.flip_x = True
+            self.flip_x = False if self.invert_x else True
         elif self.frame_movement.x > 0:
-            self.flip_x = False
+            self.flip_x = True if self.invert_x else False
 
     def on_draw(self):
         super().on_draw()
         camera = self.app.scene.camera
-        sprite = pg.transform.flip(self.anim.img(), self.flip_x, False)
-        world_position = pg.Vector2(
-            self.rect.x + self.flip_offset[self.flip_x].x,
-            self.rect.y + self.flip_offset[self.flip_x].y
-        )
+        surface = camera.get_scaled_surface(pg.transform.flip(self.anim.img(), self.flip_x, False))
+        position = camera.world_to_screen(pg.Vector2(self.rect.topleft) + self.flip_offset[self.flip_x])
 
-        screen = self.app.surfaces[LAYER_ENTITY]
-        screen.blit(sprite, camera.world_to_screen(world_position))
+        self.app.surfaces[LAYER_ENTITY].blit(surface, position)
 
-        if Entity.debuging : self.debug_draw()
+    def on_debug_draw(self):
+        super().on_debug_draw()
+        camera = self.app.scene.camera
 
-    def debug_draw(self):
-        screen = self.app.surfaces[LAYER_ENTITY]
-        pos = self.app.scene.camera.world_to_screen(pg.Vector2(self.rect.x, self.rect.y))
-
-        pg.draw.rect(screen, "red", pg.Rect(pos.x, pos.y, self.rect.w * self.app.scene.camera.scale, self.rect.h * self.app.scene.camera.scale), width=2)
+        pg.draw.rect(self.app.surfaces[LAYER_INTERFACE], "red", camera.world_rect_to_screen_rect(self.rect), width=2)
 
 class PhysicsEntity(Entity):
-    def __init__(self, name, rect : pg.Rect):
-        super().__init__(name, rect)
+    def __init__(self, name, rect : pg.Rect, start_action : str = "idle", invert_x : bool = False):
+        super().__init__(name, rect, start_action, invert_x)
 
         self.collisions = {"left" : False, "right" : False, "up" : False, "down" : False}
 
@@ -140,7 +134,7 @@ class PhysicsEntity(Entity):
 
 class Player(PhysicsEntity):
     def __init__(self, rect : pg.Rect = pg.Rect(0, 0, 80, 100)):
-        self.outline = Outline(self, "red", 2)
+        self.outline = Outline(self, "red")
         super().__init__("player", rect)
         self.input_drection = pg.Vector2()
 
@@ -201,6 +195,7 @@ class Player(PhysicsEntity):
         if (self.current_jump_count >= self.jump_count): return
         self.current_gravity = self.jump_power * 100
         self.current_jump_count += 1
+        self.app.ASSET_SFXS["player"]["jump"].play()
 
     def physics_movement(self):
         self.lerped_movement = self.lerped_movement.lerp(
@@ -220,7 +215,7 @@ class Player(PhysicsEntity):
         camera = self.app.scene.camera
         target_pos = self.rect.center
 
-        self.app.scene.camera.offset = camera.offset.lerp(target_pos, max(min(self.app.dt * self.camera_follow_speed, 1), 0))
+        camera.offset = camera.offset.lerp(target_pos, max(min(self.app.dt * self.camera_follow_speed, 1), 0))
         self.light.position = self.light.position.lerp(target_pos, max(min(self.app.dt * self.light_follow_speed, 1), 0))
 
     def on_update(self):
@@ -231,7 +226,7 @@ class Player(PhysicsEntity):
 
 class Soul(PhysicsEntity):
     def __init__(self, rect: pg.Rect = pg.Rect(0, 0, 40, 50)):
-        self.outline = Outline(self, "red", 2)
+        self.outline = Outline(self, "red")
         super().__init__("soul", rect)
         self.ai = WanderAI(self, move_speed=1.5)
 
@@ -242,25 +237,6 @@ class Soul(PhysicsEntity):
 
         self.light = Light2D(250, pg.Vector2(self.rect.center))
         self.light_follow_speed = 5
-
-    def check_floor(self):
-        tilemap = self.app.scene.tilemap
-        tile_size = tilemap.tile_size
-        check_w = 4
-
-        left = pg.Vector2(self.rect.midbottom[0] - tile_size // 2 + check_w, self.rect.bottom + 1)
-        right = pg.Vector2(self.rect.midbottom[0] + tile_size // 2 - check_w, self.rect.bottom + 1)
-
-        if not any(r.collidepoint(left) for r in tilemap.physic_tiles_around(left)):
-            self.ai.handle_collision_or_fall("fall_left")
-        elif not any(r.collidepoint(right) for r in tilemap.physic_tiles_around(right)):
-            self.ai.handle_collision_or_fall("fall_right")
-
-    def check_wall(self):
-        if self.collisions["right"]:
-            self.ai.handle_collision_or_fall("hit_right")
-        elif self.collisions["left"]:
-            self.ai.handle_collision_or_fall("hit_left")
 
     def destroy(self):
         super().destroy()
@@ -274,117 +250,10 @@ class Soul(PhysicsEntity):
         super().on_update()
 
         self.ai.on_update()
-        self.check_floor()
-        self.check_wall()
 
-        self.velocity.x = self.ai.direction * self.ai.move_speed * 100
+        self.velocity.x = self.ai.direction.x * self.ai.move_speed * 100
 
         self.follow_light()
-
-    def debug_draw(self):
-        super().debug_draw()
-        if not Entity.debuging : return
-
-        tile_size = self.app.scene.tilemap.tile_size
-        surface = self.app.surfaces[LAYER_ENTITY]
-        camera = self.app.scene.camera
-
-        left = pg.Rect(self.rect.bottomleft[0] - tile_size, self.rect.bottom, tile_size, tile_size)
-        right = pg.Rect(self.rect.bottomright[0], self.rect.bottom, tile_size, tile_size)
-
-        left_screen = camera.world_to_screen(pg.Vector2(left.x, left.y))
-        right_screen = camera.world_to_screen(pg.Vector2(right.x, right.y))
-
-        pg.draw.rect(surface, "red", pg.Rect(left_screen, (left.w, left.h)), width=2)
-        pg.draw.rect(surface, "blue", pg.Rect(right_screen, (right.w, right.h)), width=2)
-
-        arrow_color = "green" if self.ai.direction == 1 else "orange" if self.ai.direction == -1 else "gray"
-        center = camera.world_to_screen(pg.Vector2(self.rect.center))
-        arrow_end = center + pg.Vector2(30 * self.ai.direction, 0)
-        pg.draw.line(surface, arrow_color, center, arrow_end, width=3)
-
-class ThreeBeta(Entity):
-    def __init__(self, rect):
-        super().__init__("three_beta", rect, start_action="run")
-
-class FourAlpha(PhysicsEntity):
-    def __init__(self, rect: pg.Rect = pg.Rect(0, 0, 40, 50)):
-        self.outline = Outline(self, "red", 2)
-        super().__init__("four_alpha", rect)
-    
-        self.ai = WanderAI(self, move_speed=1.5)
-
-        self.flip_offset = {
-            False: pg.Vector2(-20, -20),
-            True: pg.Vector2(-20, -20)
-        }
-
-    def check_floor(self):
-        tilemap = self.app.scene.tilemap
-        tile_size = tilemap.tile_size
-        check_w = 4
-
-        left = pg.Vector2(self.rect.midbottom[0] - tile_size // 2 + check_w, self.rect.bottom + 1)
-        right = pg.Vector2(self.rect.midbottom[0] + tile_size // 2 - check_w, self.rect.bottom + 1)
-
-        #any()함수는 여 리스트에서 하나라도 True면 True를 반환해주는 좋은 내장 함수여
-        if not any(r.collidepoint(left) for r in tilemap.physic_tiles_around(left)):
-            self.ai.handle_collision_or_fall("fall_left")
-        elif not any(r.collidepoint(right) for r in tilemap.physic_tiles_around(right)):
-            self.ai.handle_collision_or_fall("fall_right")
-
-    def check_wall(self):
-        if self.collisions["right"]:
-            self.ai.handle_collision_or_fall("hit_right")
-        elif self.collisions["left"]:
-            self.ai.handle_collision_or_fall("hit_left")
-
-    def control_animation(self):
-        if self.ai.direction < 0:
-            self.flip_x = True
-            self.set_action("run")
-        elif self.ai.direction > 0:
-            self.flip_x = False
-            self.set_action("run")
-        else:
-            self.set_action("idle")
-
-    def on_update(self):
-        super().on_update()
-
-        self.ai.on_update()
-        self.check_floor()
-        self.check_wall()
-
-        self.velocity.x = self.ai.direction * self.ai.move_speed * 100
-
-        self.control_animation()
-
-    def destroy(self):
-        super().destroy()
-        self.light.destroy()
-        self.outline.destroy()
-
-    def debug_draw(self):
-        super().debug_draw()
-
-        tile_size = self.app.scene.tilemap.tile_size
-        surface = self.app.surfaces[LAYER_ENTITY]
-        camera = self.app.scene.camera
-
-        left = pg.Rect(self.rect.bottomleft[0] - tile_size, self.rect.bottom, tile_size, tile_size)
-        right = pg.Rect(self.rect.bottomright[0], self.rect.bottom, tile_size, tile_size)
-
-        left_screen = camera.world_to_screen(pg.Vector2(left.x, left.y))
-        right_screen = camera.world_to_screen(pg.Vector2(right.x, right.y))
-
-        pg.draw.rect(surface, "red", pg.Rect(left_screen, (left.w, left.h)), width=2)
-        pg.draw.rect(surface, "blue", pg.Rect(right_screen, (right.w, right.h)), width=2)
-
-        arrow_color = "green" if self.ai.direction == 1 else "orange" if self.ai.direction == -1 else "gray"
-        center = camera.world_to_screen(pg.Vector2(self.rect.center))
-        arrow_end = center + pg.Vector2(30 * self.ai.direction, 0)
-        pg.draw.line(surface, arrow_color, center, arrow_end, width=3)
 
 class Portal(Entity):
     def __init__(self, rect : pg.Rect = pg.Rect(0, 0, 75, 75)):

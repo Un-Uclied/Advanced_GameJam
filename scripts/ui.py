@@ -64,7 +64,8 @@ class ImageButton(GameObject):
     def on_draw(self):
         super().on_draw()
 
+        camera = self.app.scene.camera
         screen = self.app.surfaces[LAYER_INTERFACE]
-        screen.blit(self.render_image, self.pos)
+        screen.blit(camera.get_scaled_surface(self.render_image), self.pos)
                     
     

@@ -20,12 +20,15 @@ NEIGHBOR_OFFSETS = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (0, 0), (-1, 1)
 
 class TilemapSpawner:
     @staticmethod
-    def spawn_all(tile_map: 'Tilemap'):
-        for spawner_id, constructor in SPAWNER_ENTITY_MAP.items():
-            for pos in tile_map.get_pos_by_data("spawners", spawner_id):
+    def spawn_all(tilemap: 'Tilemap'):
+        for spawner_id, constructor in SPAWNER_ENEMY_MAP.items():
+            for pos in tilemap.get_pos_by_data("enemy_spawners", spawner_id):
                 instance = constructor(pos)
-                if spawner_id == 0:
-                    break
+        for spawner_id, constructor in SPAWNER_ENTITY_MAP.items():
+            for pos in tilemap.get_pos_by_data("spawners", spawner_id):
+                if spawner_id == 0: #플레이어는 따로
+                    continue
+                instance = constructor(pos)
 
 class Tilemap(GameObject):
     def __init__(self, json_file_name : str = "temp.json"):
@@ -93,19 +96,16 @@ class Tilemap(GameObject):
         for data in self.off_grid:
             if data["type"] in DO_NOT_RENDER_TILES and not isinstance(self.app.scene, TileMapEditScene): continue
             world_pos = pg.Vector2(data["pos"][0] * self.tile_size, data["pos"][1] * self.tile_size)
+            screen_pos = camera.world_to_screen(world_pos)
             image = tile_asset[data["type"]][data["variant"]]
             scaled_image = camera.get_scaled_surface(image)
-            # rect = pg.Rect(world_pos, scaled_image.get_size())
-            # if not camera.is_on_screen(rect) : rect             (얘는 검사 횟수가 너무 많아서 오히려 성능 안좋아짐)
-            screen.blit(scaled_image, camera.world_to_screen(world_pos))
+            screen.blit(scaled_image, screen_pos)
         
         for data in self.in_grid.values():
             if data["type"] in DO_NOT_RENDER_TILES and not isinstance(self.app.scene, TileMapEditScene): continue
             world_pos = pg.Vector2(data["pos"][0] * self.tile_size, data["pos"][1] * self.tile_size)
             image = tile_asset[data["type"]][data["variant"]]
             scaled_image = camera.get_scaled_surface(image)
-            # rect = pg.Rect(world_pos, scaled_image.get_size())
-            # if not camera.is_on_screen(rect) : rect
             screen.blit(scaled_image, camera.world_to_screen(world_pos))
 
     def save_file(self, json_file_name : str = "temp.json"):

@@ -7,32 +7,27 @@ from .objects import *
 from .sky import *
 from .volume import *
 from .camera import *
-from .entities import *
+from .status import *
 
 class Scene:
     def __init__(self):
-        #메소드 내에서 계속 임포트 할 필요없이 멤버로 만들어버리기~~
         from .app import App
         self.app = App.singleton
     
     def on_scene_start(self):
-        #모든 씬엔 카메라가 있음
         self.camera = Camera2D(scale=1, offset=pg.Vector2(0, 0))
 
-        #현재 fps보여주는건데 릴리스할때는 없애든가 말든가 해야할듯
-        self._fps_text = StringValue("")
-        TextRenderer(self._fps_text, pg.Vector2(SCREEN_SIZE.x - 55, 10), color="green")
+        self.fps_text = StringValue("")
+        TextRenderer(self.fps_text, pg.Vector2(SCREEN_SIZE.x - 55, 10), color="green")
 
-    def _update_fps_text(self):
-        self._fps_text.value = str(round(self.app.clock.get_fps()))
-    
     def on_scene_end(self):
         GameObject.object_list.clear()
+
+    def update_fps_text(self):
+        self.fps_text.value = str(round(self.app.clock.get_fps()))
     
-    #얘네 둘이는 굳이 먼저 부를필요 없음 자율적으로 하면 됨.
-    #근데 부르는 순서는 필요 없다는거지 안 부르면 안됨!!
     def on_update(self):
-        self._update_fps_text()
+        self.update_fps_text()
         GameObject.update_all()
 
     def on_draw(self):
@@ -44,21 +39,35 @@ class MainMenuScene(Scene):
         Sky()
 
         def callback():
-            self.app.scene = "main_game_scene"
+            self.app.change_scene("main_game_scene")
 
         ImageButton("temp", pg.Vector2(400, 400), callback)
 
 class MainGameScene(Scene):
     def on_scene_start(self):
         super().on_scene_start()
+        # self.camera.scale = 0.5
 
-        Sky("red_sky") #EZ 한 오브젝트 추가 ㅇㅇ
-        
-
+        PlayerStatus()
         self.tilemap = Tilemap()
-        TilemapSpawner.spawn_all(self.tilemap) #EZ한 타일맵과 엔티티
+        TilemapSpawner.spawn_all(self.tilemap)
 
-        HeavyFog()
+        from .entities import Player
+        for pos in self.tilemap.get_pos_by_data("spawners", 0):
+            self.pc = Player(pg.Rect(pos.x, pos.y, 48, 128)) #플레이어는 예외 적으로 여기서 스폰하면, 다른곳에서도 self.app.scene.pc이렇게 접근 가능!!
+            break
+        
+        Sky("red_sky")
+        Fog()
+
+    def on_update(self):
+        for event in self.app.events:
+            if event.type == pg.KEYDOWN and event.key == pg.K_e:
+                self.camera.scale += .5
+            elif event.type == pg.KEYDOWN and event.key == pg.K_q:
+                self.camera.scale -= .5
+
+        super().on_update()
 
 class TileMapEditScene(Scene):
     def on_scene_start(self):

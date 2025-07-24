@@ -11,12 +11,10 @@ class App:
     def __init__(self, start_scene_name : str):
         App.singleton = self
 
-        #파이게임 라이브러리 초기화
         pg.init()
         pg.display.set_caption(GAME_NAME, GAME_NAME)
 
-        #메인 화면
-        self._screen = pg.display.set_mode(SCREEN_SIZE, SCREEN_FLAGS)
+        self.screen = pg.display.set_mode(SCREEN_SIZE, SCREEN_FLAGS)
         self.surfaces = {
             LAYER_BG : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
             LAYER_OBJ : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
@@ -26,39 +24,36 @@ class App:
             LAYER_INTERFACE : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
         }
 
-        #에셋 전부 로드
         self.load_assets()
 
         self.clock = pg.time.Clock()
 
-        self._window_should_be_closed = False
+        self.window_should_be_closed = False
 
-        #이벤트 리스트
         self.events : list[pg.event.Event] = []
         self.dt : float = 0
         self.time_scale : float = 1
 
-        #이벤트, (이벤트는 update마다 가장 먼저 업데이트 됨)
-        self._update_time()
-        self._update_event()
+        self.update_time()
+        self.update_event()
 
-        #저장된 씬
-        self._registered_scenes = {
+        self.registered_scenes : dict[str, Scene] = {
             "main_menu_scene" : MainMenuScene(),
             "main_game_scene" : MainGameScene(),
-            "editor_scene" : TileMapEditScene()
+            "editor_scene"    : TileMapEditScene()
         }
-        #__init__() 에 들어온 씬 이름 먼저 시작됨
-        self._scene = self._registered_scenes[start_scene_name]
-        self._scene.on_scene_start()
+
+        self.scene = self.registered_scenes[start_scene_name]
+        self.scene.on_scene_start()
 
     def load_assets(self):
         self.ASSET_TILEMAP = {
-            "dirt" : load_images("tiles/tiles/dirt", tint_color= "grey"),
-            "folliage" : load_images("tiles/objects/folliage", tint_color= "grey"),
-            "props" : load_images("tiles/objects/props", tint_color= "grey"),
-            "statues" : load_images("tiles/objects/statues", tint_color= "grey"),
-            "spawners" : load_images("tiles/spawners")
+            "dirt"           :  load_images("tiles/tiles/dirt",         tint_color= "grey"),
+            "folliage"       :  load_images("tiles/objects/folliage",   tint_color= "grey"),
+            "props"          :  load_images("tiles/objects/props",      tint_color= "grey"),
+            "statues"        :  load_images("tiles/objects/statues",    tint_color= "grey"),
+            "spawners"       :  load_images("tiles/spawners"                              ),
+            "enemy_spawners" :  load_images("tiles/enemy_spawners"                        )
         }
         self.ASSET_FONT_PATHS = {
             "default" : "assets/fonts/PF스타더스트 3.0 Bold.ttf"
@@ -66,8 +61,8 @@ class App:
         self.ASSET_ANIMATIONS = {
             "player" : {
                 "idle" : Animation(load_images("entities/player/idle"), .05, True),
-                "run" : Animation(load_images("entities/player/run"), .08, True),
-                "jump" : Animation(load_images("entities/player/jump"), 1, False)
+                "run"  : Animation(load_images("entities/player/run"),  .08, True),
+                "jump" : Animation(load_images("entities/player/jump"),  1,  False)
             },
             "soul" : {
                 "idle" : Animation(load_images("entities/soul/idle", 2), .05, True)
@@ -75,76 +70,100 @@ class App:
             "portal" : {
                 "idle" : Animation(load_images("entities/portal/idle", 2), .05, True)
             },
+            "one_alpha" : {
+                "idle" : Animation(load_images("entities/enemies/1_alpha/idle"), .05, True),
+                "run"  : Animation(load_images("entities/enemies/1_alpha/run"), .15, True),
+            },
+            "one_beta" : {
+                "idle" : Animation(load_images("entities/enemies/1_beta/idle"), .05, True),
+                "run"  : Animation(load_images("entities/enemies/1_beta/run"), .15, True),
+            },
+            "two_alpha" : {
+                "idle" : Animation(load_images("entities/enemies/2_alpha/idle"), .05, True),
+                "run"  : Animation(load_images("entities/enemies/2_alpha/run"), .15, True),
+            },
+            "two_beta" : {
+                "idle" : Animation(load_images("entities/enemies/2_beta/idle"), .05, True),
+                "run"  : Animation(load_images("entities/enemies/2_beta/run"), .15, True),
+            },
+            "three_alpha" : {
+                "attack" : Animation(load_images("entities/enemies/3_alpha/attack"), .05, False),
+                "run"    : Animation(load_images("entities/enemies/3_alpha/run"), .15, True),
+            },
             "three_beta" : {
-                "run" : Animation(load_images("entities/enemies/three_beta/run"), .05, True),
+                "attack" : Animation(load_images("entities/enemies/3_beta/attack"), .05, False),
+                "run"    : Animation(load_images("entities/enemies/3_beta/run"), .15, True),
             },
             "four_alpha" : {
-                "idle" : Animation(load_images("entities/enemies/four_alpha/idle"), .05, True),
-                "run" : Animation(load_images("entities/enemies/four_alpha/run"), .15, True),
+                "idle" : Animation(load_images("entities/enemies/4_alpha/idle"), .05, True),
+                "run"  : Animation(load_images("entities/enemies/4_alpha/run"), .08, True),
+            },
+            "four_beta" : {
+                "idle" : Animation(load_images("entities/enemies/4_beta/idle"), .05, True),
+                "run"  : Animation(load_images("entities/enemies/4_beta/run"), .03, True),
+            },
+            "five_omega" : {
+                "idle" : Animation(load_images("entities/enemies/5_omega/idle"), .05, True),
+                "run"  : Animation(load_images("entities/enemies/5_omega/run"), .15, True),
             }
         }
         self.ASSET_BACKGROUND = {
-            "sky" : load_image("skys/night_sky.png", 1),
+            "sky"     : load_image("skys/night_sky.png", 1),
             "red_sky" : load_image("skys/red_sky.png", .75),
         }
         self.ASSET_UI = {
             "image_button" : {
                 "temp" : {
-                    "on_hover" : load_image("ui/buttons/temp/on_hover.png"),
+                    "on_hover"     : load_image("ui/buttons/temp/on_hover.png"),
                     "on_not_hover" : load_image("ui/buttons/temp/on_not_hover.png")
                 }
             }
         }
+        
+        pg.mixer.set_num_channels(32)
+        self.ASSET_SFXS = {
+            "player" : {
+                "jump" : pg.mixer.Sound(BASE_SOUND_PATH + "player/jump.wav"),
+                "hurt" : pg.mixer.Sound(BASE_SOUND_PATH + "player/hurt.wav")
+            }
+        }
 
-    def _update_time(self):
+    def update_time(self):
         self.dt = self.clock.tick(TARGET_FPS) / 1000 * self.time_scale
 
-    def _update_event(self):
+    def update_event(self):
         self.events = pg.event.get()
     
-    #현재 씬 얻을때 : App.singleton.scene
-    @property
-    def scene(self) -> Scene:
-        return self._scene
-    
-    #씬 바꿀때는 씬의 이름으로 바꿈 : App.singleton.scene = "씬 이름"
-    @scene.setter
-    def scene(self, value : str):
-        self._scene.on_scene_end()
-        self._scene = self._registered_scenes[value]
-        self._scene.on_scene_start()
+    def change_scene(self, name : str):
+        self.scene.on_scene_end()
+        self.scene = self.registered_scenes[name]
+        self.scene.on_scene_start()
 
-    def _check_for_quit(self):
+    def check_for_quit(self):
         for event in self.events:
             if event.type == pg.QUIT:
-                self._window_should_be_closed = True
+                self.window_should_be_closed = True
 
-    def _clear_screen(self):
-        self._screen.fill("brown")
-        for layer_name, surface in self.surfaces.items():
+    def clear_surfaces(self):
+        self.screen.fill("brown")
+        for surface in self.surfaces.values():
             surface.fill(pg.Color(0, 0, 0, 0))
 
-    def _draw_surfaces(self):
-        for layer_name, surface in self.surfaces.items():
-            self._screen.blit(surface, (0, 0))
+    def draw_surfaces(self):
+        for surface in self.surfaces.values():
+            self.screen.blit(surface, (0, 0))
 
-    #메인 게임 루프
     def run(self):
-        while not self._window_should_be_closed:
-            # update
-            self._update_event()
-            self._check_for_quit()
-            self._scene.on_update()
+        while not self.window_should_be_closed:
+            self.update_event()
+            self.check_for_quit()
+            self.scene.on_update()
 
-            #screen clear
-            self._clear_screen()
+            self.clear_surfaces()
             
-            #screen draw
-            self._scene.on_draw()
-            self._draw_surfaces()
+            self.scene.on_draw()
+            self.draw_surfaces()
 
-            #display update
             pg.display.flip()
-            self._update_time()
-
+            self.update_time()
         pg.quit()

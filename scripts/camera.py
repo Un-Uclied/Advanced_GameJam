@@ -41,16 +41,21 @@ class Camera2D(GameObject):
         return (screen_pos - anchor_pixel) / self.scale + (self.offset + self.shake_offset)
     
     def get_scaled_surface(self, surface : pg.Surface) -> pg.Surface:
-        if self.scale == 1: return surface
-        return pg.transform.scale_by(surface, self.scale)
+        if self.scale == 1:
+            return surface
+        else:
+            return pg.transform.scale_by(surface, self.scale)
+    
+    def world_rect_to_screen_rect(self, world_rect: pg.Rect) -> pg.Rect:
+        screen_pos = self.world_to_screen(pg.Vector2(world_rect.topleft))
+        screen_size = pg.Vector2(world_rect.size) * self.scale
+        return pg.Rect(screen_pos, screen_size)
 
-    def is_on_screen(self, rect : pg.Rect):
-        screen_rect = pg.Rect((0, 0), SCREEN_SIZE)
-        world_screen_pos = self.world_to_screen(pg.Vector2(rect.topleft))
-        world_screen_rect = pg.Rect(world_screen_pos, rect.size)
-        return screen_rect.colliderect(world_screen_rect)
+    def is_in_view(self, world_rect : pg.Rect):
+        whole_screen = pg.Rect((0, 0), SCREEN_SIZE)
+        return whole_screen.colliderect(self.world_rect_to_screen_rect(world_rect))
 
-    def shake(self, amount: float):
+    def shake(self, amount : float):
         self.shake_amount = max(self.shake_amount, amount)
 
     def on_update(self):
