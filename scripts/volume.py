@@ -32,6 +32,11 @@ class Light2D(GameObject):
                 self.radius / 2 - i * LIGHT_FADE_OUT
             )
 
+    def rect(self):
+        p = self.position
+        r = self.radius
+        return pg.Rect((p.x - r / 2, p.y - r/2), (r, r))
+
     def on_update(self):
         super().on_update()
         if not self._radius_cache == self.radius:
@@ -62,23 +67,25 @@ class HeavyFog(GameObject):
     def __init__(self, fog_alpha=250):
         super().__init__()
         self.fog_alpha = fog_alpha
+        self.fog_surface = pg.Surface(SCREEN_SIZE, flags=pg.SRCALPHA)
 
     def on_draw(self):
-        self.object_mask = self.app.surfaces[LAYER_OBJ].copy()
-        entity_mask = self.app.surfaces[LAYER_ENTITY].copy()
+        self.fog_surface.fill((0, 0, 0, 0)) #알파 까지 지우기 (중요함)
 
-        self.object_mask.fill((0, 0, 0, self.fog_alpha), special_flags=pg.BLEND_RGBA_MULT)
-        entity_mask.fill((0, 0, 0, self.fog_alpha), special_flags=pg.BLEND_RGBA_MULT)
+        self.fog_surface.blit(self.app.surfaces[LAYER_OBJ])
+        self.fog_surface.blit(self.app.surfaces[LAYER_ENTITY])
+
+        self.fog_surface.fill((0, 0, 0, self.fog_alpha), special_flags=pg.BLEND_RGBA_MULT)
 
         camera = self.app.scene.camera
-
         for light in Light2D.light_list:
             screen_pos = camera.world_to_screen(light.position) - pg.Vector2(light.radius / 2, light.radius / 2)
-            self.object_mask.blit(light.light_surf, screen_pos, special_flags=pg.BLEND_RGBA_SUB)
-            entity_mask.blit(light.light_surf, screen_pos, special_flags=pg.BLEND_RGBA_SUB)
+            light_surf = camera.get_scaled_surface(light.light_surf)
 
-        # (4) 최종적으로 LAYER_VOLUME에 그림자 뿌림
-        self.app.surfaces[LAYER_VOLUME].blit(self.object_mask, (0, 0))
-        self.app.surfaces[LAYER_VOLUME].blit(entity_mask, (0, 0))
+            if not camera.is_on_screen(light.rect()) : continue
+
+            self.fog_surface.blit(light_surf, screen_pos, special_flags=pg.BLEND_RGBA_SUB)
+
+        self.app.surfaces[LAYER_VOLUME].blit(self.fog_surface, (0, 0))
 
 

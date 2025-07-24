@@ -24,3 +24,18 @@ AUTO_TILE_TILES = ["dirt"]
 IN_GRID_TILES = ["dirt"]
 OFF_GRID_TILES = ["props", "folliage", "statues"]
 DO_NOT_RENDER_TILES = ["spawners"]
+
+from scripts.entities import Player, Light2D, Soul, Portal, ThreeBeta, FourAlpha
+
+SPAWNER_ENTITY_MAP = {
+    0: lambda pos: Player(pg.Rect(pos.x, pos.y, 48, 128)),
+
+    1: lambda pos: Light2D(360, pos),
+
+    2: lambda pos: Soul(pg.Rect(pos.x, pos.y, 40, 80)),
+
+    3: lambda pos: Portal(pg.Rect(pos.x, pos.y, 180, 180)),
+
+    4: lambda pos: ThreeBeta(pg.Rect(pos.x, pos.y, 120, 120)),
+    5: lambda pos: FourAlpha(pg.Rect(pos.x, pos.y, 80, 165)),
+}

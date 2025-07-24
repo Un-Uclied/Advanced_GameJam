@@ -20,30 +20,12 @@ NEIGHBOR_OFFSETS = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (0, 0), (-1, 1)
 
 class TilemapSpawner:
     @staticmethod
-    def spawn_all(tile_map : 'Tilemap'):
-        #스포너 0번 : 플레이어 | 스포너 1번 : 빛 (상수로 놓기엔 좀 마이너 해서 걍 숫자로 하기로)
-        from .entities import Player, Soul, Portal, ThreeBeta, FourAlpha
-        from .volume import Light2D #순환 참조 무서웡..
-
-        for pos in tile_map.get_pos_by_data("spawners", 3):
-            Portal(pg.Rect(pos.x, pos.y, 180, 180))
-            break
-
-        for pos in tile_map.get_pos_by_data("spawners", 1):
-            Light2D(360, pos)
-
-        for pos in tile_map.get_pos_by_data("spawners", 4):
-            ThreeBeta(pg.Rect(pos.x, pos.y, 120, 120))
-
-        for pos in tile_map.get_pos_by_data("spawners", 5):
-            FourAlpha(pg.Rect(pos.x, pos.y, 80, 165))
-
-        for pos in tile_map.get_pos_by_data("spawners", 2):
-            Soul(pg.Rect(pos.x, pos.y, 40, 80))
-
-        for pos in tile_map.get_pos_by_data("spawners", 0):
-            Player(pg.Rect(pos.x, pos.y, 48, 128))
-            break #플레이어는 하나만 (혹시 몰라 실수로 플레이어 스포너 여러개 둘수도 있자나)
+    def spawn_all(tile_map: 'Tilemap'):
+        for spawner_id, constructor in SPAWNER_ENTITY_MAP.items():
+            for pos in tile_map.get_pos_by_data("spawners", spawner_id):
+                instance = constructor(pos)
+                if spawner_id == 0:
+                    break
 
 class Tilemap(GameObject):
     def __init__(self, json_file_name : str = "temp.json"):
@@ -112,13 +94,19 @@ class Tilemap(GameObject):
             if data["type"] in DO_NOT_RENDER_TILES and not isinstance(self.app.scene, TileMapEditScene): continue
             world_pos = pg.Vector2(data["pos"][0] * self.tile_size, data["pos"][1] * self.tile_size)
             image = tile_asset[data["type"]][data["variant"]]
-            screen.blit(camera.get_scaled_surface(image), camera.world_to_screen(world_pos))
+            scaled_image = camera.get_scaled_surface(image)
+            # rect = pg.Rect(world_pos, scaled_image.get_size())
+            # if not camera.is_on_screen(rect) : rect             (얘는 검사 횟수가 너무 많아서 오히려 성능 안좋아짐)
+            screen.blit(scaled_image, camera.world_to_screen(world_pos))
         
         for data in self.in_grid.values():
             if data["type"] in DO_NOT_RENDER_TILES and not isinstance(self.app.scene, TileMapEditScene): continue
             world_pos = pg.Vector2(data["pos"][0] * self.tile_size, data["pos"][1] * self.tile_size)
             image = tile_asset[data["type"]][data["variant"]]
-            screen.blit(camera.get_scaled_surface(image), camera.world_to_screen(world_pos))
+            scaled_image = camera.get_scaled_surface(image)
+            # rect = pg.Rect(world_pos, scaled_image.get_size())
+            # if not camera.is_on_screen(rect) : rect
+            screen.blit(scaled_image, camera.world_to_screen(world_pos))
 
     def save_file(self, json_file_name : str = "temp.json"):
         file = open(BASE_TILEMAP_PATH + '/' + json_file_name, 'w')
