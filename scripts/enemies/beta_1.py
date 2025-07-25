@@ -1,6 +1,6 @@
 from datas.const import *
 
-from .base.wander_enemy import WanderEnemy
+from .base import WanderEnemy
 
 hit_box_size = (110, 110)
 
@@ -17,3 +17,4 @@ class OneBeta(WanderEnemy):
             False: pg.Vector2(0, -12),
             True: pg.Vector2(0, -12)
         }
+

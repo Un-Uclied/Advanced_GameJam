@@ -2,7 +2,7 @@ import pygame as pg
 
 from datas.const import *
 
-from .base.wander_enemy import WanderEnemy
+from .base import WanderEnemy
 
 hit_box_size = (80, 165)
 

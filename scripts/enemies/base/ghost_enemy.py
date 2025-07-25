@@ -4,6 +4,7 @@ from datas.const import *
 
 from scripts.entities.base import Entity
 from scripts.volume import Outline
+from scripts.vfx import AnimatedParticle
 from scripts.ai import ChaseAI
 
 from scripts.status import PlayerStatus
@@ -32,6 +33,7 @@ class GhostEnemy(Entity):
         self.is_attacking = True
         self.current_attack_time = self.max_attack_time
         self.set_action("attack")
+        AnimatedParticle("enemy_attack", pg.Vector2(self.rect.center))
 
         PlayerStatus.singleton.health -= self.attack_damage
 

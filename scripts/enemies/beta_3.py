@@ -2,7 +2,7 @@ import random
 
 from datas.const import *
 
-from .base.ghost_enemy import GhostEnemy
+from .base import GhostEnemy
 
 hit_box_size = (110, 110)
 
@@ -19,8 +19,9 @@ class ThreeBeta(GhostEnemy):
                          max_attack_time=.8)
 
     def attack(self):
-        super().attack()
         pc = self.app.scene.pc
         pc_position = pg.Vector2(pc.rect.center)
         pc_position += pg.Vector2(random.randint(-x_random, x_random), random.randint(-y_random, 0))
         self.rect.center = pc_position
+        super().attack()
+        

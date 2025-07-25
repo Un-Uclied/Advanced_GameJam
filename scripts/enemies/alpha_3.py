@@ -1,6 +1,6 @@
 from datas.const import *
 
-from .base.ghost_enemy import GhostEnemy
+from .base import GhostEnemy
 
 hit_box_size = (110, 110)
 

@@ -73,39 +73,39 @@ class App:
             "portal" : {
                 "idle" : Animation(load_images("entities/portal/idle", 2), .05, True)
             },
-            "one_alpha" : {
+            ONE_ALPHA : {
                 "idle" : Animation(load_images("entities/enemies/1_alpha/idle"), .05, True),
                 "run"  : Animation(load_images("entities/enemies/1_alpha/run"), .15, True),
             },
-            "one_beta" : {
+            ONE_BETA : {
                 "idle" : Animation(load_images("entities/enemies/1_beta/idle"), .05, True),
                 "run"  : Animation(load_images("entities/enemies/1_beta/run"), .15, True),
             },
-            "two_alpha" : {
+            TWO_ALPHA : {
                 "idle" : Animation(load_images("entities/enemies/2_alpha/idle"), .05, True),
                 "run"  : Animation(load_images("entities/enemies/2_alpha/run"), .15, True),
             },
-            "two_beta" : {
+            TWO_BETA : {
                 "idle" : Animation(load_images("entities/enemies/2_beta/idle"), .05, True),
                 "run"  : Animation(load_images("entities/enemies/2_beta/run"), .15, True),
             },
-            "three_alpha" : {
+            THREE_ALPHA : {
                 "attack" : Animation(load_images("entities/enemies/3_alpha/attack"), .05, False),
                 "run"    : Animation(load_images("entities/enemies/3_alpha/run"), .15, True),
             },
-            "three_beta" : {
+            THREE_BETA : {
                 "attack" : Animation(load_images("entities/enemies/3_beta/attack"), .05, False),
                 "run"    : Animation(load_images("entities/enemies/3_beta/run"), .15, True),
             },
-            "four_alpha" : {
+            FOUR_ALPHA : {
                 "idle" : Animation(load_images("entities/enemies/4_alpha/idle"), .05, True),
                 "run"  : Animation(load_images("entities/enemies/4_alpha/run"), .08, True),
             },
-            "four_beta" : {
+            FOUR_BETA : {
                 "idle" : Animation(load_images("entities/enemies/4_beta/idle"), .05, True),
                 "run"  : Animation(load_images("entities/enemies/4_beta/run"), .03, True),
             },
-            "five_omega" : {
+            FIVE_OMEGA : {
                 "idle" : Animation(load_images("entities/enemies/5_omega/idle"), .05, True),
                 "run"  : Animation(load_images("entities/enemies/5_omega/run"), .15, True),
             }
@@ -129,6 +129,16 @@ class App:
                 "jump" : pg.mixer.Sound(BASE_SOUND_PATH + "player/jump.wav"),
                 "hurt" : pg.mixer.Sound(BASE_SOUND_PATH + "player/hurt.wav")
             }
+        }
+
+        self.ASSET_VFXS = {
+            "hurt" : Animation(load_images("particles/hurt"), .03, False),
+            "enemy_attack" : Animation(load_images("particles/enemy_attack", tint_color="grey"), .03, False),
+        }
+
+        self.ASSET_PROJECTILES = {
+            "enemy_projectile_alpha" : Animation(load_images("projectiles/enemy_projectile", tint_color="purple"), .03, True),
+            "enemy_projectile_beta" : Animation(load_images("projectiles/enemy_projectile", tint_color="red"), .03, True),
         }
 
     def update_time(self):
