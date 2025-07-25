@@ -26,7 +26,7 @@ class PlayerStatus(GameObject):
         before_health = self._health
         self._health = max(min(value, self.max_health), 0)
         if before_health > self._health:
-            self.app.scene.camera.shake((before_health - self._health) * 2) #감소된 체력 * 2 만큼 흔들기
+            self.app.scene.camera.shake((before_health - self._health) * 2)#감소된 체력 * 2 만큼 흔들기
             self.current_invincible_timer = self.max_invincible_timer
 
             self.app.ASSET_SFXS["player"]["hurt"].play()

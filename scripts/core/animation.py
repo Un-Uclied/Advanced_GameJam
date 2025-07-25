@@ -4,9 +4,9 @@ class Animation:
     def __init__(self, images: list[pg.Surface], img_dur_seconds=0.1, loop=True):
         self.images = images
         self.loop = loop
-        self.img_duration = img_dur_seconds  # 초 단위 (예: 0.1초 = 10fps)
+        self.img_duration = img_dur_seconds
         self.done = False
-        self.elapsed = 0.0  # 누적 시간
+        self.elapsed = 0.0
         self.frame = 0
 
     def copy(self):

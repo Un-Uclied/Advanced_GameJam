@@ -90,8 +90,7 @@ class Tilemap(GameObject):
         camera = self.app.scene.camera
         tile_asset = self.app.singleton.ASSET_TILEMAP
 
-        #에디터 씬에선 모두 그림.
-        from .scenes import TileMapEditScene
+        from scripts.scenes import TileMapEditScene
 
         for data in self.off_grid:
             if data["type"] in DO_NOT_RENDER_TILES and not isinstance(self.app.scene, TileMapEditScene): continue

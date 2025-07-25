@@ -4,7 +4,7 @@ import random
 class AI:
     def __init__(self, entity):
         self.entity = entity
-        self.direction = pg.Vector2()
+        self.direction = pg.Vector2(0, 0)
 
     def on_update(self):
         pass
@@ -14,6 +14,8 @@ class WanderAI(AI):
         super().__init__(entity)
         
         self.direction.x = random.choice([-1, 0, 1])
+        self.direction.y = 0
+    
         self.move_speed = move_speed
 
         self.min_change_timer = min_change_timer
@@ -60,8 +62,6 @@ class WanderAI(AI):
                 self.current_change_timer = random.uniform(self.min_change_timer, self.max_change_timer)
                 self.direction.x = random.choice([-1, 0, 1])
 
-        self.entity.velocity.x = self.direction.x * self.move_speed * 100
-
     def handle_collision_or_fall(self, event_type):
         if event_type == "fall_left":
             self.direction.x = 1
@@ -73,11 +73,11 @@ class WanderAI(AI):
             self.direction.x = -1
         self.fix_direction_timer = 0.6
 
-class ChaseAI:
-    def __init__(self, entity, follow_speed: float, max_follow_dist: float):
-        self.entity = entity
+class ChaseAI(AI):
+    def __init__(self, entity, follow_speed: float, max_follow_range: float):
+        super().__init__(entity)
 
-        self.max_follow_distance = max_follow_dist
+        self.max_follow_range = max_follow_range
         self.follow_speed = follow_speed
 
         self.can_follow = True
@@ -86,6 +86,7 @@ class ChaseAI:
         self.target_position = self.start_positon
 
     def on_update(self):
+        super().on_update()
         entity = self.entity
         dt = entity.app.dt
         pc = entity.app.scene.pc
@@ -94,16 +95,16 @@ class ChaseAI:
         player_center = pg.Vector2(pc.rect.center)
         current_distance = entity_center.distance_to(player_center)
 
-        if current_distance <= self.max_follow_distance:
+        if current_distance <= self.max_follow_range:
             self.target_position = player_center
         else:
             self.target_position = self.start_positon
 
         if self.can_follow:
-            direction = self.target_position - entity_center
-            if direction.length_squared() > 0:
-                direction = direction.normalize()
-                entity.frame_movement = direction * self.follow_speed
+            self.direction = self.target_position - entity_center
+            if self.direction.length_squared() > 0:
+                self.direction = self.direction.normalize()
+                entity.frame_movement = self.direction * self.follow_speed
 
                 entity.rect.x += entity.frame_movement.x * dt
                 entity.rect.y += entity.frame_movement.y * dt

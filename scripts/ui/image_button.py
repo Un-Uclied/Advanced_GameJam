@@ -1,31 +1,8 @@
 import pygame as pg
 
 from datas.const import *
-from .objects import *
 
-class StringValue:
-    def __init__(self, value):
-        self.value = value
-
-class TextRenderer(GameObject):
-    def __init__(self, 
-                 value: StringValue, 
-                 pos: pg.Vector2,
-                 font_name : str = "default",
-                 font_size: int = 24,
-                 color: pg.Color = pg.Color(255, 255, 255)):
-        
-        super().__init__()
-        self.value = value
-        self.pos = pos
-        self.color = color
-        self.font = pg.font.Font(self.app.ASSET_FONT_PATHS[font_name], font_size)
-
-    def on_draw(self):
-        text_surf = self.font.render(self.value.value, False, self.color)
-
-        screen = self.app.surfaces[LAYER_INTERFACE]
-        screen.blit(text_surf, self.pos)
+from scripts.objects import GameObject
 
 class ImageButton(GameObject):
     def __init__(self, 
@@ -67,5 +44,3 @@ class ImageButton(GameObject):
         camera = self.app.scene.camera
         screen = self.app.surfaces[LAYER_INTERFACE]
         screen.blit(camera.get_scaled_surface(self.render_image), self.pos)
-                    
-    

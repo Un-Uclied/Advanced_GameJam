@@ -4,7 +4,10 @@ from datas.const import *
 from .load_image import *
 from .animation import *
 
-from .scenes import *
+from scripts.scenes.base import Scene
+from scripts.scenes import *
+
+mixer_channel_count = 32
 
 class App:
     singleton : 'App' = None
@@ -120,7 +123,7 @@ class App:
             }
         }
         
-        pg.mixer.set_num_channels(32)
+        pg.mixer.set_num_channels(mixer_channel_count)
         self.ASSET_SFXS = {
             "player" : {
                 "jump" : pg.mixer.Sound(BASE_SOUND_PATH + "player/jump.wav"),

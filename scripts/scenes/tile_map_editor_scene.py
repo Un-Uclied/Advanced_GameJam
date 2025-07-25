@@ -1,73 +1,13 @@
 import pygame as pg
 import math
 
-from .tilemap import *
-from .ui import *
-from .objects import *
-from .sky import *
-from .volume import *
-from .camera import *
-from .status import *
+from datas.const import *
 
-class Scene:
-    def __init__(self):
-        from .app import App
-        self.app = App.singleton
-    
-    def on_scene_start(self):
-        self.camera = Camera2D(scale=1, offset=pg.Vector2(0, 0))
+from .base.scene import Scene
 
-        self.fps_text = StringValue("")
-        TextRenderer(self.fps_text, pg.Vector2(SCREEN_SIZE.x - 55, 10), color="green")
-
-    def on_scene_end(self):
-        GameObject.object_list.clear()
-
-    def update_fps_text(self):
-        self.fps_text.value = str(round(self.app.clock.get_fps()))
-    
-    def on_update(self):
-        self.update_fps_text()
-        GameObject.update_all()
-
-    def on_draw(self):
-        GameObject.draw_all()
-
-class MainMenuScene(Scene):
-    def on_scene_start(self):
-        super().on_scene_start()
-        Sky()
-
-        def callback():
-            self.app.change_scene("main_game_scene")
-
-        ImageButton("temp", pg.Vector2(400, 400), callback)
-
-class MainGameScene(Scene):
-    def on_scene_start(self):
-        super().on_scene_start()
-        # self.camera.scale = 0.5
-
-        PlayerStatus()
-        self.tilemap = Tilemap()
-        TilemapSpawner.spawn_all(self.tilemap)
-
-        from .entities import Player
-        for pos in self.tilemap.get_pos_by_data("spawners", 0):
-            self.pc = Player(pg.Rect(pos.x, pos.y, 48, 128)) #플레이어는 예외 적으로 여기서 스폰하면, 다른곳에서도 self.app.scene.pc이렇게 접근 가능!!
-            break
-        
-        Sky("red_sky")
-        Fog()
-
-    def on_update(self):
-        for event in self.app.events:
-            if event.type == pg.KEYDOWN and event.key == pg.K_e:
-                self.camera.scale += .5
-            elif event.type == pg.KEYDOWN and event.key == pg.K_q:
-                self.camera.scale -= .5
-
-        super().on_update()
+from scripts.tilemap import Tilemap
+from scripts.volume import Sky
+from scripts.ui import TextRenderer
 
 class TileMapEditScene(Scene):
     def on_scene_start(self):
@@ -83,35 +23,20 @@ class TileMapEditScene(Scene):
         self.undo_stack = []
 
         self.can_collide = True
-        self.collide_mode_text = StringValue("[C] 현재 : 충돌 가능")
-
         self.in_grid_mode = True
-        self.grid_mode_text = StringValue("[Tab] 현재: 그리드")
-
         self.in_collision_view = False
-        self.view_mode_text = StringValue("[V] 현재 : 일반 뷰")
 
-        self.current_tile_text = StringValue(f"{self.tile_types[self.current_tile_type_index]} : [{self.current_tile_variant}]")
+        TextRenderer("[WASD] 움직이기 | [Q,E]로 줌 인,아웃",pg.Vector2(10, 10), color="black")
+        TextRenderer("[B] 오토 타일",pg.Vector2(10, 110), color="black")
+        TextRenderer("[휠] 타일 종류 변경 | [SHIFT + 휠] 타일 인덱스 변경",pg.Vector2(10, 135), color="black")
+        TextRenderer("[O] 저장하기 (temp.json에 저장됨.)",pg.Vector2(10, 190), color="black")
+        TextRenderer("[컨트롤 Z] 되돌리기 (인 그리드는 잘 안됨)",pg.Vector2(10, 215), color="black")
 
-        TextRenderer(StringValue("[WASD] 움직이기 | [Q,E]로 줌 인,아웃"),
-                      pg.Vector2(10, 10), color="black")
-        TextRenderer(self.collide_mode_text,
-                      pg.Vector2(10, 35), color="blue")
-        TextRenderer(self.grid_mode_text,
-                      pg.Vector2(10, 60), color="black")
-        TextRenderer(self.view_mode_text,
-                      pg.Vector2(10, 85), color="black")
-        TextRenderer(StringValue("[B] 오토 타일"),
-                      pg.Vector2(10, 110), color="black")
-        TextRenderer(StringValue("[휠] 타일 종류 변경 | [SHIFT + 휠] 타일 인덱스 변경"),
-                      pg.Vector2(10, 135), color="black")
-        TextRenderer(self.current_tile_text,
-                      pg.Vector2(10, 165), color="red")
-        TextRenderer(StringValue("[O] 저장하기 (temp.json에 저장됨.)"),
-                      pg.Vector2(10, 190), color="black")
-        TextRenderer(StringValue("[컨트롤 Z] 되돌리기 (인 그리드는 잘 안됨)"),
-                      pg.Vector2(10, 215), color="black")
-
+        self.collide_mode_text_renderer = TextRenderer("", pg.Vector2(10, 35), color="blue")
+        self.grid_mode_text_renderer = TextRenderer("",pg.Vector2(10, 60), color="black")
+        self.view_mode_text_renderer = TextRenderer("",pg.Vector2(10, 85), color="black")
+        self.current_tile_text_renderer = TextRenderer("", pg.Vector2(10, 165), color="red")
+        
         self.mouse_world_pos = pg.Vector2(0, 0)
         self.tile_pos = pg.Vector2(0, 0)
 
@@ -211,10 +136,10 @@ class TileMapEditScene(Scene):
                     self.camera.scale -= 0.5
 
     def _update_ui(self):
-        self.collide_mode_text.value = "[C] 현재 : 충돌 가능" if self.can_collide else "[C] 현재 : 충돌 X"
-        self.grid_mode_text.value = "[Tab] 현재: 그리드" if self.in_grid_mode else "[Tab] 현재: 자유"
-        self.view_mode_text.value = "[V] 현재 : 충돌범위 뷰" if self.in_collision_view else "[V] 현재 : 일반 뷰"
-        self.current_tile_text.value = f"{self.tile_types[self.current_tile_type_index]} : [{self.current_tile_variant}]"
+        self.view_mode_text_renderer.text = "[C] 현재 : 충돌 가능" if self.can_collide else "[C] 현재 : 충돌 X"
+        self.grid_mode_text_renderer.text = "[Tab] 현재: 그리드" if self.in_grid_mode else "[Tab] 현재: 자유"
+        self.view_mode_text_renderer.text = "[V] 현재 : 충돌범위 뷰" if self.in_collision_view else "[V] 현재 : 일반 뷰"
+        self.current_tile_text_renderer.text = f"{self.tile_types[self.current_tile_type_index]} : [{self.current_tile_variant}]"
 
     def _draw_grid(self):
         if not self.in_grid_mode:

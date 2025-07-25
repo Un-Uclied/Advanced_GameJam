@@ -1,0 +1,26 @@
+import random
+
+from datas.const import *
+
+from .base.ghost_enemy import GhostEnemy
+
+hit_box_size = (110, 110)
+
+x_random = 400
+y_random = 400
+
+class ThreeBeta(GhostEnemy):
+    def __init__(self, spawn_position : pg.Vector2):
+        rect = pg.Rect(spawn_position, hit_box_size)
+        super().__init__(THREE_BETA, rect, 
+                         follow_speed=300, 
+                         max_follow_range=700, 
+                         attack_damage=25, 
+                         max_attack_time=.8)
+
+    def attack(self):
+        super().attack()
+        pc = self.app.scene.pc
+        pc_position = pg.Vector2(pc.rect.center)
+        pc_position += pg.Vector2(random.randint(-x_random, x_random), random.randint(-y_random, 0))
+        self.rect.center = pc_position

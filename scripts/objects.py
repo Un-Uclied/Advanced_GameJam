@@ -1,6 +1,6 @@
 class GameObject:
     object_list : list["GameObject"] = []
-    debug = False
+    debug = True
 
     @classmethod
     def update_all(cls):
@@ -15,7 +15,7 @@ class GameObject:
     def __init__(self):
         GameObject.object_list.append(self)
         
-        from .app import App
+        from .core.app import App
         self.app = App.singleton
     
     def destroy(self):

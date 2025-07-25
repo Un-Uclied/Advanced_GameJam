@@ -1,0 +1,25 @@
+import pygame as pg
+
+from datas.const import *
+
+from scripts.objects import GameObject
+
+class TextRenderer(GameObject):
+    def __init__(self, 
+                 start_text : str,
+                 pos: pg.Vector2,
+                 font_name : str = "default",
+                 font_size: int = 24,
+                 color: pg.Color = pg.Color(255, 255, 255)):
+        
+        super().__init__()
+        self.text = start_text
+        self.pos = pos
+        self.color = color
+        self.font = pg.font.Font(self.app.ASSET_FONT_PATHS[font_name], font_size)
+
+    def on_draw(self):
+        text_surf = self.font.render(self.text, False, self.color)
+
+        screen = self.app.surfaces[LAYER_INTERFACE]
+        screen.blit(text_surf, self.pos)

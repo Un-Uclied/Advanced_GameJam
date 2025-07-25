@@ -1,7 +1,7 @@
 import pygame as pg
 
 from datas.const import *
-from .objects import *
+from scripts.objects import GameObject
 
 class Outline(GameObject):
     def __init__(self, entity, color, thickness = 1):

@@ -1,7 +1,6 @@
-import pygame as pg
-
 from datas.const import *
-from .objects import *
+
+from scripts.objects import GameObject
 
 class Sky(GameObject):
     def __init__(self, asset_key : str = "sky"):

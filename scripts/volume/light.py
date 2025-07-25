@@ -1,33 +1,34 @@
 import pygame as pg
 
 from datas.const import *
-from .objects import *
 
-LIGHT_SEGMENTS = 15
-LIGHT_FADE_OUT = 10
+from scripts.objects import GameObject
 
-class Light2D(GameObject):
-    lights : list["Light2D"] = []
+light_segments = 15
+light_fade_out = 10
+
+class Light(GameObject):
+    lights : list["Light"] = []
     def __init__(self, radius, position, strength=25):
         super().__init__()
         self.position = position
         self.radius = radius
         self.make_surface(radius, strength)
-        Light2D.lights.append(self)
+        Light.lights.append(self)
 
     def destroy(self):
-        Light2D.lights.remove(self)
+        Light.lights.remove(self)
         super().destroy()
 
     def make_surface(self, radius, strength):
         self.surface = pg.Surface((radius, radius), pg.SRCALPHA)
-        for i in range(LIGHT_SEGMENTS):
+        for i in range(light_segments):
             alpha = min(i * strength, 255)
             pg.draw.circle(
                 self.surface,
                 (255, 255, 255, alpha),
                 (radius / 2, radius / 2),
-                radius / 2 - i * LIGHT_FADE_OUT
+                radius / 2 - i * light_fade_out
             )
 
     def get_bound_box(self):
@@ -49,23 +50,3 @@ class Light2D(GameObject):
 
             screen_rect = camera.world_rect_to_screen_rect(box)
             surface.blit(camera.get_scaled_surface(light.surface), screen_rect.topleft, special_flags=pg.BLEND_RGBA_SUB)
-
-class Fog(GameObject):
-    def __init__(self, fog_color : pg.Color = pg.Color(0, 0, 0, 250)):
-        super().__init__()
-        self.fog_color = fog_color
-        self.fog_surface = pg.Surface(SCREEN_SIZE, flags=pg.SRCALPHA)
-
-    def on_draw(self):
-        self.fog_surface.fill((0, 0, 0, 0))
-
-        self.fog_surface.blit(self.app.surfaces[LAYER_OBJ])
-        self.fog_surface.blit(self.app.surfaces[LAYER_ENTITY])
-
-        self.fog_surface.fill(self.fog_color, special_flags=pg.BLEND_RGBA_MULT)
-        
-        Light2D.draw_lights(self.fog_surface, self.app.scene.camera)
-
-        self.app.surfaces[LAYER_VOLUME].blit(self.fog_surface, (0, 0))
-
-

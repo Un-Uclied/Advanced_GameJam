@@ -1,0 +1,1 @@
+from .ai import WanderAI, ChaseAI

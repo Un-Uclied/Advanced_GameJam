@@ -26,34 +26,33 @@ IN_GRID_TILES = ["dirt"]
 OFF_GRID_TILES = ["props", "folliage", "statues"]
 DO_NOT_RENDER_TILES = ["spawners", "enemy_spawners"]
 
-ATTACK_DMGS = {
-    "one_alpha" : 5,
-    "one_beta" : 10,
-    "two_alpha" : 10,
-    "two_beta" : 15,
-    "three_alpha" : 15,
-    "three_beta" : 20,
-    "four_alpha" : 25,
-    "four_beta" : 25,
-    "five_omega" : 30,
-}
+ONE_ALPHA = "one_alpha"
+ONE_BETA = "one_beta"
+TWO_ALPHA = "two_alpha"
+TWO_BETA = "two_beta"
+THREE_ALPHA = "three_alpha"
+THREE_BETA = "three_beta"
+FOUR_ALPHA = "four_alpha"
+FOUR_BETA = "four_beta"
+FIVE_OMEGA = "five_omega"
 
-from scripts.entities import Light2D, Soul, Portal
+from scripts.volume import Light
+from scripts.entities import Soul, Portal
 SPAWNER_ENTITY_MAP = {
-    1: lambda pos: Light2D(360, pos),
-    2: lambda pos: Soul(pg.Rect(pos.x, pos.y, 40, 80)),
-    3: lambda pos: Portal(pg.Rect(pos.x, pos.y, 180, 180)),
+    1: lambda pos: Light(360, pos),
+    2: lambda pos: Soul(pos),
+    3: lambda pos: Portal(pos),
 }
 
-from scripts.enemies import OneAlpha, OneBeta, TwoAlpha, TwoBeta, ThreeAlpha, ThreeBeta, FourAlpha, FourBeta, FiveOmega
+from scripts.enemies import *
 SPAWNER_ENEMY_MAP = {
-    0 : lambda pos: OneAlpha  (pg.Rect(pos.x, pos.y, 120, 120)),
-    1 : lambda pos: OneBeta   (pg.Rect(pos.x, pos.y, 120, 120)),
-    2 : lambda pos: TwoAlpha  (pg.Rect(pos.x, pos.y, 120, 120)),
-    3 : lambda pos: TwoBeta   (pg.Rect(pos.x, pos.y, 120, 120)),
-    4 : lambda pos: ThreeAlpha(pg.Rect(pos.x, pos.y, 120, 120)),
-    5 : lambda pos: ThreeBeta (pg.Rect(pos.x, pos.y, 120, 120)),
-    6 : lambda pos: FourAlpha (pg.Rect(pos.x, pos.y, 80, 165)),
-    7 : lambda pos: FourBeta  (pg.Rect(pos.x, pos.y, 80, 165)),
-    8 : lambda pos: FiveOmega (pg.Rect(pos.x, pos.y, 80, 165))
+    0 : lambda pos: OneAlpha  (pos),
+    1 : lambda pos: OneBeta   (pos),
+    2 : lambda pos: TwoAlpha  (pos),
+    3 : lambda pos: TwoBeta   (pos),
+    4 : lambda pos: ThreeAlpha(pos),
+    5 : lambda pos: ThreeBeta (pos),
+    6 : lambda pos: FourAlpha (pos),
+    7 : lambda pos: FourBeta  (pos),
+    8 : lambda pos: FiveOmega (pos)
 }
