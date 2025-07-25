@@ -5,9 +5,10 @@ from datas.const import *
 from .wander_enemy import WanderEnemy
 
 class ProjectileEnemy(WanderEnemy):
-    def __init__(self, name : str, rect, attack_damage, fire_range, projectile_damage, fire_cooltime, projectile_class, move_speed, min_change_timer, max_change_timer):
+    def __init__(self, name : str, rect, max_health, attack_damage, fire_range, projectile_damage, fire_cooltime, projectile_class, move_speed, min_change_timer, max_change_timer):
         super().__init__(name, rect, 
-                         attack_damage, 
+                         max_health,
+                         attack_damage,
                          move_speed, 
                          min_change_timer, 
                          max_change_timer)
@@ -26,7 +27,7 @@ class ProjectileEnemy(WanderEnemy):
         self.projectile_class = projectile_class
 
     def attack(self):
-        self.projectile_class(pg.Vector2(self.rect.center), pg.Vector2(1, 0) if self.flip_x else pg.Vector2(-1, 0))
+        self.projectile_class(self.name, self.projectile_damage, pg.Vector2(self.rect.center), pg.Vector2(1, 0) if self.flip_x else pg.Vector2(-1, 0))
 
     def on_update(self):
         super().on_update()

@@ -12,6 +12,7 @@ class TwoAlpha(ProjectileEnemy):
     def __init__(self, spawn_position : pg.Vector2):
         rect = pg.Rect(spawn_position, hit_box_size)
         super().__init__(TWO_ALPHA, rect, 
+                         max_health=125,
                          attack_damage=10,
                          fire_range=700,
                          projectile_damage = 15,

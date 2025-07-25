@@ -1,13 +1,13 @@
 import pygame as pg
 
-from .base.entity import Entity
 from .base.physics_entity import PhysicsEntity
 
-from .soul import Soul
-
-from scripts.volume import Outline, Light
+from scripts.projectiles import PlayerProjectile
+from scripts.volume import Light
+from scripts.vfx import Outline
 
 hit_box_size = (48, 128)
+projectile_damage = 25
 
 class PlayerCharacter(PhysicsEntity):
     def __init__(self, spawn_position : pg.Vector2):
@@ -40,7 +40,7 @@ class PlayerCharacter(PhysicsEntity):
 
         self.camera_follow_speed = 5
 
-    def get_input(self):
+    def handle_input(self):
         key = pg.key.get_pressed()
         self.input_drection = pg.Vector2()
         if key[pg.K_a]:
@@ -57,11 +57,10 @@ class PlayerCharacter(PhysicsEntity):
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE:
                     self.jump()
-                if event.key == pg.K_e:
-                    for entity in Entity.all_entities:
-                        if entity is not self and isinstance(entity, Soul) and self.rect.colliderect(entity.rect):
-                            entity.destroy()
-                            self.app.scene.camera.shake(20)
+
+            if event.type == pg.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    self.projectile_attack()
 
     def control_animation(self):
         if not self.collisions["down"]:
@@ -70,6 +69,13 @@ class PlayerCharacter(PhysicsEntity):
             if self.is_accel:
                 self.set_action("run")
             else : self.set_action("idle")
+
+    def projectile_attack(self):
+        camera = self.app.scene.camera
+
+        plr_pos = pg.Vector2(self.rect.center)
+        direction = (camera.screen_to_world(pg.Vector2(pg.mouse.get_pos())) - plr_pos).normalize()
+        PlayerProjectile(self.name, projectile_damage, plr_pos, direction)
 
     def jump(self):
         if (self.current_jump_count >= self.jump_count): return
@@ -99,7 +105,7 @@ class PlayerCharacter(PhysicsEntity):
         self.light.position = self.light.position.lerp(target_pos, max(min(self.app.dt * self.light_follow_speed, 1), 0))
 
     def on_update(self):
-        self.get_input()
+        self.handle_input()
         super().on_update()
         self.control_animation()
         self.follow_light_and_camera()

@@ -1,7 +1,7 @@
 import pygame as pg
 
 from scripts.vfx import AnimatedParticle
-from .objects import GameObject
+from scripts.objects import GameObject
 
 class PlayerStatus(GameObject):
     singleton : 'PlayerStatus' = None
@@ -34,7 +34,6 @@ class PlayerStatus(GameObject):
 
             self.app.ASSET_SFXS["player"]["hurt"].play()
             AnimatedParticle("hurt", pg.Vector2(pc.rect.center))
-
 
         if self._health <= 0:
             self.app.change_scene("main_game_scene")

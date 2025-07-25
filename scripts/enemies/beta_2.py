@@ -12,6 +12,7 @@ class TwoBeta(ProjectileEnemy):
     def __init__(self, spawn_position : pg.Vector2):
         rect = pg.Rect(spawn_position, hit_box_size)
         super().__init__(TWO_BETA, rect, 
+                         max_health=150,
                          attack_damage=15,
                          fire_range=700,
                          projectile_damage = 20,

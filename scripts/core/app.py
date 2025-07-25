@@ -61,14 +61,14 @@ class App:
         self.ASSET_FONT_PATHS = {
             "default" : "assets/fonts/PF스타더스트 3.0 Bold.ttf"
         }
-        self.ASSET_ANIMATIONS = {
+        self.ASSET_ENTITY_ANIMATIONS = {
             "player" : {
                 "idle" : Animation(load_images("entities/player/idle"), .05, True),
                 "run"  : Animation(load_images("entities/player/run"),  .08, True),
                 "jump" : Animation(load_images("entities/player/jump"),  1,  False)
             },
             "soul" : {
-                "idle" : Animation(load_images("entities/soul/idle", 2), .05, True)
+                "idle" : Animation(load_images("entities/soul/idle", 2, tint_color="cyan"), .05, True)
             },
             "portal" : {
                 "idle" : Animation(load_images("entities/portal/idle", 2), .05, True)
@@ -127,18 +127,39 @@ class App:
         self.ASSET_SFXS = {
             "player" : {
                 "jump" : pg.mixer.Sound(BASE_SOUND_PATH + "player/jump.wav"),
-                "hurt" : pg.mixer.Sound(BASE_SOUND_PATH + "player/hurt.wav")
+                "hurt" : pg.mixer.Sound(BASE_SOUND_PATH + "player/hurt.wav"),
+                "projectile" : pg.mixer.Sound(BASE_SOUND_PATH + "player/projectile.wav"),
+            },
+            "enemy" : {
+                "attack" : pg.mixer.Sound(BASE_SOUND_PATH + "enemy/attack.wav"),
+                "hurt" : pg.mixer.Sound(BASE_SOUND_PATH + "enemy/hurt.wav"),
+                "die" : pg.mixer.Sound(BASE_SOUND_PATH + "enemy/die.wav"),
+                "projectile" : pg.mixer.Sound(BASE_SOUND_PATH + "enemy/projectile.wav"),
+            },
+            "soul" : {
+                "interact" : pg.mixer.Sound(BASE_SOUND_PATH + "soul/interact.wav"),
             }
         }
 
         self.ASSET_VFXS = {
             "hurt" : Animation(load_images("particles/hurt"), .03, False),
+
             "enemy_attack" : Animation(load_images("particles/enemy_attack", tint_color="grey"), .03, False),
+            "enemy_die" : Animation(load_images("particles/enemy_die", tint_color="grey"), .03, False),
+
+            "soul_collect" : Animation(load_images("particles/soul_collect"), .03, False),
+            
+            "enemy_projectile_alpha_dissapear" : Animation(load_images("particles/dissapear", tint_color="purple"), .03, False),
+            "enemy_projectile_beta_dissapear" : Animation(load_images("particles/dissapear", tint_color="red"), .03, False),
+            
+            "player_projectile_dissapear" : Animation(load_images("particles/dissapear"), .03, False),
         }
 
         self.ASSET_PROJECTILES = {
-            "enemy_projectile_alpha" : Animation(load_images("projectiles/enemy_projectile", tint_color="purple"), .03, True),
-            "enemy_projectile_beta" : Animation(load_images("projectiles/enemy_projectile", tint_color="red"), .03, True),
+            "enemy_projectile_alpha" : Animation(load_images("projectiles/projectile", tint_color="purple"), .03, True),
+            "enemy_projectile_beta" : Animation(load_images("projectiles/projectile", tint_color="red"), .03, True),
+
+            "player_projectile" : Animation(load_images("projectiles/projectile"), .03, True),
         }
 
     def update_time(self):

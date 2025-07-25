@@ -3,7 +3,8 @@ import pygame as pg
 from .base.physics_entity import PhysicsEntity
 from scripts.ai import WanderAI
 
-from scripts.volume import Light, Outline
+from scripts.vfx import Outline, AnimatedParticle
+from scripts.volume import Light
 
 hit_box_size = (40, 50)
 
@@ -12,6 +13,7 @@ min_change_timer = .8
 max_change_timer = 1.5
 
 class Soul(PhysicsEntity):
+    all_souls : list['Soul'] = []
     def __init__(self, spawn_position : pg.Vector2):
         self.outline = Outline(self, "red")
         
@@ -28,13 +30,26 @@ class Soul(PhysicsEntity):
         self.light = Light(250, pg.Vector2(self.rect.center))
         self.light_follow_speed = 5
 
+        self.all_entities.append(self)
+
     def destroy(self):
         super().destroy()
         self.light.destroy()
         self.outline.destroy()
+        self.all_entities.remove(self)
+
+        AnimatedParticle("soul_collect", pg.Vector2(self.rect.center))
+
+        self.app.ASSET_SFXS[self.name]["interact"].play()
 
     def follow_light(self):
         self.light.position = self.light.position.lerp(self.rect.center, max(min(self.app.dt * self.light_follow_speed, 1), 0))
+
+    def handle_input(self):
+        for event in self.app.events:
+            if event.type == pg.KEYDOWN and event.key == pg.K_e and self.rect.colliderect(self.app.scene.pc.rect):
+                self.app.scene.camera.shake(10)
+                self.destroy()
 
     def on_update(self):
         super().on_update()
@@ -44,3 +59,5 @@ class Soul(PhysicsEntity):
         self.velocity.x = self.ai.direction.x * self.ai.move_speed * 100
 
         self.follow_light()
+
+        self.handle_input()

@@ -10,7 +10,6 @@ from scripts.volume import Fog, Sky
 class MainGameScene(Scene):
     def on_scene_start(self):
         super().on_scene_start()
-        # self.camera.scale = 0.5
 
         PlayerStatus()
         self.tilemap = Tilemap()
@@ -18,17 +17,8 @@ class MainGameScene(Scene):
 
         from scripts.entities import PlayerCharacter
         for pos in self.tilemap.get_pos_by_data("spawners", 0):
-            self.pc = PlayerCharacter(pos) #플레이어는 예외 적으로 여기서 스폰하면, 다른곳에서도 self.app.scene.pc이렇게 접근 가능!!
+            self.pc = PlayerCharacter(pos) #플레이어는 예외 적으로 여기서 스폰하면, 다른 게임 오브젝트에서도 self.app.scene.pc이렇게 접근 가능!!
             break
         
-        Sky("red_sky")
+        Sky()
         Fog()
-
-    def on_update(self):
-        for event in self.app.events:
-            if event.type == pg.KEYDOWN and event.key == pg.K_e:
-                self.camera.scale += .5
-            elif event.type == pg.KEYDOWN and event.key == pg.K_q:
-                self.camera.scale -= .5
-
-        super().on_update()

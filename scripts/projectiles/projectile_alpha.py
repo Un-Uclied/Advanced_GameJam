@@ -1,9 +1,23 @@
 import pygame as pg
 
+from scripts.status import PlayerStatus
+
 from .base import Projectile
 
-projectile_speed = 400
-
 class ProjectileAlpha(Projectile):
-    def __init__(self, start_position : pg.Vector2, start_direction : pg.Vector2):
-        super().__init__("enemy_projectile_alpha", start_position, start_direction, projectile_speed)
+    def __init__(self, entity_name : str, damage : int, start_position : pg.Vector2, start_direction : pg.Vector2):
+        super().__init__("enemy_projectile_alpha",
+                         entity_name,
+                         damage,
+                         start_position,
+                         start_direction, 
+                         speed=400)
+        
+        self.app.ASSET_SFXS["enemy"]["projectile"].play()
+        
+    def on_update(self):
+        super().on_update()
+        pc = self.app.scene.pc
+        if pc.rect.collidepoint(self.position):
+            PlayerStatus.singleton.health -= self.damage
+            self.destroy()

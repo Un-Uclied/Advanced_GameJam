@@ -2,14 +2,18 @@ import pygame as pg
 
 from datas.const import *
 
+from scripts.status import PlayerStatus
 from scripts.objects import GameObject
-from scripts.volume import Light
+from scripts.vfx import AnimatedParticle
 
 class Projectile(GameObject):
     all_projectiles : list['Projectile'] = []
-    def __init__(self, name : str, start_position : pg.Vector2, start_direction : pg.Vector2, speed : float, time_out = 5):
+    def __init__(self, name : str, entity_name : str, damage : int, start_position : pg.Vector2, start_direction : pg.Vector2, speed : float, time_out = 5):
         super().__init__()
         self.name = name
+        self.entity_name = entity_name
+
+        self.damage = damage
 
         self.position = start_position
         self.direction = start_direction
@@ -21,19 +25,16 @@ class Projectile(GameObject):
 
         Projectile.all_projectiles.append(self)
 
-        self.light = Light(400, self.position)
-
     def destroy(self):
         super().destroy()
-        self.light.destroy()
         Projectile.all_projectiles.remove(self)
+
+        AnimatedParticle(self.name + "_dissapear", self.position)
 
     def on_update(self):
         self.position += self.direction * self.speed * self.app.dt
     
         self.anim.update(self.app.dt)
-
-        self.light.position = self.position
 
         self.time_out_timer -= self.app.dt
         if self.time_out_timer <= 0:
@@ -51,7 +52,7 @@ class Projectile(GameObject):
 
         image = self.anim.img()
 
-        angle = -self.direction.angle_to(pg.Vector2(1, 0))
+        angle = self.direction.angle_to(pg.Vector2(1, 0))
 
         rotated_img = pg.transform.rotate(image, angle)
         rotated_img = camera.get_scaled_surface(rotated_img)

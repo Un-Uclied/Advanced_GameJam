@@ -20,6 +20,7 @@ class FourAlpha(WanderEnemy):
     def __init__(self, spawn_position : pg.Vector2):
         rect = pg.Rect(spawn_position, hit_box_size)
         super().__init__(FOUR_ALPHA, rect,
+                          max_health=175,
                           attack_damage=25, 
                           move_speed=normal_walk_speed, 
                           min_change_timer=normal_min_change_timer, 

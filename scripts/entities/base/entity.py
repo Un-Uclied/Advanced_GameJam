@@ -34,7 +34,7 @@ class Entity(GameObject):
         if self.current_action == action_name : return
 
         self.current_action = action_name
-        self.anim = self.app.ASSET_ANIMATIONS[self.name][action_name].copy()
+        self.anim = self.app.ASSET_ENTITY_ANIMATIONS[self.name][action_name].copy()
 
     def get_rect_points(self):
         points = []
