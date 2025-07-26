@@ -1,7 +1,6 @@
 import pygame as pg
 
-from .base.entity import Entity
-
+from .base import Entity
 from scripts.volume import Light
 
 hit_box_size = (110, 110)

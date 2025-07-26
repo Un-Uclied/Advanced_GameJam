@@ -1,6 +1,6 @@
 import pygame as pg
 
-from datas.const import *
+from scripts.constants.app_settings import *
 
 from scripts.entities.base import Entity
 from scripts.vfx import Outline, AnimatedParticle
@@ -31,10 +31,11 @@ class GhostEnemy(Entity):
 
         Enemy.all_enemies.append(self)
 
-    def destroy(self):
-        self.outline.destroy()
-        Enemy.all_enemies.remove(self)
-        super().destroy()
+    def on_destroy(self):
+        self.outline.on_destroy()
+        if self in Enemy.all_enemies:
+            Enemy.all_enemies.remove(self)
+        super().on_destroy()
 
     def attack(self):
         if self.is_attacking:
@@ -46,7 +47,7 @@ class GhostEnemy(Entity):
 
         self.set_action("attack")
         AnimatedParticle("enemy_attack", pg.Vector2(self.rect.center))
-        self.app.ASSET_SFXS["enemy"]["attack"].play()
+        self.app.ASSETS["sounds"]["enemy"]["attack"].play()
 
     def update_attack(self):
         if self.current_attack_time > 0:

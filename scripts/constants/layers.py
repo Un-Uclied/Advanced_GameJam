@@ -1,0 +1,6 @@
+LAYER_BG = "background"
+LAYER_OBJ = "objects"
+LAYER_ENTITY = "entities"
+LAYER_DYNAMIC = "dynamics"
+LAYER_VOLUME = "volume"
+LAYER_INTERFACE = "interface"

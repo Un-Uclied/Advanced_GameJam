@@ -1,6 +1,6 @@
 import pygame as pg
 
-from datas.const import *
+from scripts.constants import *
 from scripts.objects import GameObject
 
 class Outline(GameObject):
@@ -16,13 +16,14 @@ class Outline(GameObject):
         if not self.enabled:
             return
         camera = self.entity.app.scene.camera
-        screen = self.entity.app.surfaces[LAYER_ENTITY]
+        surface = self.entity.app.surfaces[LAYER_ENTITY]
         entity = self.entity
 
         world_position = pg.Vector2(entity.rect.topleft) + entity.flip_offset[entity.flip_x]
         image = entity.anim.img()
 
-        if not camera.is_in_view(pg.Rect(world_position, image.get_size())) : return
+        rect = pg.Rect(world_position, image.get_size())
+        if not camera.is_in_view(rect) : return
 
         image = camera.get_scaled_surface(image)
 
@@ -31,10 +32,10 @@ class Outline(GameObject):
         outline_surface.set_colorkey((0, 0, 0))
         outline_surface = pg.transform.flip(outline_surface, entity.flip_x, False)
 
-        position = camera.world_to_screen(world_position)
+        screen_position = camera.world_to_screen(world_position)
 
         for dx in range(-self.thickness, self.thickness + 1):
             for dy in range(-self.thickness, self.thickness + 1):
                 if dx == 0 and dy == 0:
                     continue
-                screen.blit(outline_surface, (position[0] + dx, position[1] + dy))
+                surface.blit(outline_surface, (screen_position[0] + dx, screen_position[1] + dy))

@@ -1,8 +1,8 @@
 import pygame as pg
 import json
 
-from .objects import *
-from datas.const import *
+from scripts.constants import *
+from scripts.objects import GameObject
 
 AUTOTILE_MAP = {
     tuple(sorted([(1, 0), (0, 1)])): 0,
@@ -18,17 +18,11 @@ AUTOTILE_MAP = {
 
 NEIGHBOR_OFFSETS = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (0, 0), (-1, 1), (0, 1), (1, 1)]
 
-class TilemapSpawner:
-    @staticmethod
-    def spawn_all(tilemap: 'Tilemap'):
-        for spawner_id, constructor in SPAWNER_ENEMY_MAP.items():
-            for pos in tilemap.get_pos_by_data("enemy_spawners", spawner_id):
-                instance = constructor(pos)
-        for spawner_id, constructor in SPAWNER_ENTITY_MAP.items():
-            for pos in tilemap.get_pos_by_data("spawners", spawner_id):
-                if spawner_id == 0: #플레이어는 따로
-                    continue
-                instance = constructor(pos)
+AUTO_TILE_TILES = ["dirt"]
+IN_GRID_TILES = ["dirt"]
+DO_NOT_RENDER_TILES = ["spawners_entities", "spawners_enemies"]
+
+BASE_TILEMAP_PATH = "datas/tilemaps/"
 
 class Tilemap(GameObject):
     def __init__(self, json_file_name : str = "temp.json"):
@@ -88,7 +82,7 @@ class Tilemap(GameObject):
     def on_draw(self):
         screen = self.app.surfaces[LAYER_OBJ]
         camera = self.app.scene.camera
-        tile_asset = self.app.singleton.ASSET_TILEMAP
+        tile_asset = self.app.ASSETS["tilemap"]
 
         from scripts.scenes import TileMapEditScene
 

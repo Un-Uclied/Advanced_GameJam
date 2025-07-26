@@ -1,6 +1,6 @@
 import pygame as pg
 
-from datas.const import *
+from scripts.constants.app_settings import *
 
 from .base import WanderEnemy
 
@@ -19,7 +19,7 @@ crazy_max_change_timer = 3
 class FourAlpha(WanderEnemy):
     def __init__(self, spawn_position : pg.Vector2):
         rect = pg.Rect(spawn_position, hit_box_size)
-        super().__init__(FOUR_ALPHA, rect,
+        super().__init__("four_alpha", rect,
                           max_health=175,
                           attack_damage=25, 
                           move_speed=normal_walk_speed, 

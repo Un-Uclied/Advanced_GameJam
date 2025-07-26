@@ -1,6 +1,6 @@
 import random
 
-from datas.const import *
+from scripts.constants.app_settings import *
 
 from .base import GhostEnemy
 
@@ -12,7 +12,7 @@ y_random = 400
 class ThreeBeta(GhostEnemy):
     def __init__(self, spawn_position : pg.Vector2):
         rect = pg.Rect(spawn_position, hit_box_size)
-        super().__init__(THREE_BETA, rect,
+        super().__init__("three_beta", rect,
                          max_health=150,
                          follow_speed=300, 
                          max_follow_range=700, 

@@ -1,6 +1,6 @@
 import pygame as pg
 
-from datas.const import *
+from scripts.constants.app_settings import *
 
 from .wander_enemy import WanderEnemy
 

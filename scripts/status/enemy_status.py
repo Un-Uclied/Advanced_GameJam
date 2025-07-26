@@ -23,12 +23,12 @@ class EnemyStatus(GameObject):
             self.app.scene.camera.shake(before_health - self._health) 
 
             if self._health > 0:
-                self.app.ASSET_SFXS["enemy"]["hurt"].play()
+                self.app.ASSETS["sounds"]["enemy"]["hurt"].play()
                 AnimatedParticle("hurt", pg.Vector2(self.entity.rect.center))
             else:
-                self.app.ASSET_SFXS["enemy"]["die"].play()
+                self.app.ASSETS["sounds"]["enemy"]["die"].play()
                 AnimatedParticle("enemy_die", pg.Vector2(self.entity.rect.center))
             
 
         if self._health <= 0:
-            self.entity.destroy()
+            self.entity.on_destroy()

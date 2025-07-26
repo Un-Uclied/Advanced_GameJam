@@ -1,6 +1,7 @@
 import pygame as pg
 
-from .base.physics_entity import PhysicsEntity
+
+from .base import Entity, PhysicsEntity
 from scripts.ai import WanderAI
 
 from scripts.vfx import Outline, AnimatedParticle
@@ -30,17 +31,13 @@ class Soul(PhysicsEntity):
         self.light = Light(250, pg.Vector2(self.rect.center))
         self.light_follow_speed = 5
 
-        self.all_entities.append(self)
-
-    def destroy(self):
-        super().destroy()
-        self.light.destroy()
-        self.outline.destroy()
-        self.all_entities.remove(self)
+    def on_destroy(self):
+        super().on_destroy()
+        self.light.on_destroy()
+        self.outline.on_destroy()
 
         AnimatedParticle("soul_collect", pg.Vector2(self.rect.center))
-
-        self.app.ASSET_SFXS[self.name]["interact"].play()
+        self.app.ASSETS["sounds"]["soul"]["interact"].play()
 
     def follow_light(self):
         self.light.position = self.light.position.lerp(self.rect.center, max(min(self.app.dt * self.light_follow_speed, 1), 0))
@@ -49,7 +46,7 @@ class Soul(PhysicsEntity):
         for event in self.app.events:
             if event.type == pg.KEYDOWN and event.key == pg.K_e and self.rect.colliderect(self.app.scene.pc.rect):
                 self.app.scene.camera.shake(10)
-                self.destroy()
+                self.on_destroy()
 
     def on_update(self):
         super().on_update()

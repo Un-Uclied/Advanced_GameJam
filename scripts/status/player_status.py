@@ -32,7 +32,7 @@ class PlayerStatus(GameObject):
             self.app.scene.camera.shake((before_health - self._health) * 2)#감소된 체력 * 2 만큼 흔들기
             self.current_invincible_timer = self.max_invincible_timer
 
-            self.app.ASSET_SFXS["player"]["hurt"].play()
+            self.app.ASSETS["sounds"]["player"]["hurt"].play()
             AnimatedParticle("hurt", pg.Vector2(pc.rect.center))
 
         if self._health <= 0:

@@ -1,11 +1,10 @@
 import pygame as pg
 import math
 
-from datas.const import *
-
 from .base.scene import Scene
 
-from scripts.tilemap import Tilemap
+from scripts.constants import *
+from scripts.tilemap import Tilemap, IN_GRID_TILES
 from scripts.volume import Sky
 from scripts.ui import TextRenderer
 
@@ -16,7 +15,7 @@ class TileMapEditScene(Scene):
 
         self.tilemap = Tilemap("temp.json")
 
-        self.tile_types = list(self.app.ASSET_TILEMAP.keys())
+        self.tile_types = list(self.app.ASSETS["tilemap"].keys())
         self.current_tile_type_index = 0
         self.current_tile_variant = 0
 
@@ -40,7 +39,7 @@ class TileMapEditScene(Scene):
         self.mouse_world_pos = pg.Vector2(0, 0)
         self.tile_pos = pg.Vector2(0, 0)
 
-    def _save_undo_state(self):
+    def save_undo_state(self):
         self.undo_stack.append({
             "in_grid": self.tilemap.in_grid.copy(),
             "off_grid": self.tilemap.off_grid.copy()
@@ -49,14 +48,14 @@ class TileMapEditScene(Scene):
         if len(self.undo_stack) > 50:
             self.undo_stack.pop(0)
 
-    def _undo(self):
+    def undo(self):
         if not self.undo_stack:
             return
         last_state = self.undo_stack.pop()
         self.tilemap.in_grid = last_state["in_grid"].copy()
         self.tilemap.off_grid = last_state["off_grid"].copy()
 
-    def _update_mouse_position(self):
+    def update_mouse_position(self):
         self.mouse_world_pos = self.camera.screen_to_world(pg.mouse.get_pos())
 
         if self.in_grid_mode:
@@ -67,7 +66,7 @@ class TileMapEditScene(Scene):
         else:
             self.tile_pos = pg.Vector2(self.mouse_world_pos.x / self.tilemap.tile_size, self.mouse_world_pos.y / self.tilemap.tile_size)
 
-    def _handle_input(self):
+    def handle_input(self):
         keys = pg.key.get_pressed()
         for event in self.app.events:
             if event.type == pg.KEYUP:
@@ -91,16 +90,16 @@ class TileMapEditScene(Scene):
                     self.tilemap.save_file()
                 #되돌리기
                 if event.key == pg.K_z and keys[pg.K_LCTRL]:
-                    self._undo()
+                    self.undo()
 
             if event.type == pg.MOUSEBUTTONDOWN and not self.in_grid_mode:
                 if event.button == 1:
-                    self._place_tile_offgrid()
+                    self.place_tile_offgrid()
             
             if event.type == pg.MOUSEWHEEL:
                 if keys[pg.K_LSHIFT]:
                     tile_type_name = self.tile_types[self.current_tile_type_index]
-                    tile_variant_len = len(self.app.ASSET_TILEMAP[tile_type_name])
+                    tile_variant_len = len(self.app.ASSETS["tilemap"][tile_type_name])
                     if event.y > 0:
                         self.current_tile_variant = (self.current_tile_variant + 1) % tile_variant_len
                     elif event.y < 0:
@@ -111,22 +110,22 @@ class TileMapEditScene(Scene):
 
         left, _, right = pg.mouse.get_pressed()
         if left:
-            self._place_tile_grid()
+            self.place_tile_grid()
         if right:
-            self._remove_tile()
+            self.remove_tile()
 
-    def _move_camera(self):
+    def move_camera(self):
         keys = pg.key.get_pressed()
 
         move_speed = 300 * self.app.dt / self.camera.scale
         if keys[pg.K_w]:
-            self.camera.offset += pg.Vector2(0, -move_speed)
+            self.camera.position += pg.Vector2(0, -move_speed)
         if keys[pg.K_s]:
-            self.camera.offset += pg.Vector2(0, move_speed)
+            self.camera.position += pg.Vector2(0, move_speed)
         if keys[pg.K_a]:
-            self.camera.offset += pg.Vector2(-move_speed, 0)
+            self.camera.position += pg.Vector2(-move_speed, 0)
         if keys[pg.K_d]:
-            self.camera.offset += pg.Vector2(move_speed, 0)
+            self.camera.position += pg.Vector2(move_speed, 0)
 
         for event in self.app.events:
             if event.type == pg.KEYDOWN:
@@ -135,13 +134,13 @@ class TileMapEditScene(Scene):
                 if event.key == pg.K_e:
                     self.camera.scale -= 0.5
 
-    def _update_ui(self):
+    def update_ui(self):
         self.view_mode_text_renderer.text = "[C] 현재 : 충돌 가능" if self.can_collide else "[C] 현재 : 충돌 X"
         self.grid_mode_text_renderer.text = "[Tab] 현재: 그리드" if self.in_grid_mode else "[Tab] 현재: 자유"
         self.view_mode_text_renderer.text = "[V] 현재 : 충돌범위 뷰" if self.in_collision_view else "[V] 현재 : 일반 뷰"
         self.current_tile_text_renderer.text = f"{self.tile_types[self.current_tile_type_index]} : [{self.current_tile_variant}]"
 
-    def _draw_grid(self):
+    def draw_grid(self):
         if not self.in_grid_mode:
             return
 
@@ -169,7 +168,7 @@ class TileMapEditScene(Scene):
             screen_end = self.camera.world_to_screen(pg.Vector2(bottom_right_world.x, world_y_coord))
             pg.draw.line(self.app.surfaces[LAYER_INTERFACE], grid_color, screen_start, screen_end)
 
-    def _draw_collision(self):
+    def draw_collision(self):
         if not self.in_collision_view:
             return
         
@@ -185,7 +184,7 @@ class TileMapEditScene(Scene):
             rect = pg.Rect(screen_pos.x, screen_pos.y, scaled_tile_size, scaled_tile_size)
             pg.draw.rect(self.app.surfaces[LAYER_INTERFACE], "blue", rect)
 
-    def _draw_preview(self):
+    def draw_preview(self):
         tile_size = self.tilemap.tile_size
         scaled_tile_size = int(tile_size * self.camera.scale)
         
@@ -194,7 +193,7 @@ class TileMapEditScene(Scene):
         current_tile_type = self.tile_types[self.current_tile_type_index]
         current_tile_variant = self.current_tile_variant
 
-        preview_image = self.camera.get_scaled_surface(self.app.ASSET_TILEMAP[current_tile_type][current_tile_variant].copy())
+        preview_image = self.camera.get_scaled_surface(self.app.ASSETS["tilemap"][current_tile_type][current_tile_variant].copy())
         preview_image.set_alpha(150)
 
         self.app.surfaces[LAYER_INTERFACE].blit(preview_image, preview_screen_pos)
@@ -203,12 +202,12 @@ class TileMapEditScene(Scene):
         if self.can_collide:
             pg.draw.rect(self.app.surfaces[LAYER_INTERFACE], (255, 0, 0, 100), pg.Rect(preview_screen_pos.x, preview_screen_pos.y, scaled_tile_size, scaled_tile_size), 2)
 
-    def _place_tile_grid(self):
+    def place_tile_grid(self):
         if not self.in_grid_mode:
             return
         if self.tile_types[self.current_tile_type_index] not in IN_GRID_TILES:
             return
-        self._save_undo_state()
+        self.save_undo_state()
         self.tilemap.in_grid[f"{int(self.tile_pos.x)},{int(self.tile_pos.y)}"] = {
             "pos": [int(self.tile_pos.x), int(self.tile_pos.y)],
             "type": self.tile_types[self.current_tile_type_index],
@@ -216,40 +215,41 @@ class TileMapEditScene(Scene):
             "can_collide": self.can_collide
         }
 
-    def _place_tile_offgrid(self):
+    def place_tile_offgrid(self):
         if self.in_grid_mode:
             return
-        self._save_undo_state() 
+        self.save_undo_state() 
         self.tilemap.off_grid.append({
             "pos": [self.tile_pos.x, self.tile_pos.y],
             "type": self.tile_types[self.current_tile_type_index],
             "variant": self.current_tile_variant
         })
 
-    def _remove_tile(self):
+    def remove_tile(self):
         if self.in_grid_mode:
             key = f"{int(self.tile_pos.x)},{int(self.tile_pos.y)}"
             if key in self.tilemap.in_grid:
-                self._save_undo_state()
+                self.save_undo_state()
                 del self.tilemap.in_grid[key]
         else:
             for object_data in self.tilemap.off_grid.copy():
-                original_image = self.app.ASSET_TILEMAP[object_data["type"]][object_data["variant"]]
+                original_image = self.app.ASSETS["tilemap"][object_data["type"]][object_data["variant"]]
                 size = original_image.get_size()
                 rect = pg.Rect(object_data["pos"][0] * self.tilemap.tile_size, object_data["pos"][1] * self.tilemap.tile_size, size[0], size[1])
                 if rect.collidepoint(self.mouse_world_pos):
-                    self._save_undo_state()
-                    self.tilemap.off_grid.remove(object_data)
+                    self.save_undo_state()
+                    if object_data in self.tilemap.off_grid:
+                        self.tilemap.off_grid.remove(object_data)
 
     def on_update(self):
         super().on_update()
-        self._update_mouse_position()
-        self._handle_input()
-        self._move_camera()
-        self._update_ui()
+        self.update_mouse_position()
+        self.handle_input()
+        self.move_camera()
+        self.update_ui()
 
     def on_draw(self):
-        self._draw_grid()
+        self.draw_grid()
         super().on_draw()
-        self._draw_collision()
-        self._draw_preview()
+        self.draw_collision()
+        self.draw_preview()

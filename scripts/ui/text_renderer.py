@@ -1,8 +1,9 @@
 import pygame as pg
 
-from datas.const import *
-
+from scripts.constants import *
 from scripts.objects import GameObject
+
+BASE_FONT_PATH = "assets/fonts/"
 
 class TextRenderer(GameObject):
     def __init__(self, 
@@ -16,7 +17,7 @@ class TextRenderer(GameObject):
         self.text = start_text
         self.pos = pos
         self.color = color
-        self.font = pg.font.Font(self.app.ASSET_FONT_PATHS[font_name], font_size)
+        self.font = pg.font.Font(BASE_FONT_PATH + self.app.ASSETS["fonts"][font_name], font_size)
 
     def on_draw(self):
         text_surf = self.font.render(self.text, False, self.color)

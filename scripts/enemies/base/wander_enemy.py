@@ -1,6 +1,6 @@
 import pygame as pg
 
-from datas.const import *
+from scripts.constants.app_settings import *
 
 from scripts.entities.base import PhysicsEntity
 from scripts.vfx import Outline, AnimatedParticle
@@ -36,10 +36,11 @@ class WanderEnemy(PhysicsEntity):
         else:
             self.set_action("run")
         
-    def destroy(self):
-        self.outline.destroy()
-        Enemy.all_enemies.remove(self)
-        super().destroy()
+    def on_destroy(self):
+        self.outline.on_destroy()
+        if self in Enemy.all_enemies:
+            Enemy.all_enemies.remove(self)
+        super().on_destroy()
         
     def on_update(self):
         super().on_update()
@@ -53,4 +54,4 @@ class WanderEnemy(PhysicsEntity):
             PlayerStatus.singleton.health -= self.attack_damage
 
             AnimatedParticle("enemy_attack", pg.Vector2(self.rect.center))
-            self.app.ASSET_SFXS["enemy"]["attack"].play()
+            self.app.ASSETS["sounds"]["enemy"]["attack"].play()

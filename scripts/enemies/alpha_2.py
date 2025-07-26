@@ -1,9 +1,8 @@
 import pygame as pg
 
-from datas.const import *
-
 from .base import ProjectileEnemy
 
+from scripts.constants import *
 from scripts.projectiles import ProjectileAlpha
 
 hit_box_size = (110, 110)
@@ -11,7 +10,7 @@ hit_box_size = (110, 110)
 class TwoAlpha(ProjectileEnemy):
     def __init__(self, spawn_position : pg.Vector2):
         rect = pg.Rect(spawn_position, hit_box_size)
-        super().__init__(TWO_ALPHA, rect, 
+        super().__init__("two_alpha", rect, 
                          max_health=125,
                          attack_damage=10,
                          fire_range=700,

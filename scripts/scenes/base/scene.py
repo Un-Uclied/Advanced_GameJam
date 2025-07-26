@@ -1,10 +1,8 @@
 import pygame as pg
 
-from datas.const import *
-
+from scripts.constants import *
 from scripts.camera import Camera2D
-from scripts.ui import *
-
+from scripts.ui import TextRenderer
 from scripts.objects import GameObject
 
 class Scene:
@@ -13,7 +11,7 @@ class Scene:
         self.app = App.singleton
     
     def on_scene_start(self):
-        self.camera = Camera2D(scale=1, offset=pg.Vector2(0, 0))
+        self.camera = Camera2D(scale=1, position=pg.Vector2(0, 0))
 
         self.fps_text_renderer = TextRenderer("??", pg.Vector2(SCREEN_SIZE.x - 55, 10), color="green")
 

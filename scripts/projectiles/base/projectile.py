@@ -1,14 +1,19 @@
 import pygame as pg
 
-from datas.const import *
-
-from scripts.status import PlayerStatus
+from scripts.constants import *
 from scripts.objects import GameObject
 from scripts.vfx import AnimatedParticle
 
+class ProjectileManager:
+    def __init__(self):
+        pass
+
 class Projectile(GameObject):
     all_projectiles : list['Projectile'] = []
-    def __init__(self, name : str, entity_name : str, damage : int, start_position : pg.Vector2, start_direction : pg.Vector2, speed : float, time_out = 5):
+    def __init__(self, name : str, entity_name : str,
+                 damage : int,
+                 start_position : pg.Vector2, start_direction : pg.Vector2,
+                 speed : float, time_out = 5):
         super().__init__()
         self.name = name
         self.entity_name = entity_name
@@ -21,15 +26,15 @@ class Projectile(GameObject):
 
         self.time_out_timer = time_out
 
-        self.anim = self.app.ASSET_PROJECTILES[self.name].copy()
+        self.anim = self.app.ASSETS["animations"]["projectiles"][self.name].copy()
 
         Projectile.all_projectiles.append(self)
 
-    def destroy(self):
-        super().destroy()
-        Projectile.all_projectiles.remove(self)
+    def on_destroy(self):
+        super().on_destroy()
 
-        AnimatedParticle(self.name + "_dissapear", self.position)
+        if self in Projectile.all_projectiles:
+            Projectile.all_projectiles.remove(self)
 
     def on_update(self):
         self.position += self.direction * self.speed * self.app.dt
@@ -38,11 +43,11 @@ class Projectile(GameObject):
 
         self.time_out_timer -= self.app.dt
         if self.time_out_timer <= 0:
-            self.destroy()
+            self.on_destroy()
 
         for rect in self.app.scene.tilemap.physic_tiles_around(self.position):
             if rect.collidepoint(self.position):
-                self.destroy()
+                self.on_destroy()
 
     def on_draw(self):
         super().on_draw()
@@ -61,4 +66,3 @@ class Projectile(GameObject):
         screen_pos = camera.world_to_screen(draw_pos)
 
         surface.blit(rotated_img, screen_pos)
-

@@ -1,7 +1,6 @@
 import pygame as pg
 
-from datas.const import *
-
+from scripts.constants import *
 from scripts.objects import GameObject
 
 class ImageButton(GameObject):
@@ -14,8 +13,8 @@ class ImageButton(GameObject):
         self.pos = position
         self.action = action
 
-        self.hover_image = self.app.ASSET_UI["image_button"][name]["on_hover"]
-        self.hover_not_image = self.app.ASSET_UI["image_button"][name]["on_not_hover"]
+        self.hover_image = self.app.ASSETS["ui"]["image_button"][name]["on_hover"]
+        self.hover_not_image = self.app.ASSETS["ui"]["image_button"][name]["on_not_hover"]
         self.render_image = self.hover_not_image
 
         size = self.hover_image.get_size()

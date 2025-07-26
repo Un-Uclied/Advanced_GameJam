@@ -1,13 +1,10 @@
 import pygame as pg
 
-from datas.const import *
-from .load_image import *
-from .animation import *
-
-from scripts.scenes.base import Scene
+from scripts.constants import *
 from scripts.scenes import *
 
-mixer_channel_count = 32
+from .load_image import *
+from .animation import *
 
 class App:
     singleton : 'App' = None
@@ -15,7 +12,7 @@ class App:
         App.singleton = self
 
         pg.init()
-        pg.display.set_caption(GAME_NAME, GAME_NAME)
+        pg.display.set_caption(APP_NAME)
 
         self.screen = pg.display.set_mode(SCREEN_SIZE, SCREEN_FLAGS)
         self.surfaces = {
@@ -27,6 +24,7 @@ class App:
             LAYER_INTERFACE : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
         }
 
+        pg.mixer.set_num_channels(MIXER_CHANNEL_COUNT)
         self.load_assets()
 
         self.clock = pg.time.Clock()
@@ -40,7 +38,7 @@ class App:
         self.update_time()
         self.update_event()
 
-        self.registered_scenes : dict[str, Scene] = {
+        self.registered_scenes = {
             "main_menu_scene" : MainMenuScene(),
             "main_game_scene" : MainGameScene(),
             "editor_scene"    : TileMapEditScene()
@@ -50,116 +48,121 @@ class App:
         self.scene.on_scene_start()
 
     def load_assets(self):
-        self.ASSET_TILEMAP = {
-            "dirt"           :  load_images("tiles/tiles/dirt",         tint_color= "grey"),
-            "folliage"       :  load_images("tiles/objects/folliage",   tint_color= "grey"),
-            "props"          :  load_images("tiles/objects/props",      tint_color= "grey"),
-            "statues"        :  load_images("tiles/objects/statues",    tint_color= "grey"),
-            "spawners"       :  load_images("tiles/spawners"                              ),
-            "enemy_spawners" :  load_images("tiles/enemy_spawners"                        )
-        }
-        self.ASSET_FONT_PATHS = {
-            "default" : "assets/fonts/PF스타더스트 3.0 Bold.ttf"
-        }
-        self.ASSET_ENTITY_ANIMATIONS = {
-            "player" : {
-                "idle" : Animation(load_images("entities/player/idle"), .05, True),
-                "run"  : Animation(load_images("entities/player/run"),  .08, True),
-                "jump" : Animation(load_images("entities/player/jump"),  1,  False)
+        self.ASSETS = {
+            "tilemap" : {
+                "dirt"           :   load_images("tiles/tiles/dirt", scale=2, tint_color= "grey"),
+                "folliage"       :   load_images("tiles/objects/folliage",scale=2, tint_color= "grey"),
+                "props"          :   load_images("tiles/objects/props", scale=2, tint_color= "grey"),
+                "statues"        :   load_images("tiles/objects/statues", scale=2, tint_color= "grey"),
+                "spawners_entities": load_images("tiles/spawners_entities", scale=2,),
+                "spawners_enemies" : load_images("tiles/spawners_enemies", scale=2,)
             },
-            "soul" : {
-                "idle" : Animation(load_images("entities/soul/idle", 2, tint_color="cyan"), .05, True)
+
+            "fonts" : {
+                "default" : "PF스타더스트 3.0 Bold.ttf"
             },
-            "portal" : {
-                "idle" : Animation(load_images("entities/portal/idle", 2), .05, True)
+
+            "animations" : {
+                "entities" : {
+                    "player" : {
+                        "idle" : Animation(load_images("entities/player/idle", scale=2), .05, True),
+                        "run"  : Animation(load_images("entities/player/run", scale=2),  .08, True),
+                        "jump" : Animation(load_images("entities/player/jump", scale=2),  1,  False)
+                    },
+
+                    "soul" : {
+                        "idle" : Animation(load_images("entities/soul/idle", scale=2, tint_color="cyan"), .05, True)
+                    },
+
+                    "one_alpha" : {
+                        "idle" : Animation(load_images("entities/enemies/1_alpha/idle", scale=2), .05, True),
+                        "run"  : Animation(load_images("entities/enemies/1_alpha/run", scale=2), .15, True),
+                    },
+                    "one_beta" : {
+                        "idle" : Animation(load_images("entities/enemies/1_beta/idle", scale=2), .05, True),
+                        "run"  : Animation(load_images("entities/enemies/1_beta/run", scale=2), .15, True),
+                    },
+                    "two_alpha" : {
+                        "idle" : Animation(load_images("entities/enemies/2_alpha/idle", scale=2), .05, True),
+                        "run"  : Animation(load_images("entities/enemies/2_alpha/run", scale=2), .15, True),
+                    },
+                    "two_beta" : {
+                        "idle" : Animation(load_images("entities/enemies/2_beta/idle", scale=2), .05, True),
+                        "run"  : Animation(load_images("entities/enemies/2_beta/run", scale=2), .15, True),
+                    },
+                    "three_alpha" : {
+                        "attack" : Animation(load_images("entities/enemies/3_alpha/attack", scale=2), .05, False),
+                        "run"    : Animation(load_images("entities/enemies/3_alpha/run", scale=2), .15, True),
+                    },
+                    "three_beta" : {
+                        "attack" : Animation(load_images("entities/enemies/3_beta/attack", scale=2), .05, False),
+                        "run"    : Animation(load_images("entities/enemies/3_beta/run", scale=2), .15, True),
+                    },
+                    "four_alpha" : {
+                        "idle" : Animation(load_images("entities/enemies/4_alpha/idle", scale=2), .05, True),
+                        "run"  : Animation(load_images("entities/enemies/4_alpha/run", scale=2), .08, True),
+                    },
+                    "four_beta" : {
+                            "idle" : Animation(load_images("entities/enemies/4_beta/idle", scale=2), .05, True),
+                        "run"  : Animation(load_images("entities/enemies/4_beta/run", scale=2), .03, True),
+                    },
+                    "five_omega" : {
+                        "idle" : Animation(load_images("entities/enemies/5_omega/idle", scale=2), .05, True),
+                        "run"  : Animation(load_images("entities/enemies/5_omega/run", scale=2), .15, True),
+                    }
+                },
+            
+                "vfxs" : {
+                    "hurt" : Animation(load_images("particles/hurt", scale=2), .03, False),
+
+                    "enemy_attack" : Animation(load_images("particles/enemy_attack", scale=2, tint_color="grey"), .03, False),
+                    "enemy_die" : Animation(load_images("particles/enemy_die", scale=2, tint_color="grey"), .03, False),
+                    
+                    "soul_collect" : Animation(load_images("particles/soul_collect", scale=2), .03, False),
+                    
+                    "enemy_alpha_projectile_destroy" : Animation(load_images("particles/destroy", scale=2, tint_color="purple"), .03, False),
+                    "enemy_beta_projectile_destroy" : Animation(load_images("particles/destroy", scale=2, tint_color="red"), .03, False),
+
+                    "player_projectile_destroy" : Animation(load_images("particles/destroy", scale=2,), .03, False)
+                },
+
+                "projectiles" : {
+                    "two_alpha" : Animation(load_images("projectiles/projectile", scale=2,tint_color="purple"), .03, True),
+                    "two_beta" : Animation(load_images("projectiles/projectile", scale=2, tint_color="red"), .03, True),
+                    "player" :  Animation(load_images("projectiles/projectile", scale=2),  .03, True),
+                },
             },
-            ONE_ALPHA : {
-                "idle" : Animation(load_images("entities/enemies/1_alpha/idle"), .05, True),
-                "run"  : Animation(load_images("entities/enemies/1_alpha/run"), .15, True),
+
+            "backgrounds" : {
+                "default"     : load_image("skys/night_sky.png", 1),
+                "red_sky" : load_image("skys/red_sky.png", .75),
             },
-            ONE_BETA : {
-                "idle" : Animation(load_images("entities/enemies/1_beta/idle"), .05, True),
-                "run"  : Animation(load_images("entities/enemies/1_beta/run"), .15, True),
+
+            "ui" : {
+                "image_button" : {
+                    "temp" : {
+                        "on_hover"     : load_image("ui/buttons/temp/on_hover.png"),
+                        "on_not_hover" : load_image("ui/buttons/temp/on_not_hover.png")
+                    }
+                }
             },
-            TWO_ALPHA : {
-                "idle" : Animation(load_images("entities/enemies/2_alpha/idle"), .05, True),
-                "run"  : Animation(load_images("entities/enemies/2_alpha/run"), .15, True),
-            },
-            TWO_BETA : {
-                "idle" : Animation(load_images("entities/enemies/2_beta/idle"), .05, True),
-                "run"  : Animation(load_images("entities/enemies/2_beta/run"), .15, True),
-            },
-            THREE_ALPHA : {
-                "attack" : Animation(load_images("entities/enemies/3_alpha/attack"), .05, False),
-                "run"    : Animation(load_images("entities/enemies/3_alpha/run"), .15, True),
-            },
-            THREE_BETA : {
-                "attack" : Animation(load_images("entities/enemies/3_beta/attack"), .05, False),
-                "run"    : Animation(load_images("entities/enemies/3_beta/run"), .15, True),
-            },
-            FOUR_ALPHA : {
-                "idle" : Animation(load_images("entities/enemies/4_alpha/idle"), .05, True),
-                "run"  : Animation(load_images("entities/enemies/4_alpha/run"), .08, True),
-            },
-            FOUR_BETA : {
-                "idle" : Animation(load_images("entities/enemies/4_beta/idle"), .05, True),
-                "run"  : Animation(load_images("entities/enemies/4_beta/run"), .03, True),
-            },
-            FIVE_OMEGA : {
-                "idle" : Animation(load_images("entities/enemies/5_omega/idle"), .05, True),
-                "run"  : Animation(load_images("entities/enemies/5_omega/run"), .15, True),
-            }
-        }
-        self.ASSET_BACKGROUND = {
-            "sky"     : load_image("skys/night_sky.png", 1),
-            "red_sky" : load_image("skys/red_sky.png", .75),
-        }
-        self.ASSET_UI = {
-            "image_button" : {
-                "temp" : {
-                    "on_hover"     : load_image("ui/buttons/temp/on_hover.png"),
-                    "on_not_hover" : load_image("ui/buttons/temp/on_not_hover.png")
+            
+            "sounds" : {
+                "player" : {
+                    "jump" :       pg.mixer.Sound("assets/sounds/player/jump.wav"),
+                    "hurt" :       pg.mixer.Sound("assets/sounds/player/hurt.wav"),
+                    "projectile" : pg.mixer.Sound("assets/sounds/player/projectile.wav"),
+                },
+                "enemy" : {
+                    "attack" :     pg.mixer.Sound("assets/sounds/enemy/attack.wav"),
+                    "hurt" :       pg.mixer.Sound("assets/sounds/enemy/hurt.wav"),
+                    "die" :        pg.mixer.Sound("assets/sounds/enemy/die.wav"),
+                    "projectile" : pg.mixer.Sound("assets/sounds/enemy/projectile.wav"),
+                },
+                "soul" : {
+                    "interact" :   pg.mixer.Sound("assets/sounds/soul/interact.wav"),
                 }
             }
-        }
-        
-        pg.mixer.set_num_channels(mixer_channel_count)
-        self.ASSET_SFXS = {
-            "player" : {
-                "jump" : pg.mixer.Sound(BASE_SOUND_PATH + "player/jump.wav"),
-                "hurt" : pg.mixer.Sound(BASE_SOUND_PATH + "player/hurt.wav"),
-                "projectile" : pg.mixer.Sound(BASE_SOUND_PATH + "player/projectile.wav"),
-            },
-            "enemy" : {
-                "attack" : pg.mixer.Sound(BASE_SOUND_PATH + "enemy/attack.wav"),
-                "hurt" : pg.mixer.Sound(BASE_SOUND_PATH + "enemy/hurt.wav"),
-                "die" : pg.mixer.Sound(BASE_SOUND_PATH + "enemy/die.wav"),
-                "projectile" : pg.mixer.Sound(BASE_SOUND_PATH + "enemy/projectile.wav"),
-            },
-            "soul" : {
-                "interact" : pg.mixer.Sound(BASE_SOUND_PATH + "soul/interact.wav"),
-            }
-        }
-
-        self.ASSET_VFXS = {
-            "hurt" : Animation(load_images("particles/hurt"), .03, False),
-
-            "enemy_attack" : Animation(load_images("particles/enemy_attack", tint_color="grey"), .03, False),
-            "enemy_die" : Animation(load_images("particles/enemy_die", tint_color="grey"), .03, False),
-
-            "soul_collect" : Animation(load_images("particles/soul_collect"), .03, False),
-            
-            "enemy_projectile_alpha_dissapear" : Animation(load_images("particles/dissapear", tint_color="purple"), .03, False),
-            "enemy_projectile_beta_dissapear" : Animation(load_images("particles/dissapear", tint_color="red"), .03, False),
-            
-            "player_projectile_dissapear" : Animation(load_images("particles/dissapear"), .03, False),
-        }
-
-        self.ASSET_PROJECTILES = {
-            "enemy_projectile_alpha" : Animation(load_images("projectiles/projectile", tint_color="purple"), .03, True),
-            "enemy_projectile_beta" : Animation(load_images("projectiles/projectile", tint_color="red"), .03, True),
-
-            "player_projectile" : Animation(load_images("projectiles/projectile"), .03, True),
         }
 
     def update_time(self):

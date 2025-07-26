@@ -1,34 +1,35 @@
 import pygame as pg
 
-from datas.const import *
-
+from scripts.constants import *
 from scripts.objects import GameObject
 
-light_segments = 15
-light_fade_out = 10
+LIGHT_SEGMENTS = 15
+LIGHT_FADE_OUT = 10
 
 class Light(GameObject):
-    lights : list["Light"] = []
+    all_lights : list["Light"] = []
     def __init__(self, radius, position, strength=25):
         super().__init__()
         self.position = position
         self.radius = radius
         self.make_surface(radius, strength)
-        Light.lights.append(self)
 
-    def destroy(self):
-        Light.lights.remove(self)
-        super().destroy()
+        Light.all_lights.append(self)
+
+    def on_destroy(self):
+        if self in Light.all_lights:
+            Light.all_lights.remove(self)
+        super().on_destroy()
 
     def make_surface(self, radius, strength):
         self.surface = pg.Surface((radius, radius), pg.SRCALPHA)
-        for i in range(light_segments):
+        for i in range(LIGHT_SEGMENTS):
             alpha = min(i * strength, 255)
             pg.draw.circle(
                 self.surface,
                 (255, 255, 255, alpha),
                 (radius / 2, radius / 2),
-                radius / 2 - i * light_fade_out
+                radius / 2 - i * LIGHT_FADE_OUT
             )
 
     def get_bound_box(self):
@@ -44,7 +45,7 @@ class Light(GameObject):
 
     @classmethod
     def draw_lights(cls, surface: pg.Surface, camera):
-        for light in cls.lights:
+        for light in cls.all_lights:
             box = light.get_bound_box()
             if not camera.is_in_view(box): continue
 

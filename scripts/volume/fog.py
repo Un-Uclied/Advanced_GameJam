@@ -1,7 +1,6 @@
 import pygame as pg
 
-from datas.const import *
-
+from scripts.constants import *
 from scripts.objects import GameObject
 
 from .light import Light

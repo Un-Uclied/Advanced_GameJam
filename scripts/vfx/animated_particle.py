@@ -1,7 +1,6 @@
 import pygame as pg
 
-from datas.const import *
-
+from scripts.constants import *
 from scripts.objects import GameObject
 
 class AnimatedParticle(GameObject):
@@ -10,13 +9,13 @@ class AnimatedParticle(GameObject):
 
         self.position = position
         self.anchor = anchor
-        self.anim = self.app.ASSET_VFXS[particle_name].copy()
+        self.anim = self.app.ASSETS["animations"]["vfxs"][particle_name].copy()
 
     def on_update(self):
         super().on_update()
         self.anim.update(self.app.dt)
         if self.anim.done:
-            self.destroy()
+            self.on_destroy()
 
     def on_draw(self):
         camera = self.app.scene.camera

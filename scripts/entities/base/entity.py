@@ -1,7 +1,6 @@
 import pygame as pg
 
-from datas.const import *
-
+from scripts.constants import *
 from scripts.objects import GameObject
 
 class Entity(GameObject):
@@ -27,14 +26,14 @@ class Entity(GameObject):
         }
 
     def destroy(self):
-        super().destroy()
+        super().on_destroy()
         Entity.all_entities.remove(self)
 
     def set_action(self, action_name):
         if self.current_action == action_name : return
 
         self.current_action = action_name
-        self.anim = self.app.ASSET_ENTITY_ANIMATIONS[self.name][action_name].copy()
+        self.anim = self.app.ASSETS["animations"]["entities"][self.name][action_name].copy()
 
     def get_rect_points(self):
         points = []

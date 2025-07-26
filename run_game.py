@@ -1,6 +1,2 @@
-'''
-pip install pygame-ce
-'''
-
-from scripts.core.app import App
+from scripts.core import App
 App('main_menu_scene').run()

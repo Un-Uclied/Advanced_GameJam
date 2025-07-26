@@ -1,6 +1,6 @@
 import pygame as pg
 
-from .base.physics_entity import PhysicsEntity
+from .base import PhysicsEntity
 
 from scripts.projectiles import PlayerProjectile
 from scripts.volume import Light
@@ -81,7 +81,8 @@ class PlayerCharacter(PhysicsEntity):
         if (self.current_jump_count >= self.jump_count): return
         self.current_gravity = self.jump_power * 100
         self.current_jump_count += 1
-        self.app.ASSET_SFXS["player"]["jump"].play()
+
+        self.app.ASSETS["sounds"]["player"]["jump"].play()
 
     def physics_movement(self):
         self.lerped_movement = self.lerped_movement.lerp(
@@ -92,16 +93,16 @@ class PlayerCharacter(PhysicsEntity):
         self.frame_movement = pg.Vector2(self.velocity.x + self.lerped_movement.x, self.velocity.y + self.current_gravity)
         self.velocity = self.velocity.lerp(pg.Vector2(0, 0), max(min(self.app.dt * self.drag_vel, 1), 0))
 
-    def destroy(self):
-        super().destroy()
-        self.light.destroy()
-        self.outline.destroy()
+    def on_destroy(self):
+        super().on_destroy()
+        self.light.on_destroy()
+        self.outline.on_destroy()
 
     def follow_light_and_camera(self):
         camera = self.app.scene.camera
         target_pos = self.rect.center
 
-        camera.offset = camera.offset.lerp(target_pos, max(min(self.app.dt * self.camera_follow_speed, 1), 0))
+        camera.position = camera.position.lerp(target_pos, max(min(self.app.dt * self.camera_follow_speed, 1), 0))
         self.light.position = self.light.position.lerp(target_pos, max(min(self.app.dt * self.light_follow_speed, 1), 0))
 
     def on_update(self):
