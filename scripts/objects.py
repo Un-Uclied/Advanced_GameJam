@@ -1,17 +1,17 @@
 IS_DEBUG = True
 
 class GameObject:
-    object_list : list["GameObject"] = []
+    all_objects : list["GameObject"] = []
 
     def __init__(self):
-        GameObject.object_list.append(self)
+        GameObject.all_objects.append(self)
 
         from scripts.core import App
         self.app = App.singleton
     
     def on_destroy(self):
-        if self in GameObject.object_list:
-            GameObject.object_list.remove(self)
+        if self in GameObject.all_objects:
+            GameObject.all_objects.remove(self)
 
     def on_update(self):
         pass
@@ -24,10 +24,10 @@ class GameObject:
 
     @classmethod
     def update_all(cls):
-        for obj in cls.object_list:
+        for obj in cls.all_objects:
             obj.on_update()
 
     @classmethod
     def draw_all(cls):
-        for obj in cls.object_list:
+        for obj in cls.all_objects:
             obj.on_draw()

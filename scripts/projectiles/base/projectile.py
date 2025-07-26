@@ -2,7 +2,6 @@ import pygame as pg
 
 from scripts.constants import *
 from scripts.objects import GameObject
-from scripts.vfx import AnimatedParticle
 
 class ProjectileManager:
     def __init__(self):

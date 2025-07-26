@@ -1,6 +1,7 @@
 import pygame as pg
 
-from scripts.constants.app_settings import *
+from scripts.constants import *
+from scripts.entities import PlayerCharacter
 
 from .base import WanderEnemy
 
@@ -32,7 +33,7 @@ class FourAlpha(WanderEnemy):
         }
 
     def on_update(self):
-        pc = self.app.scene.pc
+        pc = PlayerCharacter.singleton
 
         entity_center = pg.Vector2(self.rect.center)
         player_center = pg.Vector2(pc.rect.center)

@@ -19,8 +19,8 @@ class App:
             LAYER_BG : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
             LAYER_OBJ : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
             LAYER_ENTITY : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
-            LAYER_DYNAMIC : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
             LAYER_VOLUME : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
+            LAYER_DYNAMIC : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
             LAYER_INTERFACE : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
         }
 
@@ -38,7 +38,8 @@ class App:
         self.update_time()
         self.update_event()
 
-        self.registered_scenes = {
+        from scripts.scenes.base import Scene
+        self.registered_scenes : dict[str, Scene]= {
             "main_menu_scene" : MainMenuScene(),
             "main_game_scene" : MainGameScene(),
             "editor_scene"    : TileMapEditScene()
@@ -72,6 +73,10 @@ class App:
 
                     "soul" : {
                         "idle" : Animation(load_images("entities/soul/idle", scale=2, tint_color="cyan"), .05, True)
+                    },
+
+                    "portal" : {
+                        "idle" : Animation(load_images("entities/portal/idle", scale=2), .05, True)
                     },
 
                     "one_alpha" : {
@@ -134,8 +139,10 @@ class App:
             },
 
             "backgrounds" : {
-                "default"     : load_image("skys/night_sky.png", 1),
-                "red_sky" : load_image("skys/red_sky.png", .75),
+                "sky" : {
+                    "default" : load_images("skys/default", scale=2.5, tint_color=pg.Color(100, 100, 100))
+                },
+                "clouds" : load_images("clouds", scale=1.5, tint_color="grey")
             },
 
             "ui" : {

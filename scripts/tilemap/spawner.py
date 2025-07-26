@@ -1,15 +1,16 @@
 from .tilemap import Tilemap
 
 from scripts.volume import Light
-from scripts.entities import Soul, Portal
-from scripts.enemies import *
+from scripts.entities import PlayerCharacter, Soul, Portal
 
 SPAWNER_ENTITY_MAP = {
+    0: lambda pos: PlayerCharacter(pos),
     1: lambda pos: Light(360, pos),
     2: lambda pos: Soul(pos),
     3: lambda pos: Portal(pos),
 }
 
+from scripts.enemies import *
 SPAWNER_ENEMY_MAP = {
     0 : lambda pos: OneAlpha  (pos),
     1 : lambda pos: OneBeta   (pos),
@@ -28,6 +29,4 @@ def spawn_all_entities(tilemap: Tilemap):
                 instance = constructor(pos)
         for spawner_id, constructor in SPAWNER_ENTITY_MAP.items():
             for pos in tilemap.get_pos_by_data("spawners_entities", spawner_id):
-                if spawner_id == 0: #플레이어는 따로
-                    continue
                 instance = constructor(pos)

@@ -4,6 +4,7 @@ from scripts.constants import *
 from scripts.objects import GameObject
 
 class Outline(GameObject):
+    all_outline : list['Outline'] = []
     def __init__(self, entity, color, thickness = 1):
         super().__init__()
         self.enabled = True
@@ -11,6 +12,13 @@ class Outline(GameObject):
         self.entity = entity
         self.color = color
         self.thickness = thickness
+
+        Outline.all_outline.append(self)
+
+    def on_destroy(self):
+        super().on_destroy()
+        if self in Outline.all_outline:
+            Outline.all_outline.remove(self)
 
     def on_draw(self):
         if not self.enabled:

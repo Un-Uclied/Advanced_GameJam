@@ -1,6 +1,5 @@
 import pygame as pg
 
-from scripts.vfx import AnimatedParticle
 from scripts.objects import GameObject
 
 class PlayerStatus(GameObject):
@@ -23,8 +22,9 @@ class PlayerStatus(GameObject):
     @health.setter
     def health(self, value):
         if self.is_invincible: return
-
-        pc = self.app.scene.pc
+        
+        from scripts.entities import PlayerCharacter
+        pc = PlayerCharacter.singleton
 
         before_health = self._health
         self._health = max(min(value, self.max_health), 0)
@@ -33,6 +33,8 @@ class PlayerStatus(GameObject):
             self.current_invincible_timer = self.max_invincible_timer
 
             self.app.ASSETS["sounds"]["player"]["hurt"].play()
+
+            from scripts.vfx import AnimatedParticle
             AnimatedParticle("hurt", pg.Vector2(pc.rect.center))
 
         if self._health <= 0:

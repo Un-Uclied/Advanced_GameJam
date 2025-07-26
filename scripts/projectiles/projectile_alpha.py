@@ -3,7 +3,6 @@ import pygame as pg
 from .base import Projectile
 
 from scripts.vfx import AnimatedParticle
-from scripts.status import PlayerStatus
 
 class ProjectileAlpha(Projectile):
     def __init__(self, entity_name : str, damage : int, start_position : pg.Vector2, start_direction : pg.Vector2):
@@ -23,7 +22,10 @@ class ProjectileAlpha(Projectile):
     def on_update(self):
         super().on_update()
 
-        pc = self.app.scene.pc
+        from scripts.entities import PlayerCharacter
+        from scripts.status import PlayerStatus
+
+        pc = PlayerCharacter.singleton
         if pc.rect.collidepoint(self.position):
             PlayerStatus.singleton.health -= self.damage
             self.on_destroy()

@@ -2,7 +2,7 @@ import pygame as pg
 import random
 
 from .objects import *
-from scripts.constants.app_settings import *
+from scripts.constants import *
 
 SHAKE_DECREASE = 200
 WHOLE_SCREEN_RECT = pg.Rect((0, 0), SCREEN_SIZE)

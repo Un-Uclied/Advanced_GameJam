@@ -5,6 +5,7 @@ from scripts.constants.app_settings import *
 from scripts.entities.base import PhysicsEntity
 from scripts.vfx import Outline, AnimatedParticle
 from scripts.ai import WanderAI
+from scripts.entities import PlayerCharacter
 from .enemy import Enemy
 
 from scripts.status import PlayerStatus, EnemyStatus
@@ -49,7 +50,7 @@ class WanderEnemy(PhysicsEntity):
 
         self.velocity.x = self.ai.direction.x * self.ai.move_speed * 100
 
-        pc = self.app.scene.pc
+        pc = PlayerCharacter.singleton
         if self.rect.colliderect(pc.rect) and not PlayerStatus.singleton.is_invincible:
             PlayerStatus.singleton.health -= self.attack_damage
 

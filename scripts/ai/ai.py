@@ -1,6 +1,8 @@
 import pygame as pg
 import random
 
+from scripts.entities import PlayerCharacter
+
 class AI:
     def __init__(self, entity):
         self.entity = entity
@@ -89,7 +91,7 @@ class ChaseAI(AI):
         super().on_update()
         entity = self.entity
         dt = entity.app.dt
-        pc = entity.app.scene.pc
+        pc = PlayerCharacter.singleton
 
         entity_center = pg.Vector2(entity.rect.center)
         player_center = pg.Vector2(pc.rect.center)

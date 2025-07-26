@@ -1,6 +1,7 @@
 import random
 
-from scripts.constants.app_settings import *
+from scripts.entities import PlayerCharacter
+from scripts.constants import *
 
 from .base import GhostEnemy
 
@@ -20,7 +21,8 @@ class ThreeBeta(GhostEnemy):
                          max_attack_time=.8)
 
     def attack(self):
-        pc = self.app.scene.pc
+        pc = PlayerCharacter.singleton
+
         pc_position = pg.Vector2(pc.rect.center)
         pc_position += pg.Vector2(random.randint(-x_random, x_random), random.randint(-y_random, 0))
         self.rect.center = pc_position

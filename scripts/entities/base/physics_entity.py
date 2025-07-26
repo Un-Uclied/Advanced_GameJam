@@ -2,7 +2,11 @@ import pygame as pg
 
 from .entity import Entity
 
-default_gravity = 300
+DEFAULT_GRAVITY = 300
+MAX_GRAVITY = 1000
+GRAVITY_STRENGTH = 28
+
+VELOCITY_DRAG = 10
 
 class PhysicsEntity(Entity):
     def __init__(self, name, rect : pg.Rect, start_action : str = "idle", invert_x : bool = False):
@@ -11,11 +15,8 @@ class PhysicsEntity(Entity):
         self.collisions = {"left" : False, "right" : False, "up" : False, "down" : False}
 
         self.velocity : pg.Vector2 = pg.Vector2()
-        self.drag_vel = 10
 
-        self.max_gravtity = 1000
-        self.gravity_strength = 28
-        self.current_gravity = default_gravity
+        self.current_gravity = DEFAULT_GRAVITY
 
     def physics_collision(self):
         self.collisions = {"left" : False, "right" : False, "up" : False, "down" : False}
@@ -47,17 +48,16 @@ class PhysicsEntity(Entity):
                     
     def physics_gravity(self):   
         if (self.collisions["down"]):
-            self.current_gravity = default_gravity
-            self.current_jump_count = 0
+            self.current_gravity = DEFAULT_GRAVITY
         else:
-            self.current_gravity = min(self.max_gravtity * self.app.dt * 100, self.current_gravity + self.gravity_strength * self.app.dt * 100)
+            self.current_gravity = min(MAX_GRAVITY * self.app.dt * 100, self.current_gravity + GRAVITY_STRENGTH * self.app.dt * 100)
             
         if (self.collisions["up"]):
             self.current_gravity = 0
 
     def physics_movement(self):
         self.frame_movement = pg.Vector2(self.velocity.x, self.velocity.y + self.current_gravity)  
-        self.velocity = self.velocity.lerp(pg.Vector2(0, 0), max(min(self.app.dt * self.drag_vel, 1), 0))
+        self.velocity = self.velocity.lerp(pg.Vector2(0, 0), max(min(self.app.dt * VELOCITY_DRAG, 1), 0))
 
     def on_update(self):
         super().on_update()

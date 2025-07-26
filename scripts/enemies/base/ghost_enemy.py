@@ -1,11 +1,13 @@
 import pygame as pg
 
-from scripts.constants.app_settings import *
+from scripts.constants import *
 
 from scripts.entities.base import Entity
 from scripts.vfx import Outline, AnimatedParticle
 from scripts.ai import ChaseAI
 from .enemy import Enemy
+from scripts.entities import PlayerCharacter
+
 
 from scripts.status import EnemyStatus, PlayerStatus
 
@@ -60,7 +62,7 @@ class GhostEnemy(Entity):
 
     def on_update(self):
         super().on_update()
-        pc = self.app.scene.pc
+        pc = PlayerCharacter.singleton
 
         if self.rect.colliderect(pc.rect):
             self.attack()

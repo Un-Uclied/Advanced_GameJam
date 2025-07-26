@@ -43,8 +43,10 @@ class Soul(PhysicsEntity):
         self.light.position = self.light.position.lerp(self.rect.center, max(min(self.app.dt * self.light_follow_speed, 1), 0))
 
     def handle_input(self):
+        from scripts.entities import PlayerCharacter
+
         for event in self.app.events:
-            if event.type == pg.KEYDOWN and event.key == pg.K_e and self.rect.colliderect(self.app.scene.pc.rect):
+            if event.type == pg.KEYDOWN and event.key == pg.K_e and self.rect.colliderect(PlayerCharacter.singleton.rect):
                 self.app.scene.camera.shake(10)
                 self.on_destroy()
 

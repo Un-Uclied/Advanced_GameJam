@@ -27,7 +27,9 @@ BASE_TILEMAP_PATH = "datas/tilemaps/"
 class Tilemap(GameObject):
     def __init__(self, json_file_name : str = "temp.json"):
         super().__init__()
-        file = open(BASE_TILEMAP_PATH + '/' + json_file_name, 'r')
+        self.json_file_name = json_file_name
+        
+        file = open(BASE_TILEMAP_PATH + self.json_file_name, 'r')
         json_data = json.load(file)
         file.close()
 

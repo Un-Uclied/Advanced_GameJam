@@ -2,10 +2,11 @@ from scripts.constants import *
 from scripts.objects import GameObject
 
 class Sky(GameObject):
-    def __init__(self, asset_key : str = "default"):
+    def __init__(self, sky_name : str = "default"):
         super().__init__()
-        self.asset_key = asset_key
+        self.surfaces = self.app.ASSETS["backgrounds"]["sky"][sky_name]
 
     def on_draw(self):
         super().on_draw()
-        self.app.surfaces[LAYER_BG].blit(self.app.ASSETS["backgrounds"][self.asset_key], (0, 0))
+        for surface in self.surfaces:
+            self.app.surfaces[LAYER_BG].blit(surface, (0, 0))

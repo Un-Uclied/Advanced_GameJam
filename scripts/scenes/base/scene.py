@@ -16,7 +16,7 @@ class Scene:
         self.fps_text_renderer = TextRenderer("??", pg.Vector2(SCREEN_SIZE.x - 55, 10), color="green")
 
     def on_scene_end(self):
-        GameObject.object_list.clear()
+        GameObject.all_objects.clear()
 
     def update_fps_text(self):
         self.fps_text_renderer.text = str(round(self.app.clock.get_fps()))

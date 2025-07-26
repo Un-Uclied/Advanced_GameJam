@@ -1,7 +1,6 @@
 import pygame as pg
 
 from scripts.objects import GameObject
-from scripts.vfx import AnimatedParticle
 
 class EnemyStatus(GameObject):
     def __init__(self, entity, max_health = 100):
@@ -22,6 +21,7 @@ class EnemyStatus(GameObject):
         if before_health > self._health:
             self.app.scene.camera.shake(before_health - self._health) 
 
+            from scripts.vfx import AnimatedParticle
             if self._health > 0:
                 self.app.ASSETS["sounds"]["enemy"]["hurt"].play()
                 AnimatedParticle("hurt", pg.Vector2(self.entity.rect.center))
