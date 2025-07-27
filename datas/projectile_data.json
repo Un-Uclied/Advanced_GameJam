@@ -1,0 +1,15 @@
+{
+    "two_alpha_projectile" : {
+        "damage" : 20,
+        "speed" : 400
+    },
+    "two_beta_projectile" : {
+        "damage" : 20,
+        "speed" : 450
+    },
+
+    "player_projectile" : {
+        "damage" : 25,
+        "speed" : 700
+    }
+}

@@ -2,36 +2,33 @@ import pygame as pg
 
 from scripts.constants import *
 from scripts.objects import GameObject
+from scripts.camera import *
 
 class AnimatedParticle(GameObject):
-    all_particles : list["AnimatedParticle"] = []
     def __init__(self, particle_name : str, position : pg.Vector2, anchor : pg.Vector2 = pg.Vector2(.5, .5)):
         super().__init__()
 
         self.position = position
         self.anchor = anchor
+
+        #파티클 애니메이션 갖고오기
         self.anim = self.app.ASSETS["animations"]["vfxs"][particle_name].copy()
 
-        AnimatedParticle.all_particles.append(self)
-
-    def on_destroy(self):
-        super().on_destroy()
-
-        if self in AnimatedParticle.all_particles:
-            AnimatedParticle.all_particles.remove(self)
-
-    def on_update(self):
-        super().on_update()
+    def update(self):
+        super().update()
         self.anim.update(self.app.dt)
-        if self.anim.done:
-            self.on_destroy()
 
-    def on_draw(self):
+        #파티클 애니메이션 끝 자동으로 자기를 없앰
+        if self.anim.done:
+            self.destroy()
+
+    def draw(self):
+        super().draw()
         camera = self.app.scene.camera
-        surface = self.app.surfaces[LAYER_INTERFACE]
+        surface = self.app.surfaces[LAYER_DYNAMIC]
 
         image = self.anim.img()
-        screen_pos = camera.world_to_screen(self.position - pg.Vector2(image.get_size()).elementwise() * self.anchor)
-        screen_img = camera.get_scaled_surface(image)
+        screen_pos = CameraMath.world_to_screen(camera, self.position - pg.Vector2(image.get_size()).elementwise() * self.anchor)
+        screen_img = CameraView.get_scaled_surface(camera, image)
 
         surface.blit(screen_img, screen_pos)

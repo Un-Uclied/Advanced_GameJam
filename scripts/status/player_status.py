@@ -1,12 +1,12 @@
 import pygame as pg
 
-from scripts.objects import GameObject
+from scripts.vfx import *
 
-class PlayerStatus(GameObject):
-    singleton : 'PlayerStatus' = None
-    def __init__(self):
-        super().__init__()
-        PlayerStatus.singleton = self
+class PlayerStatus:
+    '''씬 시작시 PlayerStatus를 생성, 레벨 생성시 인스턴스.player_character = 엔티티 인스턴스 걸어줘야함. (살짝 위험한 구조)'''
+    def __init__(self, scene):
+        self.scene = scene
+        self.camera = self.scene.camera
 
         self.max_health = 100
         self._health = self.max_health
@@ -22,30 +22,29 @@ class PlayerStatus(GameObject):
     @health.setter
     def health(self, value):
         if self.is_invincible: return
-        
-        from scripts.entities import PlayerCharacter
-        pc = PlayerCharacter.singleton
 
         before_health = self._health
         self._health = max(min(value, self.max_health), 0)
+
+        #체력이 깎였을때
         if before_health > self._health:
-            self.app.scene.camera.shake((before_health - self._health) * 2)#감소된 체력 * 2 만큼 흔들기
+            self.is_invincible = True
+            self.camera.shake_amount += (before_health - self._health) * 2
             self.current_invincible_timer = self.max_invincible_timer
 
-            self.app.ASSETS["sounds"]["player"]["hurt"].play()
+            #맞는 소리 재생, 맞는 파티클 생성
+            self.scene.app.ASSETS["sounds"]["player"]["hurt"].play()
+            AnimatedParticle("hurt", pg.Vector2(self.player_character.rect.center))
 
-            from scripts.vfx import AnimatedParticle
-            AnimatedParticle("hurt", pg.Vector2(pc.rect.center))
-
+        #플레이어 캐릭터 제거
         if self._health <= 0:
-            self.app.change_scene("main_game_scene")
+            self.player_character.destroy()
+            self.player_character = None
 
     def on_update(self):
-        super().on_update()
+        dt = self.scene.app.dt
         if self.current_invincible_timer > 0:
-            self.current_invincible_timer -= self.app.dt
+            self.current_invincible_timer -= dt
             self.is_invincible = True
         else:
             self.is_invincible = False
-
-    

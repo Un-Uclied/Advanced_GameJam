@@ -1,43 +1,32 @@
 import pygame as pg
 
 from scripts.constants import *
-
 from scripts.entities.base import Entity
 from scripts.vfx import Outline, AnimatedParticle
 from scripts.ai import ChaseAI
-from .enemy import Enemy
-from scripts.entities import PlayerCharacter
-
-
-from scripts.status import EnemyStatus, PlayerStatus
+from scripts.status import EnemyStatus
 
 class GhostEnemy(Entity):
     def __init__(self, name: str, rect: pg.Rect,
-                 max_health : int,
-                 follow_speed: float, 
                  max_follow_range: float, 
-                 attack_damage : int, 
                  max_attack_time: float):
-    
+
+        #아웃라인 먼저 생성해야 아웃라인이 적을 덮는것을 방지
         self.outline = Outline(self, "red")
         super().__init__(name, rect, start_action="run", invert_x=True)
 
-        self.ai = ChaseAI(self, follow_speed, max_follow_range)
-        self.status = EnemyStatus(self, max_health)
+        self.status = EnemyStatus(self)
+        self.ai = ChaseAI(self, self.status.move_speed, max_follow_range)
 
         self.max_attack_time = max_attack_time
         self.current_attack_time = 0
 
-        self.attack_damage = attack_damage
         self.is_attacking = False
 
-        Enemy.all_enemies.append(self)
-
-    def on_destroy(self):
-        self.outline.on_destroy()
-        if self in Enemy.all_enemies:
-            Enemy.all_enemies.remove(self)
-        super().on_destroy()
+    def destroy(self):
+        '''생성한 아웃라인을 없애고 Enemy.all_enemies에서 자신을 없애고 destroy()'''
+        self.outline.destroy()
+        super().destroy()
 
     def attack(self):
         if self.is_attacking:
@@ -45,8 +34,11 @@ class GhostEnemy(Entity):
         self.is_attacking = True
         self.current_attack_time = self.max_attack_time
 
-        PlayerStatus.singleton.health -= self.attack_damage
-
+        #체력 깎기
+        ps = self.app.scene.player_status
+        ps.health -= self.status.attack_damage
+        
+        #액션 및 효과
         self.set_action("attack")
         AnimatedParticle("enemy_attack", pg.Vector2(self.rect.center))
         self.app.ASSETS["sounds"]["enemy"]["attack"].play()
@@ -60,13 +52,14 @@ class GhostEnemy(Entity):
             self.ai.can_follow = True
             self.set_action("run")
 
-    def on_update(self):
-        super().on_update()
-        pc = PlayerCharacter.singleton
+    def update(self):
+        super().update()
+        self.ai.on_update()
+
+        ps = self.app.scene.player_status
+        pc = ps.player_character
 
         if self.rect.colliderect(pc.rect):
             self.attack()
 
         self.update_attack()
-
-        self.ai.on_update()

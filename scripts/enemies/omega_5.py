@@ -1,15 +1,19 @@
-from scripts.constants.app_settings import *
+import json
 
+from scripts.constants import *
 from .base import WanderEnemy
 
-hit_box_size = (110, 110)
-
+ENEMY_NAME = "five_omega"
+with open("datas/enemy_data.json", 'r') as f:
+    data = json.load(f)[ENEMY_NAME]
+    HIT_BOX_SIZE = tuple(data["hit_box_size"])
+    MIN_CHANGE_TIMER = data["min_change_timer"]
+    MAX_CHANGE_TIMER = data["max_change_timer"]
+    
 class FiveOmega(WanderEnemy):
     def __init__(self, spawn_position : pg.Vector2):
-        rect = pg.Rect(spawn_position, hit_box_size)
-        super().__init__("five_omega", rect, 
-                         max_health=999,
-                         attack_damage=999,
-                         move_speed=999, 
-                         min_change_timer=.1,
-                         max_change_timer=.2)
+        super().__init__(
+                         name=ENEMY_NAME,
+                         rect=pg.Rect(spawn_position, HIT_BOX_SIZE),
+                         min_change_timer=MIN_CHANGE_TIMER, 
+                         max_change_timer=MAX_CHANGE_TIMER)

@@ -1,20 +1,27 @@
-import pygame as pg
+import pygame as pg #파이게임 커뮤니티 에디션
 
-from scripts.constants import *
+from scripts.constants import * #앱이름, 해상도, 화면 설정, 레이어 등이 있음.
 from scripts.scenes import *
-
-from .load_image import *
-from .animation import *
+from scripts.pre_assets import *#애니메이션 클래스, 이미지 로드 함수
 
 class App:
     singleton : 'App' = None
     def __init__(self, start_scene_name : str):
+        #싱글톤으로 해서 GameObject __init__에서 접근 가능
+        if App.singleton is not None:
+            return App.singleton
         App.singleton = self
 
+        #라이브러리 초기화
         pg.init()
+
+        #이름 설정
         pg.display.set_caption(APP_NAME)
 
+        #메인 디스플레이로, 접근은 App에서만
         self.screen = pg.display.set_mode(SCREEN_SIZE, SCREEN_FLAGS)
+
+        #레이어 별로 surface를 만들고, GameObject를 상속받는 클래스마다 원하는곳에 그리거나 접근 가능.
         self.surfaces = {
             LAYER_BG : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
             LAYER_OBJ : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
@@ -24,20 +31,29 @@ class App:
             LAYER_INTERFACE : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
         }
 
+        #소리가 너무 많아지면 씹히는 현상 없애려고 채널 개수 늘리기
         pg.mixer.set_num_channels(MIXER_CHANNEL_COUNT)
+
+        #모든 애셋 로드, 너무 많으면 프리징 현상 발생
         self.load_assets()
 
         self.clock = pg.time.Clock()
 
         self.window_should_be_closed = False
 
+        #현재 이벤트들이 들어가있는 리스트
+        # pg.event.get()을 한프레임에 여러번 부르면 성능을 많이 잡아 먹기에, 가장 먼저 이벤트들을 업데이트하고, 게임오브젝트들을 업데이트
         self.events : list[pg.event.Event] = []
+
+        #델타타임
         self.dt : float = 0
+        #타임 스케일 (조절 해서 슬로우 모션 연출 가능)
         self.time_scale : float = 1
 
         self.update_time()
         self.update_event()
 
+        #순환 참조를 피하기 위해 생성자에서 임포트 ㅜ
         from scripts.scenes.base import Scene
         self.registered_scenes : dict[str, Scene]= {
             "main_menu_scene" : MainMenuScene(),
@@ -49,6 +65,7 @@ class App:
         self.scene.on_scene_start()
 
     def load_assets(self):
+        '''모든 에셋 로드'''
         self.ASSETS = {
             "tilemap" : {
                 "dirt"           :   load_images("tiles/tiles/dirt", scale=2, tint_color= "grey"),
@@ -132,9 +149,9 @@ class App:
                 },
 
                 "projectiles" : {
-                    "two_alpha" : Animation(load_images("projectiles/projectile", scale=2,tint_color="purple"), .03, True),
-                    "two_beta" : Animation(load_images("projectiles/projectile", scale=2, tint_color="red"), .03, True),
-                    "player" :  Animation(load_images("projectiles/projectile", scale=2),  .03, True),
+                    "two_alpha_projectile" : Animation(load_images("projectiles/projectile", scale=2,tint_color="purple"), .03, True),
+                    "two_beta_projectile" : Animation(load_images("projectiles/projectile", scale=2, tint_color="red"), .03, True),
+                    "player_projectile" :  Animation(load_images("projectiles/projectile", scale=2),  .03, True),
                 },
             },
 
@@ -179,6 +196,7 @@ class App:
         self.events = pg.event.get()
     
     def change_scene(self, name : str):
+        '''등록된 씬의 이름을 넣으면 원래씬 종료후 그 씬을 업데이트, 그리기 시작'''
         self.scene.on_scene_end()
         self.scene = self.registered_scenes[name]
         self.scene.on_scene_start()
@@ -189,25 +207,29 @@ class App:
                 self.window_should_be_closed = True
 
     def clear_surfaces(self):
-        self.screen.fill("brown")
+        '''메인 화면 초기화, 다른 surface들은 알파채널까지 없애기'''
+        self.screen.fill("red")
         for surface in self.surfaces.values():
             surface.fill(pg.Color(0, 0, 0, 0))
 
     def draw_surfaces(self):
+        '''모든 surface들을 메인 화면에 그리기'''
         for surface in self.surfaces.values():
             self.screen.blit(surface, (0, 0))
 
     def run(self):
+        '''메인 게임 루프'''
         while not self.window_should_be_closed:
-            self.update_event()
-            self.check_for_quit()
-            self.scene.on_update()
+            self.update_event()     #1. 제일먼저 이벤트 리슨
+            self.check_for_quit()   #2. 종료 확인
+            self.scene.update()  #3. 현재 씬 업데이트
 
-            self.clear_surfaces()
+            self.clear_surfaces()   #4. 화면 초기화
             
-            self.scene.on_draw()
-            self.draw_surfaces()
+            self.scene.draw()    #5.현재 씬 드로우
+            self.draw_surfaces()    #6.surfaces에 그려진것들을 메인 화면에 드로우
 
-            pg.display.flip()
-            self.update_time()
-        pg.quit()
+            pg.display.flip()       #7.화면 업데이트
+            self.update_time()      #8.시간 업데이트
+        
+        pg.quit()                   #a. 루프 탈출시 정상적으로 종료

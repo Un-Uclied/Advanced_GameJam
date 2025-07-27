@@ -1,15 +1,19 @@
-from scripts.constants.app_settings import *
+import json
 
+from scripts.constants import *
 from .base import GhostEnemy
 
-hit_box_size = (110, 110)
+ENEMY_NAME = "three_alpha"
+with open("datas/enemy_data.json", 'r') as f:
+    data = json.load(f)[ENEMY_NAME]
+    HIT_BOX_SIZE = tuple(data["hit_box_size"])
+    MAX_FOLLOW_RANGE = data["max_follow_range"]
+    MAX_ATTACK_TIME = data["max_attack_time"]
 
 class ThreeAlpha(GhostEnemy):
     def __init__(self, spawn_position : pg.Vector2):
-        rect = pg.Rect(spawn_position, hit_box_size)
-        super().__init__("three_alpha", rect, 
-                         max_health=150,
-                         follow_speed=200,
-                         max_follow_range=400, 
-                         attack_damage=20, 
-                         max_attack_time=1.2)
+        super().__init__(
+                         name=ENEMY_NAME,
+                         rect=pg.Rect(spawn_position, HIT_BOX_SIZE),
+                         max_follow_range=MAX_FOLLOW_RANGE,
+                         max_attack_time=MAX_ATTACK_TIME)

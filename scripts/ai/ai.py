@@ -1,8 +1,6 @@
 import pygame as pg
 import random
 
-from scripts.entities import PlayerCharacter
-
 class AI:
     def __init__(self, entity):
         self.entity = entity
@@ -91,7 +89,9 @@ class ChaseAI(AI):
         super().on_update()
         entity = self.entity
         dt = entity.app.dt
-        pc = PlayerCharacter.singleton
+        
+        ps = entity.app.scene.player_status
+        pc = ps.player_character
 
         entity_center = pg.Vector2(entity.rect.center)
         player_center = pg.Vector2(pc.rect.center)
@@ -107,6 +107,7 @@ class ChaseAI(AI):
             if self.direction.length_squared() > 0:
                 self.direction = self.direction.normalize()
                 entity.frame_movement = self.direction * self.follow_speed
+                print(self.follow_speed)
 
                 entity.rect.x += entity.frame_movement.x * dt
                 entity.rect.y += entity.frame_movement.y * dt

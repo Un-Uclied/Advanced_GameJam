@@ -1,7 +1,7 @@
 import pygame as pg
 import os
 
-from scripts.constants.app_settings import *
+from scripts.constants import *
 
 BASE_IMAGE_PATH = "assets/images/"
 

@@ -2,6 +2,7 @@ import pygame as pg
 
 from .base import PhysicsEntity, VELOCITY_DRAG
 
+from scripts.camera import *
 from scripts.projectiles import PlayerProjectile
 from scripts.volume import Light
 from scripts.vfx import Outline
@@ -9,7 +10,7 @@ from scripts.vfx import Outline
 hit_box_size = (48, 128)
 projectile_damage = 25
 
-MOVE_SPEED = 3.25
+MOVE_SPEED = 3.25*4
 JUMP_POWER = -7.5
 
 MAX_JUMP_COUNT = 2
@@ -23,9 +24,7 @@ CAMERA_FOLLOW_SPEED = 5
 LIGHT_SIZE = 500
 
 class PlayerCharacter(PhysicsEntity):
-    singleton : 'PlayerCharacter' = None
     def __init__(self, spawn_position : pg.Vector2):
-        PlayerCharacter.singleton = self
         
         self.outline = Outline(self, "red")
 
@@ -47,10 +46,10 @@ class PlayerCharacter(PhysicsEntity):
 
         self.light = Light(LIGHT_SIZE, pg.Vector2(self.rect.center))
 
-    def on_destroy(self):
-        super().on_destroy()
-        self.light.on_destroy()
-        self.outline.on_destroy()
+    def destroy(self):
+        self.light.destroy()
+        self.outline.destroy()
+        super().destroy()
 
     def handle_input(self):
         key = pg.key.get_pressed()
@@ -86,8 +85,8 @@ class PlayerCharacter(PhysicsEntity):
         camera = self.app.scene.camera
 
         plr_pos = pg.Vector2(self.rect.center)
-        direction = (camera.screen_to_world(pg.Vector2(pg.mouse.get_pos())) - plr_pos).normalize()
-        PlayerProjectile(self.name, projectile_damage, plr_pos, direction)
+        direction = (CameraMath.screen_to_world(camera, pg.Vector2(pg.mouse.get_pos())) - plr_pos).normalize()
+        PlayerProjectile(plr_pos, direction)
 
     def jump(self):
         if (self.current_jump_count >= MAX_JUMP_COUNT): return
@@ -117,8 +116,8 @@ class PlayerCharacter(PhysicsEntity):
         camera.position = camera.position.lerp(target_pos, max(min(self.app.dt * CAMERA_FOLLOW_SPEED, 1), 0))
         self.light.position = self.light.position.lerp(target_pos, max(min(self.app.dt * LIGHT_FOLLOW_SPEED, 1), 0))
 
-    def on_update(self):
+    def update(self):
         self.handle_input()
-        super().on_update()
+        super().update()
         self.control_animation()
         self.follow_light_and_camera()

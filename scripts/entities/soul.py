@@ -31,32 +31,29 @@ class Soul(PhysicsEntity):
         self.light = Light(250, pg.Vector2(self.rect.center))
         self.light_follow_speed = 5
 
-    def on_destroy(self):
-        super().on_destroy()
-        self.light.on_destroy()
-        self.outline.on_destroy()
+    def destroy(self):
+        self.light.destroy()
+        self.outline.destroy()
 
         AnimatedParticle("soul_collect", pg.Vector2(self.rect.center))
         self.app.ASSETS["sounds"]["soul"]["interact"].play()
+        self.app.scene.camera.shake_amount += 10
+
+        super().destroy()
 
     def follow_light(self):
         self.light.position = self.light.position.lerp(self.rect.center, max(min(self.app.dt * self.light_follow_speed, 1), 0))
 
     def handle_input(self):
-        from scripts.entities import PlayerCharacter
-
         for event in self.app.events:
-            if event.type == pg.KEYDOWN and event.key == pg.K_e and self.rect.colliderect(PlayerCharacter.singleton.rect):
-                self.app.scene.camera.shake(10)
-                self.on_destroy()
+            ps = self.app.scene.player_status
+            pc = ps.player_character
+            if event.type == pg.KEYDOWN and event.key == pg.K_e and self.rect.colliderect(pc.rect):
+                self.destroy()
 
-    def on_update(self):
-        super().on_update()
-
+    def update(self):
+        super().update()
         self.ai.on_update()
-
         self.velocity.x = self.ai.direction.x * self.ai.move_speed * 100
-
         self.follow_light()
-
         self.handle_input()

@@ -9,3 +9,5 @@ from .beta_3 import ThreeBeta
 from .beta_4 import FourBeta
 
 from .omega_5 import FiveOmega
+
+all_enemy_types = [OneAlpha, TwoAlpha, ThreeAlpha, FourAlpha, OneBeta, TwoBeta, ThreeBeta, FourBeta, FiveOmega]

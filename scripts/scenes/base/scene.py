@@ -1,13 +1,13 @@
 import pygame as pg
 
 from scripts.constants import *
-from scripts.camera import Camera2D
+from scripts.camera.camera import Camera2D
 from scripts.ui import TextRenderer
 from scripts.objects import GameObject
 
 class Scene:
     def __init__(self):
-        from scripts.core.app import App
+        from scripts.app import App
         self.app = App.singleton
     
     def on_scene_start(self):
@@ -21,9 +21,9 @@ class Scene:
     def update_fps_text(self):
         self.fps_text_renderer.text = str(round(self.app.clock.get_fps()))
     
-    def on_update(self):
+    def update(self):
         self.update_fps_text()
         GameObject.update_all()
 
-    def on_draw(self):
+    def draw(self):
         GameObject.draw_all()

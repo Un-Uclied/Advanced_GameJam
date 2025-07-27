@@ -10,7 +10,8 @@ class MainMenuScene(Scene):
         super().on_scene_start()
         Sky()
 
-        def callback():
-            self.app.change_scene("main_game_scene")
+        def callback(name, button):
+            if name == "temp":
+                self.app.change_scene("main_game_scene")
 
         ImageButton("temp", pg.Vector2(400, 400), callback)

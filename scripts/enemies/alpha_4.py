@@ -1,51 +1,54 @@
-import pygame as pg
+import json
 
 from scripts.constants import *
-from scripts.entities import PlayerCharacter
-
 from .base import WanderEnemy
 
-hit_box_size = (80, 165)
+ENEMY_NAME = "four_alpha"
+with open("datas/enemy_data.json", 'r') as f:
+    data = json.load(f)[ENEMY_NAME]
+    HIT_BOX_SIZE = tuple(data["hit_box_size"])
 
-normal_walk_speed = 1.5
-normal_min_change_timer = 1
-normal_max_change_timer = 1.8
+    MOVE_SPEED_NORMAL = data["move_speed_normal"]
+    MIN_CHANGE_TIMER_NORMAL = data["min_change_timer_normal"]
+    MAX_CHANGE_TIMER_NORMAL = data["max_change_timer_normal"]
 
-crazy_range = 500
+    MOVE_SPEED_CRAZY = data["move_speed_crazy"]
+    MIN_CHANGE_TIMER_CRAZY = data["min_change_timer_crazy"]
+    MAX_CHANGE_TIMER_CRAZY = data["max_change_timer_crazy"]
 
-crazy_walk_speed = 6
-crazy_min_change_timer = 2
-crazy_max_change_timer = 3
+    CRAZY_RANGE = data["crazy_range"]
 
+    FLIP_OFFSET = data["flip_offset"]
+    
 class FourAlpha(WanderEnemy):
     def __init__(self, spawn_position : pg.Vector2):
-        rect = pg.Rect(spawn_position, hit_box_size)
-        super().__init__("four_alpha", rect,
-                          max_health=175,
-                          attack_damage=25, 
-                          move_speed=normal_walk_speed, 
-                          min_change_timer=normal_min_change_timer, 
-                          max_change_timer=normal_max_change_timer)
+        super().__init__(
+                         name=ENEMY_NAME,
+                         rect=pg.Rect(spawn_position, HIT_BOX_SIZE),
+                         min_change_timer=MIN_CHANGE_TIMER_NORMAL, 
+                         max_change_timer=MAX_CHANGE_TIMER_NORMAL)
 
         self.flip_offset = {
-            False: pg.Vector2(-20, -13),
-            True: pg.Vector2(-20, -13)
+            False: FLIP_OFFSET,
+            True: FLIP_OFFSET
         }
 
-    def on_update(self):
-        pc = PlayerCharacter.singleton
+    def update(self):
+        ps = self.app.scene.player_status
+        pc = ps.player_character
 
         entity_center = pg.Vector2(self.rect.center)
         player_center = pg.Vector2(pc.rect.center)
         current_distance = entity_center.distance_to(player_center)
 
-        if current_distance < crazy_range:
-            self.ai.move_speed = crazy_walk_speed
-            self.ai.min_change_timer = crazy_max_change_timer
-            self.ai.max_change_timer = crazy_max_change_timer
+        if current_distance < CRAZY_RANGE:
+            self.ai.move_speed = MOVE_SPEED_CRAZY
+            self.ai.min_change_timer = MIN_CHANGE_TIMER_CRAZY
+            self.ai.max_change_timer = MAX_CHANGE_TIMER_CRAZY
         else:
-            self.ai.move_speed = normal_walk_speed
-            self.ai.min_change_timer = normal_max_change_timer
-            self.ai.max_change_timer = normal_max_change_timer
+            self.ai.move_speed = MOVE_SPEED_NORMAL
+            self.ai.min_change_timer = MIN_CHANGE_TIMER_NORMAL
+            self.ai.max_change_timer = MAX_CHANGE_TIMER_NORMAL
 
-        super().on_update()
+        super().update()
+    

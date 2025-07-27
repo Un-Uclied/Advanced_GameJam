@@ -59,8 +59,8 @@ class PhysicsEntity(Entity):
         self.frame_movement = pg.Vector2(self.velocity.x, self.velocity.y + self.current_gravity)  
         self.velocity = self.velocity.lerp(pg.Vector2(0, 0), max(min(self.app.dt * VELOCITY_DRAG, 1), 0))
 
-    def on_update(self):
-        super().on_update()
+    def update(self):
+        super().update()
         self.physics_movement()
         self.physics_collision()
         self.physics_gravity()

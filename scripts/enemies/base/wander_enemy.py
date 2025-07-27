@@ -1,35 +1,22 @@
 import pygame as pg
 
-from scripts.constants.app_settings import *
-
+from scripts.constants import *
 from scripts.entities.base import PhysicsEntity
 from scripts.vfx import Outline, AnimatedParticle
 from scripts.ai import WanderAI
-from scripts.entities import PlayerCharacter
-from .enemy import Enemy
-
-from scripts.status import PlayerStatus, EnemyStatus
+from scripts.status import EnemyStatus
 
 class WanderEnemy(PhysicsEntity):
-    def __init__(self, name : str, rect : pg.Rect, max_health : int, attack_damage : int, 
-                 move_speed : float,
+    def __init__(self, name : str, rect : pg.Rect,
                  min_change_timer : float, 
                  max_change_timer : float):
         
+        #아웃라인 먼저 생성해야 아웃라인이 적을 덮는것을 방지
         self.outline = Outline(self, "red")
         super().__init__(name, rect, invert_x=True)
 
-        self.ai = WanderAI(self, move_speed, min_change_timer, max_change_timer)
-        self.status = EnemyStatus(self, max_health)
-
-        self.flip_offset = {
-            False: pg.Vector2(-12, -5),
-            True: pg.Vector2(-12, -5)
-        }
-
-        self.attack_damage = attack_damage
-
-        Enemy.all_enemies.append(self)
+        self.status = EnemyStatus(self)
+        self.ai = WanderAI(self, self.status.move_speed, min_change_timer, max_change_timer)
 
     def control_animation(self):
         if self.ai.direction.x == 0:
@@ -37,22 +24,24 @@ class WanderEnemy(PhysicsEntity):
         else:
             self.set_action("run")
         
-    def on_destroy(self):
-        self.outline.on_destroy()
-        if self in Enemy.all_enemies:
-            Enemy.all_enemies.remove(self)
-        super().on_destroy()
+    def destroy(self):
+        '''생성한 아웃라인을 없애고 destroy()'''
+        self.outline.destroy()
+        super().destroy()
         
-    def on_update(self):
-        super().on_update()
+    def update(self):
+        super().update()
         self.ai.on_update()
         self.control_animation()
 
         self.velocity.x = self.ai.direction.x * self.ai.move_speed * 100
 
-        pc = PlayerCharacter.singleton
-        if self.rect.colliderect(pc.rect) and not PlayerStatus.singleton.is_invincible:
-            PlayerStatus.singleton.health -= self.attack_damage
+        ps = self.app.scene.player_status
+        pc = ps.player_character
+
+        #체력 깎을때 자동으로 무적이면 안 바꾸지만 검사 안하면 겹치는 도중 계속 공격 이펙트 나옴
+        if self.rect.colliderect(pc.rect) and not ps.is_invincible:
+            ps.health -= self.status.attack_damage
 
             AnimatedParticle("enemy_attack", pg.Vector2(self.rect.center))
             self.app.ASSETS["sounds"]["enemy"]["attack"].play()

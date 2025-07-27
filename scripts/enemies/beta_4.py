@@ -1,22 +1,25 @@
-import pygame as pg
+import json
 
-from scripts.constants.app_settings import *
-
+from scripts.constants import *
 from .base import WanderEnemy
 
-hit_box_size = (80, 165)
-
+ENEMY_NAME = "four_beta"
+with open("datas/enemy_data.json", 'r') as f:
+    data = json.load(f)[ENEMY_NAME]
+    HIT_BOX_SIZE = tuple(data["hit_box_size"])
+    MIN_CHANGE_TIMER = data["min_change_timer"]
+    MAX_CHANGE_TIMER = data["max_change_timer"]
+    FLIP_OFFSET = pg.Vector2(data["flip_offset"])
+    
 class FourBeta(WanderEnemy):
     def __init__(self, spawn_position : pg.Vector2):
-        rect = pg.Rect(spawn_position, hit_box_size)
-        super().__init__("four_beta", rect,
-                         max_health=175,
-                         attack_damage=30,
-                         move_speed=5,
-                         min_change_timer=.1,
-                         max_change_timer=.2)
+        super().__init__(
+                         name=ENEMY_NAME,
+                         rect=pg.Rect(spawn_position, HIT_BOX_SIZE),
+                         min_change_timer=MIN_CHANGE_TIMER, 
+                         max_change_timer=MAX_CHANGE_TIMER)
 
         self.flip_offset = {
-            False: pg.Vector2(-20, -13),
-            True: pg.Vector2(-20, -13)
+            False: FLIP_OFFSET,
+            True: FLIP_OFFSET
         }

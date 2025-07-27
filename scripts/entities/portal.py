@@ -12,11 +12,11 @@ class Portal(Entity):
         from scripts.volume import Light
         self.light = Light(500, pg.Vector2(self.rect.center), 50)
 
-    def on_update(self):
-        super().on_update()
+    def update(self):
+        super().update()
 
-        from scripts.entities import PlayerCharacter
-        pc = PlayerCharacter.singleton
+        ps = self.app.scene.player_status
+        pc = ps.player_character
         
         if self.rect.colliderect(pc.rect):
             for event in self.app.events:
