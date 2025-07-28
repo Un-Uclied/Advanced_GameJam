@@ -12,4 +12,4 @@ from .four_beta import FourBeta
 
 from .five_omega import FiveOmega
 
-ALL_ENEMY_TYPE = [OneAlpha, TwoAlpha, ThreeAlpha, FourAlpha, OneBeta, TwoBeta, ThreeBeta, FourBeta, FiveOmega]
+ALL_ENEMY_TYPE = (OneAlpha, TwoAlpha, ThreeAlpha, FourAlpha, OneBeta, TwoBeta, ThreeBeta, FourBeta, FiveOmega)

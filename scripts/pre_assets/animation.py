@@ -37,4 +37,5 @@ class Animation:
                     self.done = True
 
     def img(self) -> pg.Surface:
+        '''현재 이미지 반환!'''
         return self.images[self.frame]

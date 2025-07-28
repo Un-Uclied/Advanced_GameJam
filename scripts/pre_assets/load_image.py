@@ -8,7 +8,7 @@ BASE_IMAGE_PATH = "assets/images/"
 def load_image(path : str, scale : float = 1, tint_color : pg.Color = None) -> pg.Surface:
     '''한개의 이미지를 반환 | tint_color가 None이면 틴트 적용 안함. | 스케일도 적용 가능'''
     #convert_alpha()로 뒤에 배경 없게 알파값까지 챙기기
-    surface = pg.image.load(BASE_IMAGE_PATH + path).convert()
+    surface = pg.image.load(BASE_IMAGE_PATH + path).convert_alpha()
 
     #스케일이 1이면 굳이 할필요 없음
     surface = surface if scale == 1 else pg.transform.scale_by(surface, scale)

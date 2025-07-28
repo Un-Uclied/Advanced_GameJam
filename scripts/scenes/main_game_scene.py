@@ -9,6 +9,7 @@ from scripts.status import PlayerStatus
 from scripts.entities import PlayerCharacter
 
 from scripts.objects import GameObject
+from scripts.camera import Camera2D
 from scripts.ui import ALL_UI_TYPE
 from scripts.volume import *
 
@@ -68,7 +69,7 @@ class MainGameScene(Scene):
             self.level_count = 0
             self.current_difficulty += 1
 
-        # UI빼고 모든 엔티티, 적, 빛, 플레이어, 타일맵, 파티클, 탄환 등등 다 지워버림.
-        GameObject.remove_all(do_not_destroy = ALL_UI_TYPE)
+        # UI, 카메라 빼고 모든 엔티티, 적, 빛, 플레이어, 타일맵, 파티클, 탄환 등등 다 지워버림.
+        GameObject.remove_all(do_not_destroy = ALL_UI_TYPE + tuple([Camera2D]))
         # 레벨 새로 만들기!!
         self.load_new_level()

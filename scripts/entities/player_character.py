@@ -11,7 +11,7 @@ FLIP_OFFSET = {
     True : pg.Vector2(-40, 0)
 }
 
-MOVE_SPEED = 3.25
+MOVE_SPEED = 3.8
 JUMP_POWER = -7.5
 
 MAX_JUMP_COUNT = 2
