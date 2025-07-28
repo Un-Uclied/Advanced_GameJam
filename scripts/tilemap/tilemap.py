@@ -2,7 +2,6 @@ import pygame as pg
 import json
 
 from scripts.constants import *
-from scripts.objects import GameObject
 from scripts.camera import *
 
 
@@ -28,6 +27,7 @@ DO_NOT_RENDER_TILES = ["spawners_entities", "spawners_enemies"]
 
 BASE_TILEMAP_PATH = "datas/tilemaps/"
 
+from scripts.objects import GameObject
 class Tilemap(GameObject):
     def __init__(self, file_name: str = "temp.json"):
         super().__init__()
@@ -88,9 +88,10 @@ class Tilemap(GameObject):
         world_pos = pg.Vector2(data["pos"]) * self.tile_size
 
         image = tile_asset[data["type"]][data["variant"]]
-        rect = pg.Rect(world_pos, image.get_size())
 
-        # 여기서 시야 밖이면 return
+        # 최적화를 위해 화면 밖이면 렌더 안하기
+        # 타일맵 스케일이 작으면 오히려 독이 되겠지만, 스케일이 커질수록 fps가 내려가는것을 막아줌.
+        rect = pg.Rect(world_pos, image.get_size())
         if not CameraView.is_in_view(camera, rect):
             return
 
@@ -100,7 +101,6 @@ class Tilemap(GameObject):
 
         surface.blit(scaled_img, screen_pos)
 
-
     def draw(self):
         super().draw()
 
@@ -109,7 +109,6 @@ class Tilemap(GameObject):
 
         #순환 참조 피하기
         from scripts.scenes import TileMapEditScene
-        
         for data in self.off_grid:
             #렌더하면 안되는 타일 && 현재 씬이 타일맵 에디터가 아니라면 건너뛰기
             if data["type"] in DO_NOT_RENDER_TILES and not isinstance(self.app.scene, TileMapEditScene):

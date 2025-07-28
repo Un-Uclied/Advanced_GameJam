@@ -1,109 +1,181 @@
 {
-    "one_alpha" : {
-        "max_health" : 75,
-        "attack_damage" : 10,
-        "move_speed" : 2,
-
-        "hit_box_size" : [110, 110],
-        "min_change_timer" : 0.8,
-        "max_change_timer" : 1,
-        "flip_offset" : [0, -12]
+  "one_alpha": {
+    "base": {
+      "hit_box_size": [100, 100],
+      "flip_offset": {
+        "fliped_true": [0, -12],
+        "fliped_false": [0, -12]
+      }
     },
-    "one_beta" : {
-        "max_health" : 100,
-        "attack_damage" : 15,
-        "move_speed" : 3,
-
-        "hit_box_size" : [110, 110],
-        "min_change_timer" : 0.6,
-        "max_change_timer" : 0.8,
-        "flip_offset" : [0, -12]
+    "combat": {
+      "max_health": 75,
+      "collide_damage": 10
     },
-    "two_alpha" : {
-        "max_health" : 100,
-        "attack_damage" : 15,
-        "move_speed" : 2,
-
-        "hit_box_size" : [110, 110],
-        "min_change_timer" : 0.2,
-        "max_change_timer" : 1,
-        "flip_offset" : [0, -12],
-
-        "fire_range" : 500,
-        "fire_cooltime" : 1.5
-    },
-    "two_beta" : {
-        "max_health" : 125,
-        "attack_damage" : 15,
-        "move_speed" : 2,
-
-        "hit_box_size" : [110, 110],
-        "min_change_timer" : 0.2,
-        "max_change_timer" : 1,
-        "flip_offset" : [0, -12],
-
-        "fire_range" : 600,
-        "fire_cooltime" : 1
-    },
-    "three_alpha" : {
-        "max_health" : 100,
-        "attack_damage" : 20,
-        "move_speed" : 300,
-
-        "hit_box_size" : [110, 110],
-
-        "max_follow_range" : 500,
-        "max_attack_time" : 1
-    },
-    "three_beta" : {
-        "max_health" : 125,
-        "attack_damage" : 20,
-        "move_speed" : 300,
-
-        "hit_box_size" : [110, 110],
-
-        "max_follow_range" : 700,
-        "max_attack_time" : 0.8,
-
-        "max_tp_x_random" : 400,
-        "max_tp_y_random" : 400
-    },
-    "four_alpha" : {
-        "max_health" : 150,
-        "attack_damage" : 20,
-        "move_speed" : 5,
-
-        "hit_box_size" : [110, 110],
-
-        "move_speed_normal" : 2,
-        "min_change_timer_normal" : 0.8,
-        "max_change_timer_normal" : 1,
-
-        "move_speed_crazy" : 8,
-        "min_change_timer_crazy" : 0.1,
-        "max_change_timer_crazy" : 0.6,
-
-        "crazy_range" : 550,
-        
-        "flip_offset" : [-20, -13]
-    },
-    "four_beta" : {
-        "max_health" : 150,
-        "attack_damage" : 25,
-        "move_speed" : 7,
-
-        "hit_box_size" : [110, 110],
-        "min_change_timer" : 0.05,
-        "max_change_timer" : 0.8,
-        "flip_offset" : [-20, -13]
-    },
-    "five_omega" : {
-        "max_health" : 999,
-        "attack_damage" : 999,
-        "move_speed" : 7,
-        
-        "hit_box_size" : [110, 110],
-        "min_change_timer" : 0.05,
-        "max_change_timer" : 0.8
+    "behavior": {
+      "move_speed": 2,
+      "min_change_timer": 0.8,
+      "max_change_timer": 1
     }
+  },
+  "one_beta": {
+    "base": {
+      "hit_box_size": [100, 100],
+      "flip_offset": {
+        "fliped_true": [-4, -12],
+        "fliped_false": [0, -12]
+      }
+    },
+    "combat": {
+      "max_health": 100,
+      "collide_damage": 15
+    },
+    "behavior": {
+      "move_speed": 2.8,
+      "min_change_timer": 0.35,
+      "max_change_timer": 0.8
+    }
+  },
+  "two_alpha": {
+    "base": {
+      "hit_box_size": [100, 100],
+      "flip_offset": {
+        "fliped_true": [0, -12],
+        "fliped_false": [-4, -12]
+      }
+    },
+    "combat": {
+      "max_health": 100,
+      "collide_damage": 10
+    },
+    "behavior": {
+      "move_speed": 2,
+      "min_change_timer": 0.1,
+      "max_change_timer": 0.6
+    },
+    "special": {
+      "fire_range": 400,
+      "fire_cooltime": 1.5
+    }
+  },
+  "two_beta": {
+    "base": {
+      "hit_box_size": [100, 100],
+      "flip_offset": {
+        "fliped_true": [0, -12],
+        "fliped_false": [-4, -12]
+      }
+    },
+    "combat": {
+      "max_health": 100,
+      "collide_damage": 15
+    },
+    "behavior": {
+      "move_speed": 3,
+      "min_change_timer": 0.1,
+      "max_change_timer": 0.5
+    },
+    "special": {
+      "fire_range": 550,
+      "fire_cooltime": 1
+    }
+  },
+  "three_alpha": {
+    "base": {
+      "hit_box_size": [100, 100],
+      "flip_offset": {
+        "fliped_true": [0, -12],
+        "fliped_false": [-4, -12]
+      }
+    },
+    "combat": {
+      "max_health": 75,
+      "collide_damage": 20
+    },
+    "behavior": {
+      "move_speed": 300,
+      "max_follow_range": 500,
+      "max_attack_time": 1
+    }
+  },
+  "three_beta": {
+    "base": {
+      "hit_box_size": [100, 100],
+      "flip_offset": {
+        "fliped_true": [0, -12],
+        "fliped_false": [-4, -12]
+      }
+    },
+    "combat": {
+      "max_health": 100,
+      "collide_damage": 20
+    },
+    "behavior": {
+      "move_speed": 400,
+      "max_follow_range": 700,
+      "max_attack_time": 0.8
+    },
+    "special": {
+      "tp_random_range": [400, 400]
+    }
+  },
+  "four_alpha": {
+    "base": {
+      "hit_box_size": [100, 100],
+      "flip_offset": {
+        "fliped_true": [0, -12],
+        "fliped_false": [-4, -12]
+      }
+    },
+    "combat": {
+      "max_health": 100,
+      "collide_damage": 20
+    },
+    "behavior": {
+      "move_speed": 2,
+      "min_change_timer": 0.8,
+      "max_change_timer": 1,
+      "crazy_range": 550,
+      "crazy_mode": {
+        "move_speed": 8,
+        "min_change_timer": 0.1,
+        "max_change_timer": 0.6
+      }
+    }
+  },
+  "four_beta": {
+    "base": {
+      "hit_box_size": [100, 100],
+      "flip_offset": {
+        "fliped_true": [0, -12],
+        "fliped_false": [-4, -12]
+      }
+    },
+    "combat": {
+      "max_health": 125,
+      "collide_damage": 20
+    },
+    "behavior": {
+      "move_speed": 7,
+      "min_change_timer": 0.02,
+      "max_change_timer": 0.2
+    }
+  },
+  "five_omega": {
+    "base": {
+      "hit_box_size": [100, 100],
+      "flip_offset": {
+        "fliped_true": [0, -12],
+        "fliped_false": [-4, -12]
+      }
+    },
+    "combat": {
+      "max_health": 125,
+      "collide_damage": 20
+    },
+    "behavior": {
+      "move_speed": 7,
+      "min_change_timer": 0.02,
+      "max_change_timer": 0.2
+    }
+  }
 }

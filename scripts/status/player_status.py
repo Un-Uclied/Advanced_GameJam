@@ -1,19 +1,29 @@
 import pygame as pg
 
 from scripts.vfx import *
+from scripts.entities import PlayerCharacter
+
+MAX_INVINCIBLE_TIME = 1.5
+MAX_HEALTH = 100
 
 class PlayerStatus:
     '''씬 시작시 PlayerStatus를 생성, 레벨 생성시 인스턴스.player_character = 엔티티 인스턴스 걸어줘야함. (살짝 위험한 구조)'''
     def __init__(self, scene):
+        '''MainGameScene에서만 생성!!\nGameObject상속 안받아서 씬에서 직접 관리!!'''
         self.scene = scene
         self.camera = self.scene.camera
 
-        self.max_health = 100
-        self._health = self.max_health
+        self._health = MAX_HEALTH
 
         self.is_invincible = False
-        self.max_invincible_timer = 1.5
         self.current_invincible_timer = 0
+
+        #MainGameScene에서 on_death_event.append(메소드)이렇게 하면 플레이어가 죽을때 그 메소드가 불림.
+        self.on_death_event : list[callable] = []
+    
+    def on_dead(self):
+        for event in self.on_death_event:
+            event(self)
 
     @property
     def health(self):
@@ -21,27 +31,30 @@ class PlayerStatus:
     
     @health.setter
     def health(self, value):
+        #무적 상태라면 리턴
         if self.is_invincible: return
 
+        #깎이기 전 체력 저장
         before_health = self._health
-        self._health = max(min(value, self.max_health), 0)
+        self._health = max(min(value, MAX_HEALTH), 0) #0~100 넘기지 않게
 
         #체력이 깎였을때
         if before_health > self._health:
-            self.is_invincible = True
-            self.camera.shake_amount += (before_health - self._health) * 2
-            self.current_invincible_timer = self.max_invincible_timer
+            self.current_invincible_timer = MAX_INVINCIBLE_TIME              #무적 시간을 늘리면 무적 상태가 됨.
+            self.camera.shake_amount += (before_health - self._health) * 2   #받은 대미지의 두배만큼 카메라 흔들기
 
             #맞는 소리 재생, 맞는 파티클 생성
             self.scene.app.ASSETS["sounds"]["player"]["hurt"].play()
             AnimatedParticle("hurt", pg.Vector2(self.player_character.rect.center))
 
-        #플레이어 캐릭터 제거
-        if self._health <= 0:
+        if self.health <= 0:
+            self.on_dead()
             self.player_character.destroy()
+
+            # 이렇게 하면 아무도 참조 안해서 GC가 가져감
             self.player_character = None
 
-    def on_update(self):
+    def update(self):
         dt = self.scene.app.dt
         if self.current_invincible_timer > 0:
             self.current_invincible_timer -= dt

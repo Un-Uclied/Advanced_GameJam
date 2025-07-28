@@ -1,13 +1,15 @@
-from .alpha_1 import OneAlpha
-from .alpha_2 import TwoAlpha
-from .alpha_3 import ThreeAlpha
-from .alpha_4 import FourAlpha
+from .one_alpha import OneAlpha
+from .one_beta import OneBeta
 
-from .beta_1 import OneBeta
-from .beta_2 import TwoBeta
-from .beta_3 import ThreeBeta
-from .beta_4 import FourBeta
+from .two_alpha import TwoAlpha
+from .two_beta import TwoBeta
 
-from .omega_5 import FiveOmega
+from .three_alpha import ThreeAlpha
+from .three_beta import ThreeBeta
 
-all_enemy_types = [OneAlpha, TwoAlpha, ThreeAlpha, FourAlpha, OneBeta, TwoBeta, ThreeBeta, FourBeta, FiveOmega]
+from .four_alpha import FourAlpha
+from .four_beta import FourBeta
+
+from .five_omega import FiveOmega
+
+ALL_ENEMY_TYPE = [OneAlpha, TwoAlpha, ThreeAlpha, FourAlpha, OneBeta, TwoBeta, ThreeBeta, FourBeta, FiveOmega]

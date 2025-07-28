@@ -1,18 +1,17 @@
 import pygame as pg
 
 from scripts.constants import *
-from scripts.objects import *
 
+from scripts.objects import GameObject
 class ImageButton(GameObject):
-    '''action 형식: def action(name: str, button: ImageButton): ...'''
     '''스크린 기준 UI 버튼'''
-
     def __init__(self, 
                  name: str, 
                  position: pg.Vector2, 
                  action: callable,
                  button: int = 1,
                  anchor: pg.Vector2 = pg.Vector2(0, 0)):
+        ''':param action: 클릭시 불리는 함수인데, 버튼의 이름, 버튼 객체를 인수로 받아야함.'''
         super().__init__()
         self.name = name
         self.pos = position
@@ -26,26 +25,32 @@ class ImageButton(GameObject):
 
     @property
     def size(self) -> pg.Vector2:
+        '''현재 렌더되는 이미지 크기'''
         return pg.Vector2(self.render_image.get_size())
 
     @property
     def screen_pos(self) -> pg.Vector2:
+        '''앵커를 계산한 렌더 위치'''
         return self.pos - self.size.elementwise() * self.anchor
 
     @property
     def rect(self) -> pg.Rect:
         return pg.Rect(self.screen_pos, self.size)
+    
+    @property
+    def is_hovered(self):
+        mouse_pos = pg.Vector2(pg.mouse.get_pos())
+        return self.rect.collidepoint(mouse_pos)
 
     def update(self):
         super().update()
-        mouse_pos = pg.Vector2(pg.mouse.get_pos())
-        is_hovered = self.rect.collidepoint(mouse_pos)
 
-        self.render_image = self.hover_image if is_hovered else self.default_image
+        #렌더 되는 이미지
+        self.render_image = self.hover_image if self.is_hovered else self.default_image
 
         for event in self.app.events:
-            if event.type == pg.MOUSEBUTTONDOWN and event.button == self.button and is_hovered:
-                self.action(self.name, self)
+            if event.type == pg.MOUSEBUTTONDOWN and event.button == self.button and self.is_hovered:
+                self.action(self.name, self) #액션에 이름이랑 자기 자신 보내기
 
     def draw(self):
         super().draw()

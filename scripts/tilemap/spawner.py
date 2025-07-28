@@ -1,6 +1,5 @@
 from scripts.volume import Light
 from scripts.entities import Soul, Portal
-from .tilemap import Tilemap
 
 LIGHT_SIZE = 360
 
@@ -24,14 +23,16 @@ SPAWNER_ENEMY_MAP = {
     8 : lambda pos: FiveOmega (pos)
 }
 
+from .tilemap import Tilemap
 def spawn_all_entities(tilemap: Tilemap):
-        '''타일맵을 받으면 위치와 타입, 종류에 맞게 엔티티 및 적 생성'''
+        '''타일맵을 받으면 위치와 타입, 종류에 맞게 엔티티 및 적 생성 (플레이어는 제외)'''
         #적을 먼저 생성후, 다른 엔티티 생성 (생성한 순서에 따라 그려지는 순서가 달라져서 적을 미리 생성하면 플레이어나 영혼들 보다 앞에 있지 않게 함)
         for spawner_id, constructor in SPAWNER_ENEMY_MAP.items():
             for pos in tilemap.get_pos_by_data("spawners_enemies", spawner_id):
                 constructor(pos)
+                
         for spawner_id, constructor in SPAWNER_ENTITY_MAP.items():
             if spawner_id == 0: continue #플레이어는 스킵
-            
+
             for pos in tilemap.get_pos_by_data("spawners_entities", spawner_id):
                 constructor(pos)

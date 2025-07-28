@@ -1,11 +1,12 @@
 import pygame as pg
 
 from scripts.constants import *
-from scripts.objects import *
 
 from .light import Light
 
+from scripts.objects import GameObject
 class Fog(GameObject):
+    '''성능 많이 잡아먹음'''
     '''쉐이더 없이 빛 효과 만점'''
     '''성능 많이 잡아먹음'''
     '''화면 전체를 덮지 않고, 오브젝트와 엔티티만 안개 처리가 됨.'''
@@ -15,6 +16,7 @@ class Fog(GameObject):
     '''사과 모양의 종이에 구멍을 내면 구멍을 낸곳에만 사과가 일부 보임.'''
 
     def __init__(self, fog_color : pg.Color = pg.Color(0, 0, 0, 250)):
+        '''Fog()하고 타일맵 만들면 안되고, 타일맵 만든후에 Fog()하세여'''
         super().__init__()
         self.fog_color = fog_color
         self.fog_surface = pg.Surface(SCREEN_SIZE, flags=pg.SRCALPHA)

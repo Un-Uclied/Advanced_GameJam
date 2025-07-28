@@ -1,40 +1,42 @@
 import pygame as pg
 
 
-from .base import Entity, PhysicsEntity
 from scripts.ai import WanderAI
 
 from scripts.vfx import Outline, AnimatedParticle
 from scripts.volume import Light
 
-hit_box_size = (40, 50)
+HIT_BOX_SIZE = (40, 50)
 
-move_speed = 1.5
-min_change_timer = .8
-max_change_timer = 1.5
+MOVE_SPEED = 1.5
+MIN_CHANGE_TIMER = .8
+MAX_CHANGE_TIMER = 1.5
 
+FLIP_OFFSET = {
+    False: pg.Vector2(5, -20),
+    True: pg.Vector2(5, -20)
+}
+
+from .base import PhysicsEntity
 class Soul(PhysicsEntity):
-    all_souls : list['Soul'] = []
     def __init__(self, spawn_position : pg.Vector2):
         self.outline = Outline(self, "red")
-        
-        rect = pg.Rect(spawn_position, hit_box_size)
-        super().__init__("soul", rect)
 
-        self.ai = WanderAI(self, move_speed, min_change_timer, max_change_timer)
+        super().__init__("soul", pg.Rect(spawn_position, HIT_BOX_SIZE))
 
-        self.flip_offset = {
-            False: pg.Vector2(5, -20),
-            True: pg.Vector2(5, -20)
-        }
+        self.ai = WanderAI(self, MIN_CHANGE_TIMER, MAX_CHANGE_TIMER)
+
+        self.flip_offset = FLIP_OFFSET
 
         self.light = Light(250, pg.Vector2(self.rect.center))
         self.light_follow_speed = 5
 
     def destroy(self):
+        # 자기가 생성한 빛, 아웃라인도 직접 제거
         self.light.destroy()
         self.outline.destroy()
 
+        # 파티클 생성, 소리 재생, 카메라 흔들림
         AnimatedParticle("soul_collect", pg.Vector2(self.rect.center))
         self.app.ASSETS["sounds"]["soul"]["interact"].play()
         self.app.scene.camera.shake_amount += 10
@@ -53,7 +55,7 @@ class Soul(PhysicsEntity):
 
     def update(self):
         super().update()
-        self.ai.on_update()
-        self.velocity.x = self.ai.direction.x * self.ai.move_speed * 100
+        self.ai.update()
+        self.velocity.x = self.ai.direction.x * MOVE_SPEED * 100
         self.follow_light()
         self.handle_input()

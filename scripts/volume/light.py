@@ -1,14 +1,15 @@
 import pygame as pg
 
 from scripts.constants import *
-from scripts.objects import *
 from scripts.camera import *
 
 LIGHT_SEGMENTS = 15 #원 모양이 그려지는 횟수
 LIGHT_FADE_OUT = 10 #빛의 알파값이 점점 줄어드는 양 
 
+from scripts.objects import GameObject
 class Light(GameObject):
     def __init__(self, size : float, position : pg.Vector2, strength : float = 25):
+        '''size & strength는 런타임중에 바꿀수 없음, 위치는 언제든지 변경 가능'''
         super().__init__()
 
         self.position = position

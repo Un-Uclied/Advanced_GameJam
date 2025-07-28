@@ -1,10 +1,10 @@
 import pygame as pg
 
 from scripts.constants import *
-from scripts.objects import *
 
 BASE_FONT_PATH = "assets/fonts/"
 
+from scripts.objects import GameObject
 class TextRenderer(GameObject):
     '''텍스트, 위치, 색상은 런타임중 바꿀수 있으나, 폰트와 크기는 변경 불가 (성능상의 이유로)'''
     '''pygame.freetype은 성능을 많이 잡아먹어서 pg.font.Font를 사용'''

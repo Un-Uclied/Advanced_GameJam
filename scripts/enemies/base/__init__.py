@@ -1,3 +1,2 @@
-from .ghost_enemy import GhostEnemy
-from .wander_enemy import WanderEnemy
-from .projectile_enemy import ProjectileEnemy
+from .enemy import PhysicsEnemy, ProjectileEnemy, GhostEnemy
+all_enemy_base_type = [PhysicsEnemy, ProjectileEnemy, GhostEnemy]

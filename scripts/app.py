@@ -2,11 +2,12 @@ import pygame as pg #파이게임 커뮤니티 에디션
 
 from scripts.constants import * #앱이름, 해상도, 화면 설정, 레이어 등이 있음.
 from scripts.scenes import *
-from scripts.pre_assets import *#애니메이션 클래스, 이미지 로드 함수
+from scripts.pre_assets import load_all_assets
 
 class App:
     singleton : 'App' = None
     def __init__(self, start_scene_name : str):
+        '''생성자 : 프로그램의 모든 클래스중 싱글톤 클래스는 App밖에 없게 함.'''
         #싱글톤으로 해서 GameObject __init__에서 접근 가능
         if App.singleton is not None:
             return App.singleton
@@ -66,133 +67,14 @@ class App:
 
     def load_assets(self):
         '''모든 에셋 로드'''
-        self.ASSETS = {
-            "tilemap" : {
-                "dirt"           :   load_images("tiles/tiles/dirt", scale=2, tint_color= "grey"),
-                "folliage"       :   load_images("tiles/objects/folliage",scale=2, tint_color= "grey"),
-                "props"          :   load_images("tiles/objects/props", scale=2, tint_color= "grey"),
-                "statues"        :   load_images("tiles/objects/statues", scale=2, tint_color= "grey"),
-                "spawners_entities": load_images("tiles/spawners_entities", scale=2,),
-                "spawners_enemies" : load_images("tiles/spawners_enemies", scale=2,)
-            },
-
-            "fonts" : {
-                "default" : "PF스타더스트 3.0 Bold.ttf"
-            },
-
-            "animations" : {
-                "entities" : {
-                    "player" : {
-                        "idle" : Animation(load_images("entities/player/idle", scale=2), .05, True),
-                        "run"  : Animation(load_images("entities/player/run", scale=2),  .08, True),
-                        "jump" : Animation(load_images("entities/player/jump", scale=2),  1,  False)
-                    },
-
-                    "soul" : {
-                        "idle" : Animation(load_images("entities/soul/idle", scale=2, tint_color="cyan"), .05, True)
-                    },
-
-                    "portal" : {
-                        "idle" : Animation(load_images("entities/portal/idle", scale=2), .05, True)
-                    },
-
-                    "one_alpha" : {
-                        "idle" : Animation(load_images("entities/enemies/1_alpha/idle", scale=2), .05, True),
-                        "run"  : Animation(load_images("entities/enemies/1_alpha/run", scale=2), .15, True),
-                    },
-                    "one_beta" : {
-                        "idle" : Animation(load_images("entities/enemies/1_beta/idle", scale=2), .05, True),
-                        "run"  : Animation(load_images("entities/enemies/1_beta/run", scale=2), .15, True),
-                    },
-                    "two_alpha" : {
-                        "idle" : Animation(load_images("entities/enemies/2_alpha/idle", scale=2), .05, True),
-                        "run"  : Animation(load_images("entities/enemies/2_alpha/run", scale=2), .15, True),
-                    },
-                    "two_beta" : {
-                        "idle" : Animation(load_images("entities/enemies/2_beta/idle", scale=2), .05, True),
-                        "run"  : Animation(load_images("entities/enemies/2_beta/run", scale=2), .15, True),
-                    },
-                    "three_alpha" : {
-                        "attack" : Animation(load_images("entities/enemies/3_alpha/attack", scale=2), .05, False),
-                        "run"    : Animation(load_images("entities/enemies/3_alpha/run", scale=2), .15, True),
-                    },
-                    "three_beta" : {
-                        "attack" : Animation(load_images("entities/enemies/3_beta/attack", scale=2), .05, False),
-                        "run"    : Animation(load_images("entities/enemies/3_beta/run", scale=2), .15, True),
-                    },
-                    "four_alpha" : {
-                        "idle" : Animation(load_images("entities/enemies/4_alpha/idle", scale=2), .05, True),
-                        "run"  : Animation(load_images("entities/enemies/4_alpha/run", scale=2), .08, True),
-                    },
-                    "four_beta" : {
-                            "idle" : Animation(load_images("entities/enemies/4_beta/idle", scale=2), .05, True),
-                        "run"  : Animation(load_images("entities/enemies/4_beta/run", scale=2), .03, True),
-                    },
-                    "five_omega" : {
-                        "idle" : Animation(load_images("entities/enemies/5_omega/idle", scale=2), .05, True),
-                        "run"  : Animation(load_images("entities/enemies/5_omega/run", scale=2), .15, True),
-                    }
-                },
-            
-                "vfxs" : {
-                    "hurt" : Animation(load_images("particles/hurt", scale=2), .03, False),
-
-                    "enemy_attack" : Animation(load_images("particles/enemy_attack", scale=2, tint_color="grey"), .03, False),
-                    "enemy_die" : Animation(load_images("particles/enemy_die", scale=2, tint_color="grey"), .03, False),
-                    
-                    "soul_collect" : Animation(load_images("particles/soul_collect", scale=2), .03, False),
-                    
-                    "enemy_alpha_projectile_destroy" : Animation(load_images("particles/destroy", scale=2, tint_color="purple"), .03, False),
-                    "enemy_beta_projectile_destroy" : Animation(load_images("particles/destroy", scale=2, tint_color="red"), .03, False),
-
-                    "player_projectile_destroy" : Animation(load_images("particles/destroy", scale=2,), .03, False)
-                },
-
-                "projectiles" : {
-                    "two_alpha_projectile" : Animation(load_images("projectiles/projectile", scale=2,tint_color="purple"), .03, True),
-                    "two_beta_projectile" : Animation(load_images("projectiles/projectile", scale=2, tint_color="red"), .03, True),
-                    "player_projectile" :  Animation(load_images("projectiles/projectile", scale=2),  .03, True),
-                },
-            },
-
-            "backgrounds" : {
-                "sky" : {
-                    "default" : load_images("skys/default", scale=2.5, tint_color=pg.Color(100, 100, 100))
-                },
-                "clouds" : load_images("clouds", scale=1.5, tint_color="grey")
-            },
-
-            "ui" : {
-                "image_button" : {
-                    "temp" : {
-                        "on_hover"     : load_image("ui/buttons/temp/on_hover.png"),
-                        "on_not_hover" : load_image("ui/buttons/temp/on_not_hover.png")
-                    }
-                }
-            },
-            
-            "sounds" : {
-                "player" : {
-                    "jump" :       pg.mixer.Sound("assets/sounds/player/jump.wav"),
-                    "hurt" :       pg.mixer.Sound("assets/sounds/player/hurt.wav"),
-                    "projectile" : pg.mixer.Sound("assets/sounds/player/projectile.wav"),
-                },
-                "enemy" : {
-                    "attack" :     pg.mixer.Sound("assets/sounds/enemy/attack.wav"),
-                    "hurt" :       pg.mixer.Sound("assets/sounds/enemy/hurt.wav"),
-                    "die" :        pg.mixer.Sound("assets/sounds/enemy/die.wav"),
-                    "projectile" : pg.mixer.Sound("assets/sounds/enemy/projectile.wav"),
-                },
-                "soul" : {
-                    "interact" :   pg.mixer.Sound("assets/sounds/soul/interact.wav"),
-                }
-            }
-        }
+        self.ASSETS = load_all_assets()
 
     def update_time(self):
+        '''시간 업데이트'''
         self.dt = self.clock.tick(TARGET_FPS) / 1000 * self.time_scale
 
     def update_event(self):
+        '''매프레임 딱 한번만 이벤트 리프레쉬 하도록'''
         self.events = pg.event.get()
     
     def change_scene(self, name : str):
@@ -202,6 +84,7 @@ class App:
         self.scene.on_scene_start()
 
     def check_for_quit(self):
+        '''종료 이벤트 (이거 없으면 X버튼 눌러도 게임이 안꺼짐)'''
         for event in self.events:
             if event.type == pg.QUIT:
                 self.window_should_be_closed = True
@@ -222,11 +105,11 @@ class App:
         while not self.window_should_be_closed:
             self.update_event()     #1. 제일먼저 이벤트 리슨
             self.check_for_quit()   #2. 종료 확인
-            self.scene.update()  #3. 현재 씬 업데이트
+            self.scene.update()     #3. 현재 씬 업데이트
 
             self.clear_surfaces()   #4. 화면 초기화
             
-            self.scene.draw()    #5.현재 씬 드로우
+            self.scene.draw()       #5.현재 씬 드로우
             self.draw_surfaces()    #6.surfaces에 그려진것들을 메인 화면에 드로우
 
             pg.display.flip()       #7.화면 업데이트
