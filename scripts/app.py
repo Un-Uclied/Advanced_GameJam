@@ -2,12 +2,53 @@ import pygame as pg #파이게임 커뮤니티 에디션
 
 from scripts.constants import * #앱이름, 해상도, 화면 설정, 레이어 등이 있음.
 from scripts.scenes import *
-from scripts.pre_assets import load_all_assets
+from scripts.pre_assets import *
+
+class SoundManager:
+    def __init__(self):
+        # BGM 전용 mixer.music 사용
+        self.bgm_volume = 1.0
+
+        # 효과음 채널 풀 만들기
+        pg.mixer.set_num_channels(MIXER_CHANNEL_COUNT)
+        self.sfx_channels = [pg.mixer.Channel(i) for i in range(MIXER_CHANNEL_COUNT)]
+        self.sfx_volume = 1.0
+
+    def play_sfx(self, sound: pg.mixer.Sound, volume: float = 1.0):
+        """사용 가능한 채널 찾아서 효과음 재생"""
+        for ch in self.sfx_channels:
+            if not ch.get_busy():
+                ch.set_volume(volume * self.sfx_volume)
+                ch.play(sound)
+                return
+
+    def play_bgm(self, music_path: str, loop: bool = True, fade_ms: int = 0):
+        """배경음악 재생 (streaming 방식)"""
+        pg.mixer.music.load(music_path)
+        pg.mixer.music.set_volume(self.bgm_volume)
+        pg.mixer.music.play(-1 if loop else 0, fade_ms=fade_ms)
+
+    def stop_bgm(self, fade_ms: int = 0):
+        if fade_ms > 0:
+            pg.mixer.music.fadeout(fade_ms)
+        else:
+            pg.mixer.music.stop()
+
+    def set_bgm_volume(self, volume: float):
+        self.bgm_volume = max(0.0, min(1.0, volume))
+        pg.mixer.music.set_volume(self.bgm_volume)
+
+    def set_sfx_volume(self, volume: float):
+        self.sfx_volume = max(0.0, min(1.0, volume))
+        for ch in self.sfx_channels:
+            ch.set_volume(self.sfx_volume)
 
 class App:
+    '''
+    :param start_scene_name: 처음 시작할 씬 키 (run_game.py에선 "main_menu_scene")
+    '''
     singleton : 'App' = None
     def __init__(self, start_scene_name : str):
-        '''생성자 : 프로그램의 모든 클래스중 싱글톤 클래스는 App밖에 없게 함.'''
         #싱글톤으로 해서 GameObject __init__에서 접근 가능
         if App.singleton is not None:
             return App.singleton
@@ -24,16 +65,16 @@ class App:
 
         #레이어 별로 surface를 만들고, GameObject를 상속받는 클래스마다 원하는곳에 그리거나 접근 가능.
         self.surfaces = {
-            LAYER_BG : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
-            LAYER_OBJ : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
-            LAYER_ENTITY : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
-            LAYER_VOLUME : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
-            LAYER_DYNAMIC : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
-            LAYER_INTERFACE : pg.Surface(SCREEN_SIZE, pg.SRCALPHA),
+            LAYER_BG : pg.Surface(SCREEN_SIZE, SURFACE_FLAGS).convert_alpha(),
+            LAYER_OBJ : pg.Surface(SCREEN_SIZE, SURFACE_FLAGS).convert_alpha(),
+            LAYER_ENTITY : pg.Surface(SCREEN_SIZE, SURFACE_FLAGS).convert_alpha(),
+            LAYER_VOLUME : pg.Surface(SCREEN_SIZE, SURFACE_FLAGS).convert_alpha(),
+            LAYER_DYNAMIC : pg.Surface(SCREEN_SIZE, SURFACE_FLAGS).convert_alpha(),
+            LAYER_INTERFACE : pg.Surface(SCREEN_SIZE, SURFACE_FLAGS).convert_alpha(),
         }
 
-        #소리가 너무 많아지면 씹히는 현상 없애려고 채널 개수 늘리기
-        pg.mixer.set_num_channels(MIXER_CHANNEL_COUNT)
+        # 사운드 매니저!!
+        self.sound_manager = SoundManager()    
 
         #모든 애셋 로드, 너무 많으면 프리징 현상 발생
         self.load_assets()
@@ -48,6 +89,7 @@ class App:
 
         #델타타임
         self.dt : float = 0
+        self.unscaled_dt : float = 0
         #타임 스케일 (조절 해서 슬로우 모션 연출 가능)
         self.time_scale : float = 1
 
@@ -58,6 +100,8 @@ class App:
         from scripts.scenes.base import Scene
         self.registered_scenes : dict[str, Scene]= {
             "main_menu_scene" : MainMenuScene(),
+            "settings_scene" : SettingsScene(),
+            "info_scene" : InfoScene(),
             "main_game_scene" : MainGameScene(),
             "editor_scene"    : TileMapEditScene()
         }
@@ -71,7 +115,8 @@ class App:
 
     def update_time(self):
         '''시간 업데이트'''
-        self.dt = self.clock.tick(TARGET_FPS) / 1000 * self.time_scale
+        self.unscaled_dt = self.clock.tick(TARGET_FPS) / 1000
+        self.dt = self.unscaled_dt * self.time_scale
 
     def update_event(self):
         '''매프레임 딱 한번만 이벤트 리프레쉬 하도록'''

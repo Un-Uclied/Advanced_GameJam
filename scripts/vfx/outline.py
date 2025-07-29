@@ -5,12 +5,20 @@ from scripts.camera import *
 
 from scripts.objects import GameObject
 class Outline(GameObject):
-    '''엔티티만 대상으로 아웃라인 효과'''
-    '''성능 꽤 잡아먹음'''
+    """
+    엔티티만 대상으로 아웃라인 효과를 적용하는 클래스임
+
+    :param entity: 아웃라인을 적용할 대상 엔티티 (GameObject 상속 객체)
+    :param color: 외곽선 색상 (RGB 튜플)
+    :param thickness: 외곽선 두께 (기본값 1)
+
+    경고: 대상 엔티티가 super().__init__() 호출 전에 Outline이 먼저 생성되어야 함!
+    엔티티가 제거될 때 Outline도 destroy()로 제거해줘야 함!
+    """
+
     def __init__(self, entity, color, thickness=1):
-        '''엔티티 대상만 Outline되고, 엔티티 없어질때 이거도 destroy()해줘야함!! (경고 : 엔티티 super().__init__()하기전에 불러야함)'''
         super().__init__()
-        self.entity = entity #타겟 엔티티
+        self.entity = entity
         self.color = color
         self.thickness = thickness
 

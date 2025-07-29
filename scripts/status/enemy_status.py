@@ -3,8 +3,14 @@ import pygame as pg
 from scripts.vfx import AnimatedParticle
 
 class EnemyStatus:
-    def __init__(self, enemy, max_health):
-        '''적 클래스에서 직접 만들어야하고, GameObject를 상속 받지 않기에 app은 self.enemy.app으로 접근 (좀 돌아가서 접근하는 느낌이 있긴하지만)'''
+    '''
+    적 클래스에서 직접 만들어야하고, GameObject를 상속 받지 않기에 app은 self.enemy.app으로 접근 (좀 돌아가서 접근하는 느낌이 있긴하지만)
+
+    :param enemy: 적 인스턴스!!
+    :param max_health: 최대 체력 ㅇㅇ
+    '''
+
+    def __init__(self, enemy, max_health : int):
         self.enemy = enemy
 
         self.max_health = max_health
@@ -29,10 +35,10 @@ class EnemyStatus:
 
             #죽을때와 체력이 깎일때 효과음 | 파티클이 다르게끔
             if self._health > 0:
-                app.ASSETS["sounds"]["enemy"]["hurt"].play()
+                app.sound_manager.play_sfx(app.ASSETS["sounds"]["enemy"]["hurt"])
                 AnimatedParticle("hurt", pg.Vector2(self.enemy.rect.center))
             else:
-                app.ASSETS["sounds"]["enemy"]["die"].play()
+                app.sound_manager.play_sfx(app.ASSETS["sounds"]["enemy"]["die"])
                 AnimatedParticle("enemy_die", pg.Vector2(self.enemy.rect.center))
         
         #0이 되면 제거

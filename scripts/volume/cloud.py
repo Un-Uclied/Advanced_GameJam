@@ -41,8 +41,13 @@ class Cloud:
 
 from scripts.objects import GameObject
 class Clouds(GameObject):
+    '''
+    구름 추가 Sky 생성하고 부르세영
+    
+    :param cloud_count: 구름 개수
+    '''
     def __init__(self, cloud_count: int = 16):
-        '''구름 이펙트 추가!! 구름은 끝없이 스크롤 되니깐 cloud_count그리 안올려도 됨'''
+        #구름 이펙트 추가!! 구름은 끝없이 스크롤 되니깐 cloud_count그리 안올려도 됨
         super().__init__()
         cloud_images = self.app.ASSETS["backgrounds"]["clouds"]
         self.all_clouds : list[Cloud] = []

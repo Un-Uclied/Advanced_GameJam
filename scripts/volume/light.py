@@ -4,16 +4,23 @@ from scripts.constants import *
 from scripts.camera import *
 
 LIGHT_SEGMENTS = 15 #원 모양이 그려지는 횟수
-LIGHT_FADE_OUT = 10 #빛의 알파값이 점점 줄어드는 양 
+LIGHT_FADE_OUT = 10 #원 모양이 작아지는 양
 
 from scripts.objects import GameObject
 class Light(GameObject):
+    '''
+    size & strength는 런타임중에 바꿀수 없음, 위치는 언제든지 변경 가능
+    
+    :param size: 빛 Surface의 월드 좌표계 크기
+    :param position: 빛 Surface의 중앙 위치
+    :param strength: 빛 알파값
+    '''
+    
     def __init__(self, size : float, position : pg.Vector2, strength : float = 25):
-        '''size & strength는 런타임중에 바꿀수 없음, 위치는 언제든지 변경 가능'''
         super().__init__()
 
         self.position = position
-        #성능을 위해 생성시 딱 한번만 surface를 만듦. | 그래서 self.size를 선언하지 않음 => 런타임중 바꿀수 없음.
+        #성능을 위해 생성시 딱 한번만 Surface를 만듦. | 그래서 self.size를 선언하지 않음 => 런타임중 바꿀수 없음.
         self.surface = pg.Surface((size, size), pg.SRCALPHA)
 
         for i in range(LIGHT_SEGMENTS):

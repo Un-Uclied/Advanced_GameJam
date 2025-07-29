@@ -38,7 +38,7 @@ class Soul(PhysicsEntity):
 
         # 파티클 생성, 소리 재생, 카메라 흔들림
         AnimatedParticle("soul_collect", pg.Vector2(self.rect.center))
-        self.app.ASSETS["sounds"]["soul"]["interact"].play()
+        self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["soul"]["interact"])
         self.app.scene.camera.shake_amount += 10
 
         super().destroy()

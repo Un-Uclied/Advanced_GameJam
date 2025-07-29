@@ -56,7 +56,7 @@ def load_vfx_animations():
     return {
         "hurt": Animation(load_images("particles/hurt", scale=2), .03, False),
         "enemy_attack": Animation(load_images("particles/enemy_attack", scale=2, tint_color="grey"), .03, False),
-        "enemy_die": Animation(load_images("particles/enemy_die", scale=2, tint_color="grey"), .03, False),
+        "enemy_die": Animation(load_images("particles/enemy_die", scale=2, tint_color="black"), .03, False),
         "soul_collect": Animation(load_images("particles/soul_collect", scale=2), .03, False),
         "enemy_alpha_projectile_destroy": Animation(load_images("particles/destroy", scale=2, tint_color="purple"), .03, False),
         "enemy_beta_projectile_destroy": Animation(load_images("particles/destroy", scale=2, tint_color="red"), .03, False),
@@ -88,15 +88,34 @@ def load_sound_assets():
         },
         "soul": {
             "interact": snd("soul/interact"),
+        },
+        "ui" : {
+            "button" : {
+                "hover_enter" : snd("ui/button/hover_enter"),
+                "hover_exit" : snd("ui/button/hover_exit"),
+                "click" : snd("ui/button/click")
+            }
         }
     }
 
 def load_ui_assets():
     return {
         "image_button": {
-            "temp": {
-                "on_hover": load_image("ui/buttons/temp/on_hover.png"),
-                "on_not_hover": load_image("ui/buttons/temp/on_not_hover.png")
+            "game_start": {
+                "on_hover": load_image("ui/buttons/game_start/on_hover.png", scale=2),
+                "on_not_hover": load_image("ui/buttons/game_start/on_not_hover.png", scale=2)
+            },
+            "app_settings": {
+                "on_hover": load_image("ui/buttons/app_settings/on_hover.png", scale=2),
+                "on_not_hover": load_image("ui/buttons/app_settings/on_not_hover.png", scale=2)
+            },
+            "app_info": {
+                "on_hover": load_image("ui/buttons/app_info/on_hover.png", scale=2),
+                "on_not_hover": load_image("ui/buttons/app_info/on_not_hover.png", scale=2)
+            },
+            "app_quit": {
+                "on_hover": load_image("ui/buttons/app_quit/on_hover.png", scale=2),
+                "on_not_hover": load_image("ui/buttons/app_quit/on_not_hover.png", scale=2)
             }
         }
     }

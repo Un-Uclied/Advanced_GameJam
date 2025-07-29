@@ -107,7 +107,7 @@ class PlayerCharacter(PhysicsEntity):
         self.current_jump_count += 1
 
         # 플레이어 점프 소리 재생
-        self.app.ASSETS["sounds"]["player"]["jump"].play()
+        self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["player"]["jump"])
 
     def physics_gravity(self):
         super().physics_gravity()

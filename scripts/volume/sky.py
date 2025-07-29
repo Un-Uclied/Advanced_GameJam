@@ -2,8 +2,13 @@ from scripts.constants import *
 
 from scripts.objects import GameObject
 class Sky(GameObject):
+    '''
+    그냥 Sky()하면 바로 하늘 생김 (구름 & 안개 제외)
+
+    :param sky_name: 하늘 에셋 키인데 그냥 보스전 같은데 빼고 그냥 "default"로 써라 ㅇㅇ
+    '''
+
     def __init__(self, sky_name : str = "default"):
-        '''그냥 Sky()하면 바로 하늘 생김 (구름 & 안개 제외)'''
         super().__init__()
 
         #App클래스의 에셋의 ["backgrounds"]["sky"][하늘 이름]은 list[pg.Surface]

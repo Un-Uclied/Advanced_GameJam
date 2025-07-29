@@ -1,8 +1,8 @@
 타일맵 에디터 열기 -> run_editor.py실행
 
-타일맵 만들때엔 datas/tilemaps/temp.json을 열게됨.
+타일맵 만들때엔 data/tilemaps/temp.json을 열게됨.
 
-저장후, 에디터를 끄고, datas/tilemaps/temp.json를 복사해서 원하는곳에 붙여놓고 이름을 a.json, b.json, c.json이렇게 바꾸면 끝
+저장후, 에디터를 끄고, data/tilemaps/temp.json를 복사해서 원하는곳에 붙여놓고 이름을 a.json, b.json, c.json이렇게 바꾸면 끝
 
 구성은 이렇게 : 
 

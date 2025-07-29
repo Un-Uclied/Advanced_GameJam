@@ -5,10 +5,17 @@ import random
 FIX_DIRECTION_TIMER = 0.6
 
 class WanderAI:
+    '''
+    이 AI는 GameObject를 상속받지 않아서 엔티티가 직접 업데이트 해야함
+    그냥 왔다 갔다 가만히 있는 AI
+    AI관련 클래스는 방향만 알려주는거고, 직접 위치 업데이트는 엔티티가 직접
+    
+    :param entity: 영혼이나 적 엔티티 인스턴스
+    :param min_change_timer: 랜덤으로 방향전환하는데 랜덤의 가장 작은값
+    :param max_change_timer: 랜덤으로 방향전환하는데 랜덤의 가장 큰값
+    '''
+
     def __init__(self, entity, min_change_timer: float, max_change_timer: float):
-        '''이 AI는 GameObject를 상속받지 않아서 엔티티가 직접 업데이트 해야함'''
-        '''그냥 왔다 갔다 가만히 있는 AI'''
-        '''AI관련 클래스는 방향만 알려주는거고, 직접 위치 업데이트는 엔티티가 직접'''
         self.entity = entity
         self.direction = pg.Vector2()
 
@@ -73,10 +80,17 @@ class WanderAI:
         self.fix_direction_timer = FIX_DIRECTION_TIMER
 
 class ChaseAI:
+    '''
+    이 AI는 GameObject를 상속받지 않아서 엔티티가 직접 업데이트 해야함
+    엔티티 일정거리 안으로 들어오면 self.direction이 플레이어 방향으로, 일정거리 밖이면 시작 위치로 방향을 잡음
+    AI관련 클래스는 방향만 알려주는거고, 직접 위치 업데이트는 엔티티가 직접
+    
+    :param entity: 유령 적 엔티티 인스턴스
+    :param max_follow_range: 적이 감지할수 있는 방향 (플레이어의 거리가 이 값안으로 들어오면 플레이어쪽으로 방향가고,\n 값 밖으로 나가면 다시 스폰 위치로 감)
+    '''
+
     def __init__(self, entity, max_follow_range: float):
-        '''이 AI는 GameObject를 상속받지 않아서 엔티티가 직접 업데이트 해야함'''
-        '''엔티티 일정거리 안으로 들어오면 self.direction이 플레이어 방향으로, 일정거리 밖이면 시작 위치로 방향을 잡음'''
-        '''AI관련 클래스는 방향만 알려주는거고, 직접 위치 업데이트는 엔티티가 직접'''
+        
         self.entity = entity
         self.direction = pg.Vector2()
 

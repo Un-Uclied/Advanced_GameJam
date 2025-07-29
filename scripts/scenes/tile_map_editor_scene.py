@@ -17,7 +17,7 @@ class TileMapEditScene(Scene):
         super().on_scene_start()
         Sky()
 
-        # datas/tilmap/temp.json을 로드함.
+        # data/tilmap/temp.json을 로드함.
         # temp.json에 작업하고, 복사후 원하는곳에 붙여넣기
         self.tilemap = Tilemap("temp.json")
 

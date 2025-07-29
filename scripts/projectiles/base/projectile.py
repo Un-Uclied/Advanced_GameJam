@@ -7,7 +7,7 @@ from scripts.camera import *
 
 #5초가 지나면 자동으로 삭제
 TIME_OUT = 5
-DATA_PATH = "datas/projectile_data.json"
+DATA_PATH = "data/projectile_data.json"
 
 # Projectile 생성할때 대미지나 속도 같은게 인수로 들어오면 더러워져서 여기서 모든 탄환 데이터 로드
 with open(DATA_PATH, 'r') as f:
@@ -16,10 +16,17 @@ with open(DATA_PATH, 'r') as f:
 
 from scripts.objects import GameObject
 class Projectile(GameObject):
-    '''모든 탄환들의 부모 클래스'''
+    '''
+    다른 탄환 클래스의 부모 클래스
+    새로운 탄환을 만들꺼면 이 클래스를 상속 받아서 만들기 (예: PlayerProjectile(Projectile) )
+
+    :param projectile_name: 탄환 데이터의 키 (중요)
+    :param start_position: 시작 위치!! (대개로 pg.Vector2(엔티티.rect.center))
+    :param start_direction: 탄환 방향!!
+    '''
+
     def __init__(self, projectile_name : str,
                  start_position : pg.Vector2, start_direction : pg.Vector2):
-        '''새로운 탄환을 만들꺼면 이 클래스를 상속 받아서 만들기 (예: PlayerProjectile(Projectile) )'''
         super().__init__()
 
         #여기에 속도, 대미지가 들어가 있음

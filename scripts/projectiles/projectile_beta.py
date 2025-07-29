@@ -4,13 +4,20 @@ from scripts.vfx import AnimatedParticle
 
 from .base import Projectile
 class ProjectileBeta(Projectile):
+    '''
+    TwoBeta의 탄환!!
+    
+    :param start_position: 시작 위치!! (대개로 pg.Vector2(엔티티.rect.center))
+    :param start_direction: 탄환 방향!!
+    '''
+    
     def __init__(self, start_position : pg.Vector2, start_direction : pg.Vector2):
         super().__init__("two_beta_projectile",
                          start_position,
                          start_direction)
         
         # TwoBeta 클래스의 적 탄환 생성 소리 재생
-        self.app.ASSETS["sounds"]["enemy"]["projectile"].play()
+        self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["enemy"]["projectile"])
     
     def destroy(self):
         # TwoBeta 클래스의 적 탄환 제거 파티클 생성

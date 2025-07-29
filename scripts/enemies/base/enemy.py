@@ -25,7 +25,7 @@ class PhysicsEnemy(PhysicsEntity):
             ps.health -= self.collide_attack_damage
 
             AnimatedParticle("enemy_attack", pg.Vector2(self.rect.center))
-            self.app.ASSETS["sounds"]["enemy"]["attack"].play()
+            self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["enemy"]["attack"])
 
 class ProjectileEnemy(PhysicsEnemy):
     def __init__(self, name : str, rect, collide_attack_damage : int, fire_range : float, fire_cooltime : float, projectile_class : type):
@@ -93,7 +93,7 @@ class GhostEnemy(Entity):
         
         self.set_action("attack")
         AnimatedParticle("enemy_attack", pg.Vector2(self.rect.center))
-        self.app.ASSETS["sounds"]["enemy"]["attack"].play()
+        self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["enemy"]["attack"])
 
     def update_attack(self):
         if self.current_attack_time > 0:

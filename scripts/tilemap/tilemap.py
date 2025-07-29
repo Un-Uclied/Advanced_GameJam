@@ -25,10 +25,16 @@ AUTO_TILE_TILES = ["dirt"]
 IN_GRID_TILES = ["dirt"]
 DO_NOT_RENDER_TILES = ["spawners_entities", "spawners_enemies"]
 
-BASE_TILEMAP_PATH = "datas/tilemaps/"
+BASE_TILEMAP_PATH = "data/tilemaps/"
 
 from scripts.objects import GameObject
 class Tilemap(GameObject):
+    '''
+    타일맵 클래스!!! 엄청 중요함!! 엔티티 만들기전에 만들어짐
+
+    :param file_name: 기본은 data/tilemaps/temp.json에 있는거 불러옴
+    '''
+    
     def __init__(self, file_name: str = "temp.json"):
         super().__init__()
         self.file_name = file_name
