@@ -78,11 +78,8 @@ class Entity(GameObject):
         if not CameraView.is_in_view(camera, image_rect):
             return
 
-        # 스케일 처리
-        surface = CameraView.get_scaled_surface(camera, flipped_image)
-
         # 실제 스크린 위치 계산
         position = CameraMath.world_to_screen(camera, world_position)
 
         # 렌더링
-        self.app.surfaces[LAYER_ENTITY].blit(surface, position)
+        self.app.surfaces[LAYER_ENTITY].blit(flipped_image, position)

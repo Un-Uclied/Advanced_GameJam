@@ -43,6 +43,5 @@ class AnimatedParticle(GameObject):
             camera,
             self.position - pg.Vector2(image.get_size()).elementwise() * self.anchor
         )
-        screen_img = CameraView.get_scaled_surface(camera, image)
 
-        surface.blit(screen_img, screen_pos)
+        surface.blit(image, screen_pos)

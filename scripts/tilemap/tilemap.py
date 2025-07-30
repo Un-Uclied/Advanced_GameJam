@@ -103,9 +103,7 @@ class Tilemap(GameObject):
 
         # 시야 안에 있을 때만 렌더링
         screen_pos = CameraMath.world_to_screen(camera, world_pos)
-        scaled_img = CameraView.get_scaled_surface(camera, image)
-
-        surface.blit(scaled_img, screen_pos)
+        surface.blit(image, (round(screen_pos.x), round(screen_pos.y)))
 
     def draw(self):
         super().draw()

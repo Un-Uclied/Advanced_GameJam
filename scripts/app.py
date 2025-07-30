@@ -3,6 +3,7 @@ import pygame as pg #파이게임 커뮤니티 에디션
 from scripts.constants import * #앱이름, 해상도, 화면 설정, 레이어 등이 있음.
 from scripts.scenes import *
 from scripts.pre_assets import *
+from scripts.vfx import ScreenFader
 
 class SoundManager:
     def __init__(self):
@@ -108,6 +109,7 @@ class App:
 
         self.scene = self.registered_scenes[start_scene_name]
         self.scene.on_scene_start()
+        self.transition = False
 
     def load_assets(self):
         '''모든 에셋 로드'''
@@ -123,10 +125,16 @@ class App:
         self.events = pg.event.get()
     
     def change_scene(self, name : str):
-        '''등록된 씬의 이름을 넣으면 원래씬 종료후 그 씬을 업데이트, 그리기 시작'''
-        self.scene.on_scene_end()
-        self.scene = self.registered_scenes[name]
-        self.scene.on_scene_start()
+        '''트랜지션과 함께 등록된 씬의 이름을 넣으면 원래씬 종료후 그 씬을 업데이트, 그리기 시작'''
+        def on_fade_out_end():
+            self.transition = False
+        def on_fade_in_end():
+            self.scene.on_scene_end()
+            self.scene = self.registered_scenes[name]
+            self.scene.on_scene_start()
+            ScreenFader(1, False, on_complete=on_fade_out_end)
+        self.transition = True
+        ScreenFader(1, True, on_complete=on_fade_in_end)
 
     def check_for_quit(self):
         '''종료 이벤트 (이거 없으면 X버튼 눌러도 게임이 안꺼짐)'''

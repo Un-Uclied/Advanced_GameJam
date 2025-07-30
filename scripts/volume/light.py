@@ -48,4 +48,4 @@ class Light(GameObject):
             if not CameraView.is_in_view(camera, light.bound_box): continue
 
             rect = CameraView.world_rect_to_screen(camera, light.bound_box)
-            surface.blit(CameraView.get_scaled_surface(camera, light.surface), rect.topleft, special_flags=pg.BLEND_RGBA_SUB)
+            surface.blit(light.surface, rect.topleft, special_flags=pg.BLEND_RGBA_SUB)

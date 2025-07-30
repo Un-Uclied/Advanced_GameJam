@@ -14,6 +14,8 @@ class Portal(Entity):
         from scripts.volume import Light
         self.light = Light(LIGHT_SIZE, pg.Vector2(self.rect.center))
 
+        self.interacted = False
+
     def update(self):
         super().update()
 
@@ -21,8 +23,9 @@ class Portal(Entity):
         pc = ps.player_character
         
         # F키 누르면 MainGameScene.on_level_end()를 불러서 다음 레벨로 감
-        if self.rect.colliderect(pc.rect):
+        if self.rect.colliderect(pc.rect) and not self.interacted:
             for event in self.app.events:
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_f:
                         self.app.scene.on_level_end()
+                        self.interacted = True

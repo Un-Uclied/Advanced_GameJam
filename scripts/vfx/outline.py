@@ -35,7 +35,6 @@ class Outline(GameObject):
         # 원본 이미지 처리
         image = entity.anim.img()
         image = pg.transform.flip(image, entity.flip_x, False)
-        scaled_image = CameraView.get_scaled_surface(camera, image)
 
         # 최적화를 위해서 화면에 없으면 렌더 안함
         world_rect = pg.Rect(world_pos, image.get_size())
@@ -43,7 +42,7 @@ class Outline(GameObject):
             return
 
         # 마스크 따기
-        mask = pg.mask.from_surface(scaled_image)
+        mask = pg.mask.from_surface(image)
         outline_surf = mask.to_surface(setcolor=self.color, unsetcolor=(0, 0, 0, 0))
         outline_surf.set_colorkey((0, 0, 0))
 

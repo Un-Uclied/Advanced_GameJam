@@ -105,11 +105,6 @@ class TileMapEditScene(Scene):
                 elif event.key == pg.K_z and keys[pg.K_LCTRL]:
                     #컨트롤 + Z
                     self.undo()
-    
-                elif event.key == pg.K_q:
-                    self.camera.scale += 0.5
-                elif event.key == pg.K_e:
-                    self.camera.scale -= 0.5
 
     def handle_mouse_input(self):
         '''마우스 인풋 핸들'''
@@ -145,8 +140,7 @@ class TileMapEditScene(Scene):
     def move_camera(self):
         '''카메라 움직임'''
         keys = pg.key.get_pressed()
-        #카메라 줌에 맞게 움직이는 속도 조절
-        move_speed = CAMERA_MOVE_SPEED * self.app.dt / self.camera.scale
+        move_speed = CAMERA_MOVE_SPEED * self.app.dt
 
         if keys[pg.K_w]:
             self.camera.position += pg.Vector2(0, -move_speed)
@@ -197,19 +191,19 @@ class TileMapEditScene(Scene):
         if not self.in_collision_view:
             return
 
-        scaled_tile_size = int(self.tilemap.tile_size * self.camera.scale)
+        tile_size = int(self.tilemap.tile_size)
         for key, tile_data in self.tilemap.in_grid.items():
             if tile_data["can_collide"]:
                 world_pos = pg.Vector2(tile_data["pos"][0] * self.tilemap.tile_size,
                                        tile_data["pos"][1] * self.tilemap.tile_size)
                 screen_pos = CameraMath.world_to_screen(self.camera, world_pos)
-                rect = pg.Rect(screen_pos.x, screen_pos.y, scaled_tile_size, scaled_tile_size)
+                rect = pg.Rect(screen_pos.x, screen_pos.y, tile_size, tile_size)
                 pg.draw.rect(self.app.surfaces[LAYER_INTERFACE], "blue", rect)
 
     def draw_preview(self):
         '''마우스 위치에 현재 선택된 타일 보여주기'''
         tile_size = self.tilemap.tile_size
-        scaled_tile_size = int(tile_size * self.camera.scale)
+        tile_size = tile_size
 
         preview_screen_pos = CameraMath.world_to_screen(self.camera, self.tile_pos * tile_size)
 
@@ -217,14 +211,13 @@ class TileMapEditScene(Scene):
         current_tile_variant = self.current_tile_variant
 
         preview_image = self.app.ASSETS["tilemap"][current_tile_type][current_tile_variant].copy()
-        preview_image = CameraView.get_scaled_surface(self.camera, preview_image)
         preview_image.set_alpha(150)
 
         self.app.surfaces[LAYER_INTERFACE].blit(preview_image, preview_screen_pos)
 
         if self.can_collide:
             pg.draw.rect(self.app.surfaces[LAYER_INTERFACE], (255, 0, 0, 100),
-                         pg.Rect(preview_screen_pos.x, preview_screen_pos.y, scaled_tile_size, scaled_tile_size), 2)
+                         pg.Rect(preview_screen_pos.x, preview_screen_pos.y, tile_size, tile_size), 2)
 
     def place_tile_grid(self):
         '''그리드 안에 있는거 설치'''
@@ -282,7 +275,7 @@ class TileMapEditScene(Scene):
         self.update_ui()
 
     def draw(self):
-        self.draw_grid()
+        # self.draw_grid()
         super().draw()
         self.draw_collision()
         self.draw_preview()

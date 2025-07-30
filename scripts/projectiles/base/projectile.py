@@ -74,10 +74,9 @@ class Projectile(GameObject):
 
         # 애니메이션의 현재 이미지를 돌림 => 그리고 이미지 크기 카메라에 맞게 조절
         rotated_img = pg.transform.rotate(image, angle)
-        scaled_img = CameraView.get_scaled_surface(camera, rotated_img)
 
         #이미지 중앙에 그리기 (앵커가 중앙)
-        draw_pos = self.position - pg.Vector2(scaled_img.get_size()) * 0.5
+        draw_pos = self.position - pg.Vector2(rotated_img.get_size()) * 0.5
         screen_pos = CameraMath.world_to_screen(camera, draw_pos)
 
-        surface.blit(scaled_img, screen_pos)
+        surface.blit(rotated_img, screen_pos)
