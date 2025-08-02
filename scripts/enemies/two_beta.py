@@ -1,6 +1,7 @@
 from scripts.constants import *
-from scripts.status import EnemyStatus
-from scripts.ai import WanderAI
+from scripts.status import *
+from scripts.ai import *
+from .base import ProjectileEnemy
 
 HIT_BOX_SIZE = (100, 100)
 FLIP_OFFSET = {
@@ -21,7 +22,6 @@ FIRE_COOLTIME = 1
 from scripts.projectiles import ProjectileBeta
 PROJECTILE_CLASS = ProjectileBeta
 
-from .base import ProjectileEnemy
 class TwoBeta(ProjectileEnemy):
     def __init__(self, spawn_position : pg.Vector2):
         super().__init__(

@@ -1,136 +1,99 @@
 import pygame as pg
 
 from scripts.constants import *
-from scripts.timer import Timer
+from scripts.core import *
+from scripts.vfx import *
 from scripts.entities.base import *
-from scripts.vfx import Outline, AnimatedParticle
 
-class PhysicsEnemy(PhysicsEntity):
-    """
-    물리 기반의 적 클래스. 플레이어와 충돌 시 데미지를 입힘.
-    
-    :param name: 애니메이션 등 리소스를 불러올 이름
-    :param rect: 초기 위치와 크기를 지정하는 Pygame Rect
-    :param collide_attack_damage: 플레이어와 충돌했을 때 입히는 데미지
-    """
+PLAYER_HIT_KNOCKBACK = 1000
+
+class EnemyBase:
+    def __init__(self, entity: Entity):
+        self.entity = entity
+        self.attack_particle_anim = self.entity.app.ASSETS["animations"]["vfxs"]["enemy"]["attack"]
+        self.attack_sound = self.entity.app.ASSETS["sounds"]["enemy"]["attack"]
+
+    def do_attack(self, damage: int, pos: pg.Vector2, shake: int = 0):
+        ps = self.entity.app.scene.player_status
+        pc = ps.player_character
+        ps.health -= damage
+        AnimatedParticle(self.attack_particle_anim, pos)
+        self.entity.app.sound_manager.play_sfx(self.attack_sound)
+        if shake:
+            cam = self.app.scene.camera
+            cam.shake_amount += shake
+        
+        direction = pg.Vector2(pc.rect.center) - pos
+        if direction.length() > 0:
+            direction = direction.normalize()
+        pc.velocity += direction * PLAYER_HIT_KNOCKBACK
+
+class PhysicsEnemy(PhysicsEntity, EnemyBase):
     def __init__(self, name: str, rect: pg.Rect, collide_attack_damage: int):
-        self.outline = Outline(self, "red")
-        super().__init__(name, rect, invert_x=True)
+        PhysicsEntity.__init__(self, name, rect, invert_x=True)
+        EnemyBase.__init__(self, self)
 
         self.collide_attack_damage = collide_attack_damage
 
-        self.attack_particle_anim = self.app.ASSETS["animations"]["vfxs"]["enemy"]["attack"]
-        self.attack_sound = self.app.ASSETS["sounds"]["enemy"]["attack"]
+    def update(self):
+        super().update()
 
-    def destroy(self):
-        """적 제거 시 호출. 외곽선도 제거됨."""
-        self.outline.destroy()
-        super().destroy()
-
-    def handle_collision_attack(self):
-        """플레이어와 충돌했을 때 데미지를 입히고 효과를 발생시킴."""
-        ps = self.app.scene.player_status
+        ps = self.entity.app.scene.player_status
         pc = ps.player_character
 
         if self.rect.colliderect(pc.rect) and not ps.is_invincible:
-            ps.health -= self.collide_attack_damage
-            AnimatedParticle(self.attack_particle_anim, pg.Vector2(self.rect.center))
-            self.app.sound_manager.play_sfx(self.attack_sound)
-
-    def update(self):
-        """기본 업데이트 + 충돌 공격 처리"""
-        super().update()
-        self.handle_collision_attack()
+            self.do_attack(self.collide_attack_damage, pg.Vector2(self.rect.center), shake=10)
 
 class ProjectileEnemy(PhysicsEnemy):
-    """
-    일정 거리 내에 플레이어가 있으면 투사체를 발사하는 적 클래스.
-    
-    :param fire_range: 플레이어가 이 거리 안에 있으면 발사
-    :param fire_cooltime: 발사 쿨타임 (초 단위)
-    :param projectile_class: 발사할 투사체 클래스
-    """
     def __init__(self, name: str, rect, collide_attack_damage: int, fire_range: float, fire_cooltime: float, projectile_class: type):
         super().__init__(name, rect, collide_attack_damage)
 
         self.fire_range = fire_range
-        self.fire_cooltime = fire_cooltime
-        self.current_cooltime_timer = fire_cooltime
-
+        self.cooldown = Cooldown(fire_cooltime)
         self.projectile_class = projectile_class
 
     def fire(self):
-        """투사체를 발사함."""
         direction = pg.Vector2(1, 0) if self.flip_x else pg.Vector2(-1, 0)
         self.projectile_class(pg.Vector2(self.rect.center), direction)
 
-    def update_fire(self):
-        """쿨타임 체크 후 발사 로직 실행"""
-        if self.current_cooltime_timer > 0:
-            self.current_cooltime_timer -= self.app.dt
-            return
+    def update(self):
+        super().update()
 
         pc = self.app.scene.player_status.player_character
-        distance = pg.Vector2(self.rect.center).distance_to(pg.Vector2(pc.rect.center))
+        dist = pg.Vector2(self.rect.center).distance_to(pg.Vector2(pc.rect.center))
 
-        if distance <= self.fire_range:
+        if dist <= self.fire_range and self.cooldown.ready():
             self.fire()
-            self.current_cooltime_timer = self.fire_cooltime
+            self.cooldown.reset()
 
-    def update(self):
-        """기본 업데이트 + 발사 쿨타임 관리"""
-        super().update()
-        self.update_fire()
-
-class GhostEnemy(Entity):
-    """
-    플레이어와 충돌 시 짧은 시간 동안 공격 애니메이션 재생 + 데미지를 입히는 적.
-    
-    :param max_attack_time: 공격 애니메이션 유지 시간
-    """
-    def __init__(self, name: str, rect: pg.Rect, collide_attack_damage: int, max_attack_time: float):
-        self.outline = Outline(self, "red")
-        super().__init__(name, rect, start_action="run", invert_x=True)
+class GhostEnemy(Entity, EnemyBase):
+    def __init__(self, name: str, rect: pg.Rect, collide_attack_damage: int, attack_cool: float):
+        Entity.__init__(self, name, rect, invert_x=True)
+        EnemyBase.__init__(self, self)
 
         self.collide_attack_damage = collide_attack_damage
-        self.max_attack_time = max_attack_time
+        self.attack_cool = attack_cool
 
         self.is_attacking = False
-        self.attack_timer: Timer | None = None
-
-        self.attack_particle_anim = self.app.ASSETS["animations"]["vfxs"]["enemy"]["attack"]
-        self.attack_sound = self.app.ASSETS["sounds"]["enemy"]["attack"]
-
-    def destroy(self):
-        """유령 제거 시 외곽선도 제거"""
-        self.outline.destroy()
-        super().destroy()
-
-    def control_animation(self):
-        """상태에 따라 애니메이션 결정"""
-        self.set_action("attack" if self.is_attacking else "run")
+        self.attack_timer = None
 
     def trigger_attack(self):
-        """공격을 발동함. 쿨타임은 Timer로 관리"""
         if self.is_attacking:
             return
-
         self.is_attacking = True
-        self.attack_timer = Timer(self.max_attack_time, lambda: setattr(self, "is_attacking", False))
+        self.set_action("attack")
+        self.do_attack(self.collide_attack_damage, pg.Vector2(self.rect.center), shake=15)
 
-        ps = self.app.scene.player_status
-        ps.health -= self.collide_attack_damage
-
-        AnimatedParticle(self.attack_particle_anim, pg.Vector2(self.rect.center))
-        self.app.sound_manager.play_sfx(self.attack_sound)
+        self.attack_timer = Timer(self.attack_cool, lambda: setattr(self, "is_attacking", False))
 
     def update(self):
-        """기본 업데이트 + 공격 처리"""
         super().update()
-        self.control_animation()
 
-        ps = self.app.scene.player_status
+        ps = self.entity.app.scene.player_status
         pc = ps.player_character
 
-        if self.rect.colliderect(pc.rect) and not ps.is_invincible:
-            self.trigger_attack()
+        if not self.is_attacking:
+            if self.rect.colliderect(pc.rect) and not ps.is_invincible:
+                self.trigger_attack()
+            else:
+                self.set_action("idle")

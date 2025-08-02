@@ -1,72 +1,87 @@
-
-
 import pygame as pg
-import random
-import copy
+import pytweening as pt
 import json
 
+from scripts.core import *
+from scripts.constants import *
 from scripts.status import PlayerStatus
 from scripts.entities import PlayerCharacter
+from scripts.backgrounds import *
 from scripts.volume import *
+from scripts.tilemap import *
+from scripts.ui import *
+from .base import Scene
 
-from scripts.tilemap import Tilemap, spawn_all_entities
-
+# 타일맵 경로 불러오기
 with open("data/tilemap_data.json", 'r') as f:
     data = json.load(f)
-    TILEMAP_FILES = data["tilemap_files"]
-    TILEMAP_LEVEL_COUNT = data["tilemap_level_count"]
+    TILEMAP_FILES_BY_CHAPTER = data["maps"]
+    LEVEL_NAMES_BY_CHAPTER = data["names"]
 
-from .base.scene import Scene
 class MainGameScene(Scene):
     def __init__(self):
         super().__init__()
-        # 씬을 다시 로드해도 초기화되면 안되는것들 !!
 
-        # 플레이어 스테이터스 한번만 만들고, 여기서 직접 관리.
         self.player_status = PlayerStatus(self)
 
-        # 현재 레벨을 한 횟수
-        self.level_count = 0
-        # 현재 난이도
-        self.current_difficulty = 6
-
-        # 깊은복사 => 랜덤을 돌려서 가능한 레벨이 들어있음. (연속으로 같은 레벨을 하면 재미없기 때문에, 한번한 레벨은 여기에서 지움.)
-        self.remaining_tilemap_files = copy.deepcopy(TILEMAP_FILES)
+        self.current_chapter = 1
+        self.current_level = 0
 
     def on_scene_start(self):
         super().on_scene_start()
 
-        # 가능한 타일맵 들중 난이도에 맞게 랜덤으로 선택
-        self.tilemap = Tilemap(random.choice(self.remaining_tilemap_files[str(self.current_difficulty)]))
-        # 플레이어는 제외하고 모든 엔티티 (적, 빛 포함) 생성
+        chapter_str = str(self.current_chapter)
+        chapter_maps = TILEMAP_FILES_BY_CHAPTER.get(chapter_str)
+
+        if not chapter_maps:
+            print(f"🔥 챕터 {chapter_str} 없음. 메인메뉴로 이동")
+            self.app.change_scene("main_menu_scene")
+            return
+
+        if self.current_level >= len(chapter_maps):
+            # 다음 챕터로 넘어가기
+            self.current_chapter += 1
+            self.current_level = 0
+
+            next_chapter_str = str(self.current_chapter)
+            if next_chapter_str not in TILEMAP_FILES_BY_CHAPTER:
+                print("🎉 모든 챕터 클리어! 메인메뉴로")
+                self.app.change_scene("main_menu_scene")
+                return
+
+            chapter_maps = TILEMAP_FILES_BY_CHAPTER[next_chapter_str]
+
+        # 타일맵 로드
+        file_path = chapter_maps[self.current_level]
+        self.tilemap = Tilemap(file_path)
         spawn_all_entities(self.tilemap)
 
-        # 플레이어는 따로
+        # 플레이어 스폰
         spawn_pos = self.tilemap.get_pos_by_data("spawners_entities", 0)[0]
-        #self.player_status에서 접근 가능하게 직접 여기서 연결 (조금 위험)
         self.player_status.player_character = PlayerCharacter(spawn_pos)
         self.camera.position = pg.Vector2(self.player_status.player_character.rect.center)
 
+        # 배경 효과
         Sky()
         Clouds()
         Fog()
 
-        self.app.sound_manager.play_bgm("boss_bgm")
+        # BGM 재생
+        # self.app.sound_manager.play_bgm("boss_bgm")
+
+        self.level_name_text = TextRenderer(
+            LEVEL_NAMES_BY_CHAPTER[str(self.current_chapter)][self.current_level],
+            SCREEN_SIZE.elementwise() / 2,
+            "title", 50, anchor=pg.Vector2(0.5, 0.5),
+        )
+        Tween(self.level_name_text, "alpha", 0, 255, duration=1, easing=pt.easeInQuad).on_complete.append(
+            lambda: Tween(self.level_name_text, "alpha", 255, 0, duration=2, easing=pt.easeOutQuad)
+        )
 
     def update(self):
-        # !!!여기서 직접 관리!!!
         self.player_status.update()
         super().update()
-            
+
     def on_level_end(self):
-        self.level_count += 1
-
-        # 이미 한 레벨 리스트에서 지우기
-        self.remaining_tilemap_files[str(self.current_difficulty)].remove(self.tilemap.file_name)
-
-        #난이도 증가
-        if self.level_count >= TILEMAP_LEVEL_COUNT[str(self.current_difficulty)]:
-            self.level_count = 0
-            self.current_difficulty += 1
-
+        self.current_level += 1
         self.app.change_scene("main_game_scene")

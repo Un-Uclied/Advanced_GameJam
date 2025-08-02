@@ -1,9 +1,10 @@
 import pygame as pg
 
 from scripts.constants import *
-from scripts.volume import Sky
+from scripts.backgrounds import *
 from scripts.ui import *
-from scripts.vfx import Tween
+from scripts.core import *
+from .base import Scene
 
 def on_click(name : str, button : ImageButton):
     from scripts.app import App
@@ -23,7 +24,6 @@ def on_hover(name : str, button : ImageButton, status : str):
         text = TextRenderer("게임 시작 !!!!", pg.Vector2(400, 500))
         Tween(text, "alpha", 255, 0, 2).on_complete.append(lambda: text.destroy())
 
-from .base.scene import Scene
 class MainMenuScene(Scene):
     def on_scene_start(self):
         super().on_scene_start()

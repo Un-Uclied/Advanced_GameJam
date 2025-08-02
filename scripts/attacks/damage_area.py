@@ -1,10 +1,9 @@
 import pygame as pg
 
 from scripts.constants import *
-from scripts.timer import Timer
 from scripts.camera import CameraView
+from scripts.core import *
 
-from scripts.objects import GameObject
 class DamageArea(GameObject):
     """
     범위 기반 대미지 오브젝트 (레이저, 용암, 낫 휘두르기 등)

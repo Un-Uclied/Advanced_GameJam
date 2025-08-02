@@ -1,10 +1,10 @@
 import pygame as pg
 
 from scripts.constants import *
+from scripts.core import *
 
 from .light import Light
 
-from scripts.objects import GameObject
 class Fog(GameObject):
     '''성능 많이 잡아먹음
     쉐이더 없이 빛 효과 만점

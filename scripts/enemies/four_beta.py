@@ -1,11 +1,12 @@
 from scripts.constants import *
-from scripts.status import EnemyStatus
-from scripts.ai import WanderAI
+from scripts.status import *
+from scripts.ai import *
+from .base import PhysicsEnemy
 
-HIT_BOX_SIZE = (100, 100)
+HIT_BOX_SIZE = (80, 170)
 FLIP_OFFSET = {
-    False : [0, -12],
-    True  : [-4, -12]
+    False : [-12, -8],
+    True  : [-8, -8]
 }
 
 MAX_HEALTH = 100
@@ -16,7 +17,6 @@ MAX_CHANGE_TIMER = 0.2
 
 COLLIDE_ATTACK_DAMAGE = 20
 
-from .base import PhysicsEnemy
 class FourBeta(PhysicsEnemy):
     def __init__(self, spawn_position : pg.Vector2):
         super().__init__(

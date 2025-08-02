@@ -1,8 +1,8 @@
 import pygame as pg
 
-from scripts.vfx import AnimatedParticle
-
+from scripts.vfx import *
 from .base import Projectile
+
 class ProjectileAlpha(Projectile):
     '''
     OneBeta의 탄환!!

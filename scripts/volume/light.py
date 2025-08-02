@@ -2,11 +2,11 @@ import pygame as pg
 
 from scripts.constants import *
 from scripts.camera import *
+from scripts.core import *
 
 LIGHT_SEGMENTS = 15 #원 모양이 그려지는 횟수
 LIGHT_FADE_OUT = 10 #원 모양이 작아지는 양
 
-from scripts.objects import GameObject
 class Light(GameObject):
     '''
     size & strength는 런타임중에 바꿀수 없음, 위치는 언제든지 변경 가능

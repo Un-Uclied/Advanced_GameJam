@@ -1,7 +1,7 @@
 import pygame as pg
 import random
 
-from scripts.objects import *
+from scripts.core import *
 from scripts.constants import *
 
 SHAKE_DECREASE = 200

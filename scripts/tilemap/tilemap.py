@@ -3,7 +3,7 @@ import json
 
 from scripts.constants import *
 from scripts.camera import *
-
+from scripts.core import *
 
 #예 : 오른쪽, 아래에 타일이 있다면 내(타일) 이미지를 0번으로 바꿔라
 #예 : 4방향 전부 타일이 있다면 내 이미지를 8번으로 바꿔라
@@ -27,7 +27,6 @@ DO_NOT_RENDER_TILES = ["spawners_entities", "spawners_enemies"]
 
 BASE_TILEMAP_PATH = "data/tilemaps/"
 
-from scripts.objects import GameObject
 class Tilemap(GameObject):
     '''
     타일맵 클래스!!! 엄청 중요함!! 엔티티 만들기전에 만들어짐

@@ -2,9 +2,7 @@ import pygame as pg
 
 from scripts.constants import *
 from scripts.camera import *
-from scripts.pre_assets.animation import Animation
-
-from scripts.objects import GameObject
+from scripts.core import *
 
 class AnimatedParticle(GameObject):
     """

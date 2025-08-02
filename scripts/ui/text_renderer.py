@@ -2,7 +2,7 @@ import pygame as pg
 
 from scripts.constants import *
 from scripts.camera import *
-from scripts.objects import GameObject
+from scripts.core import *
 
 BASE_FONT_PATH = "assets/fonts/"
 

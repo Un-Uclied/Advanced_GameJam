@@ -1,9 +1,10 @@
 from scripts.constants import *
-from scripts.status import EnemyStatus
-from scripts.timer import Timer
-from scripts.ai import WanderAI
-from scripts.vfx import AnimatedParticle
-from scripts.attacks import DamageArea
+from scripts.status import *
+from scripts.core import *
+from scripts.ai import *
+from scripts.vfx import *
+from scripts.attacks import *
+from .base import PhysicsEnemy
 
 HIT_BOX_SIZE = (100, 256)
 FLIP_OFFSET = {
@@ -27,7 +28,6 @@ SCYTHE_ATTACK_DAMAGE = 20
 SCYTHE_ATTACK_WIDTH = 180
 SCYTHE_ATTACK_COOLTIME = 1.25
 
-from .base import PhysicsEnemy
 class FiveOmega(PhysicsEnemy):
     def __init__(self, spawn_position: pg.Vector2):
         super().__init__(

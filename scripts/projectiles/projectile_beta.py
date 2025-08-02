@@ -1,8 +1,8 @@
 import pygame as pg
 
 from scripts.vfx import AnimatedParticle
-
 from .base import Projectile
+
 class ProjectileBeta(Projectile):
     '''
     TwoBeta의 탄환!!

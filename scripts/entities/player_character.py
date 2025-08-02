@@ -1,9 +1,9 @@
 import pygame as pg
 
 from scripts.camera import *
-from scripts.projectiles import PlayerProjectile
-from scripts.volume import Light
-from scripts.vfx import Outline
+from scripts.projectiles import *
+from scripts.volume import *
+from .base import PhysicsEntity, VELOCITY_DRAG
 
 HIT_BOX_SIZE = (48, 128)
 FLIP_OFFSET = {
@@ -18,19 +18,15 @@ MAX_JUMP_COUNT = 2
 
 ACCEL_POWER = 7
 DECCEL_POWER = 5
+PLAYER_PROJECTILE_KNOCKBACK = 1500
 
 LIGHT_FOLLOW_SPEED = 3
 CAMERA_FOLLOW_SPEED = 5
 
 LIGHT_SIZE = 500
 
-from .base import PhysicsEntity, VELOCITY_DRAG
 class PlayerCharacter(PhysicsEntity):
     def __init__(self, spawn_position : pg.Vector2):
-        
-        # 먼저 아웃라인 생성
-        self.outline = Outline(self, "red")
-
         super().__init__("player", pg.Rect(spawn_position, HIT_BOX_SIZE))
 
         self.input_drection = pg.Vector2()
@@ -49,9 +45,8 @@ class PlayerCharacter(PhysicsEntity):
         self.light = Light(LIGHT_SIZE, pg.Vector2(self.rect.center))
 
     def destroy(self):
-        # 내가 생성한 빛, 아웃라인도 제거
+        # 내가 생성한 빛도 제거
         self.light.destroy()
-        self.outline.destroy()
         super().destroy()
 
     def handle_input(self):
@@ -100,6 +95,8 @@ class PlayerCharacter(PhysicsEntity):
         direction = (CameraMath.screen_to_world(camera, pg.Vector2(pg.mouse.get_pos())) - plr_pos).normalize()
         PlayerProjectile(plr_pos, direction)
 
+        self.velocity += -direction * PLAYER_PROJECTILE_KNOCKBACK  # 탄환 발사시 플레이어가 밀려나도록
+
     def jump(self):
         '''점프 시도'''
         if (self.current_jump_count >= MAX_JUMP_COUNT): return
@@ -142,6 +139,10 @@ class PlayerCharacter(PhysicsEntity):
         self.handle_input()
 
         super().update()
+
+        # 플레이어는 인풋 방향에만 따라 좌우 반전하게 함. (그래야 예쁨)
+        self.flip_x = self.input_drection.x < 0
+        self.anim.flip_x = self.flip_x
 
         self.control_animation()
         self.follow_light_and_camera()

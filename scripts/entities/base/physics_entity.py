@@ -1,5 +1,7 @@
 import pygame as pg
 
+from .entity import Entity
+
 # 땅에 닿고 있을때의 중력
 DEFAULT_GRAVITY = 300
 # 최대 중력 (최대 중력 속도)
@@ -7,10 +9,9 @@ MAX_GRAVITY = 5000
 # 이만큼 지속적으로 아래로 가려함
 GRAVITY_STRENGTH = 28
 
-# velocity 감쇠율
-VELOCITY_DRAG = 10
+# velocity 감쇠량
+VELOCITY_DRAG = 5
 
-from .entity import Entity
 class PhysicsEntity(Entity):
     '''거의 모든 엔티티의 부모 클래스'''
     def __init__(self, name, rect : pg.Rect, start_action : str = "idle", invert_x : bool = False):

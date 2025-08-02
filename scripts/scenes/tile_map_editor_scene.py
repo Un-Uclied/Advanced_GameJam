@@ -5,13 +5,13 @@ import copy
 from scripts.constants import *
 from scripts.tilemap import Tilemap, IN_GRID_TILES
 from scripts.camera import *
-from scripts.volume import Sky
+from scripts.backgrounds import Sky
 from scripts.ui import TextRenderer
+from .base import Scene
 
 CAMERA_MOVE_SPEED = 400
 MAX_UNDO_STACK = 10
 
-from .base.scene import Scene
 class TileMapEditScene(Scene):
     def on_scene_start(self):
         super().on_scene_start()

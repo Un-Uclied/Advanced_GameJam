@@ -1,10 +1,10 @@
 import pygame as pg
 
 from scripts.constants import *
-from scripts.volume import Sky
+from scripts.backgrounds import Sky
 from scripts.ui import *
+from .base import Scene
 
-from .base.scene import Scene
 class SettingsScene(Scene):
     def on_scene_start(self):
         super().on_scene_start()

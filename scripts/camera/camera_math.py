@@ -1,7 +1,6 @@
 import pygame as pg
 
 from scripts.constants import *
-
 from .camera import Camera2D
 
 class CameraMath:

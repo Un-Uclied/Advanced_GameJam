@@ -1,10 +1,9 @@
 import pygame as pg
-import pytweening as tween
+import pytweening as pt
 
 from scripts.constants import *
-from scripts.vfx import Tween
+from scripts.core import *
 
-from scripts.objects import GameObject
 class ImageButton(GameObject):
     '''스크린 기준 UI 버튼
 
@@ -80,10 +79,10 @@ class ImageButton(GameObject):
         if not self._was_hovered and now_hovered:
             self.on_hover(self.name, self, "enter")
             self.app.sound_manager.play_sfx(self.hover_enter_sound)
-            Tween(self, "scale", 1, 1.2, .2, tween.easeOutBack)
+            Tween(self, "scale", 1, 1.2, .2, pt.easeOutBack)
         elif self._was_hovered and not now_hovered:
             self.on_hover(self.name, self, "exit")
-            Tween(self, "scale", 1.2, 1, .2, tween.easeInBack)
+            Tween(self, "scale", 1.2, 1, .2, pt.easeInBack)
             self.app.sound_manager.play_sfx(self.hover_exit_sound)
 
         # 클릭 처리

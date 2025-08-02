@@ -2,8 +2,8 @@ import pygame as pg
 import json
 
 from scripts.constants import *
+from scripts.core import *
 from scripts.camera import *
-
 
 #5초가 지나면 자동으로 삭제
 TIME_OUT = 5
@@ -14,7 +14,6 @@ with open(DATA_PATH, 'r') as f:
     data = json.load(f)
     ALL_PROJECTILE_DATA = data
 
-from scripts.objects import GameObject
 class Projectile(GameObject):
     '''
     다른 탄환 클래스의 부모 클래스
@@ -38,7 +37,7 @@ class Projectile(GameObject):
         self.time_out_timer = TIME_OUT
 
         # 탄환 애니메이션
-        self.anim = self.app.ASSETS["animations"]["projectiles"][projectile_name].copy()
+        self.anim : Animation = self.app.ASSETS["animations"]["projectiles"][projectile_name].copy()
 
     def update(self):
         super().update()

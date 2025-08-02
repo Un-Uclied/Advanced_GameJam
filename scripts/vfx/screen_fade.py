@@ -1,10 +1,9 @@
 import pygame as pg
-import pytweening as tween
+import pytweening as pt
 
 from scripts.constants import *
-from .tween import Tween
+from scripts.core import *
 
-from scripts.objects import GameObject
 class ScreenFader(GameObject):
     '''
     App에서 부르는 페이드 이펙트
@@ -25,7 +24,7 @@ class ScreenFader(GameObject):
         self.on_complete = on_complete
 
         # 트윈 추가
-        Tween(self, "alpha", self.alpha, 255 if fade_in else 0, duration, tween.easeInCubic).on_complete.append(self.fade_done)
+        Tween(self, "alpha", self.alpha, 255 if fade_in else 0, duration, pt.easeInCubic).on_complete.append(self.fade_done)
 
     def fade_done(self):
         if self.on_complete is not None:

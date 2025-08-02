@@ -1,6 +1,7 @@
 from scripts.constants import *
-from scripts.status import EnemyStatus
-from scripts.ai import WanderAI
+from scripts.status import *
+from scripts.ai import *
+from .base import PhysicsEnemy
 
 HIT_BOX_SIZE = (100, 100)
 FLIP_OFFSET = {
@@ -16,7 +17,6 @@ MAX_CHANGE_TIMER = 1.2
 
 COLLIDE_ATTACK_DAMAGE = 10
 
-from .base import PhysicsEnemy
 class OneAlpha(PhysicsEnemy):
     def __init__(self, spawn_position : pg.Vector2):
         super().__init__(

@@ -1,11 +1,12 @@
 from scripts.constants import *
-from scripts.status import EnemyStatus
-from scripts.ai import WanderAI
+from scripts.status import *
+from scripts.ai import *
+from .base import PhysicsEnemy
 
-HIT_BOX_SIZE = (100, 100)
+HIT_BOX_SIZE = (80, 170)
 FLIP_OFFSET = {
-    False : [0, -12],
-    True  : [-4, -12]
+    False : [-12, -8],
+    True  : [-8, -8]
 }
 
 MAX_HEALTH = 125
@@ -16,13 +17,12 @@ MAX_CHANGE_TIMER_NORMAL = 1.2
 
 CRAZY_RANGE = 350
 
-MOVE_SPEED_CRAZY = 2
-MIN_CHANGE_TIMER_CRAZY = 0.8
-MAX_CHANGE_TIMER_CRAZY = 1.2
+MOVE_SPEED_CRAZY = 7
+MIN_CHANGE_TIMER_CRAZY = 0.05
+MAX_CHANGE_TIMER_CRAZY = 0.2
 
 COLLIDE_ATTACK_DAMAGE = 10
 
-from .base import PhysicsEnemy
 class FourAlpha(PhysicsEnemy):
     def __init__(self, spawn_position : pg.Vector2):
         super().__init__(
@@ -43,20 +43,21 @@ class FourAlpha(PhysicsEnemy):
         else:
             self.set_action("run")
 
+    @property
+    def is_player_nearby(self):
+        ps = self.app.scene.player_status
+        pc = ps.player_character
+        entity_center = pg.Vector2(self.rect.center)
+        player_center = pg.Vector2(pc.rect.center)
+        return entity_center.distance_to(player_center) < CRAZY_RANGE
+
     def update(self):
         super().update()
         
         self.ai.update()
         self.control_animation()
 
-        ps = self.app.scene.player_status
-        pc = ps.player_character
-
-        entity_center = pg.Vector2(self.rect.center)
-        player_center = pg.Vector2(pc.rect.center)
-        current_distance = entity_center.distance_to(player_center)
-
-        if current_distance < CRAZY_RANGE:
+        if self.is_player_nearby:
             self.current_move_speed = MOVE_SPEED_CRAZY
             self.ai.min_change_timer = MIN_CHANGE_TIMER_CRAZY
             self.ai.max_change_timer = MAX_CHANGE_TIMER_CRAZY

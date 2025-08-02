@@ -1,21 +1,15 @@
 {
-    "tilemap_level_count" : {
-        "0" : 3,
-        "1" : 3,
-        "2" : 4,
-        "3" : 4,
-        "4" : 5,
-        "5" : 5,
-        "6" : 1
+    "maps" : {
+        "1" : ["chap_1/a.json", "chap_1/b.json", "chap_1/c.json", "chap_1/d.json", "chap_1/e.json"],
+        "2" : ["chap_2/a.json", "chap_2/b.json", "chap_2/c.json", "chap_2/d.json", "chap_2/e.json"],
+        "3" : ["chap_3/a.json", "chap_3/b.json", "chap_3/c.json", "chap_3/d.json", "chap_3/e.json"],
+        "4" : ["boss/a.json"]
     },
 
-    "tilemap_files" : {
-        "0" : ["difficulty_0/a.json", "difficulty_0/b.json", "difficulty_0/c.json", "difficulty_0/d.json", "difficulty_0/e.json"],
-        "1" : ["difficulty_1/a.json", "difficulty_1/b.json", "difficulty_1/c.json", "difficulty_1/d.json", "difficulty_1/e.json"],
-        "2" : ["difficulty_2/a.json", "difficulty_2/b.json", "difficulty_2/c.json", "difficulty_2/d.json", "difficulty_2/e.json", "difficulty_2/f.json"],
-        "3" : ["difficulty_3/a.json", "difficulty_3/b.json", "difficulty_3/c.json", "difficulty_3/d.json", "difficulty_3/e.json", "difficulty_3/f.json"],
-        "4" : ["difficulty_4/a.json", "difficulty_4/b.json", "difficulty_4/c.json", "difficulty_4/d.json", "difficulty_4/e.json", "difficulty_4/f.json", "difficulty_4/g.json"],
-        "5" : ["difficulty_5/a.json", "difficulty_5/b.json", "difficulty_5/c.json", "difficulty_5/d.json", "difficulty_5/e.json", "difficulty_5/f.json", "difficulty_5/g.json"],
-        "6" : ["difficulty_6/a.json"]
+    "names" : {
+        "1" : ["chap_1/a", "chap_1/b", "chap_1/c", "chap_1/d", "chap_1/e"],
+        "2" : ["chap_2/a", "chap_2/b", "chap_2/c", "chap_2/d", "chap_2/e"],
+        "3" : ["chap_3/a", "chap_3/b", "chap_3/c", "chap_3/d", "chap_3/e"],
+        "4" : ["boss/a"]
     }
 }

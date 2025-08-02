@@ -1,10 +1,9 @@
 import pygame as pg
 
 from scripts.constants import *
-from scripts.camera import Camera2D
-from scripts.ui import TextRenderer
-from scripts.entities.base import Entity
-from scripts.objects import GameObject
+from scripts.camera import *
+from scripts.ui import *
+from scripts.core import *
 from scripts.vfx import *
 
 class Scene:
@@ -15,6 +14,7 @@ class Scene:
     def on_scene_start(self):
         self.camera = Camera2D(position=pg.Vector2(0, 0))
         self.fps_text_renderer = TextRenderer("??", pg.Vector2(SCREEN_SIZE.x - 55, 10), color="green")
+        self.event_bus = EventBus()
         
     def on_scene_end(self):
         GameObject.all_objects.clear()

@@ -2,8 +2,8 @@ import pygame as pg #파이게임 커뮤니티 에디션
 
 from scripts.constants import * #앱이름, 해상도, 화면 설정, 레이어 등이 있음.
 from scripts.scenes import *
-from scripts.pre_assets import *
-from scripts.vfx import ScreenFader
+from scripts.asset_load import *
+from scripts.vfx import *
 
 class SoundManager:
     def __init__(self):
@@ -97,9 +97,7 @@ class App:
         self.update_time()
         self.update_event()
 
-        #순환 참조를 피하기 위해 생성자에서 임포트 ㅜ
-        from scripts.scenes.base import Scene
-        self.registered_scenes : dict[str, Scene]= {
+        self.registered_scenes = {
             "main_menu_scene" : MainMenuScene(),
             "settings_scene" : SettingsScene(),
             "info_scene" : InfoScene(),

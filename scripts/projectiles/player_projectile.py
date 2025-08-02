@@ -1,9 +1,9 @@
 import pygame as pg
 
-from scripts.objects import GameObject
+from scripts.core import *
 from scripts.vfx import AnimatedParticle
-
 from .base import Projectile
+
 class PlayerProjectile(Projectile):
     '''
     플레이어의 탄환!!
