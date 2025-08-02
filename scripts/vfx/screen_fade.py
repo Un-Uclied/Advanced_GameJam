@@ -31,9 +31,7 @@ class ScreenFader(GameObject):
         if self.on_complete is not None:
             self.on_complete()
         self.destroy()
-        print("destroy")
 
     def draw(self):
         self.surface.set_alpha(int(self.alpha))
-        print(self.surface.get_alpha())
         self.app.surfaces[LAYER_INTERFACE].blit(self.surface, (0, 0))

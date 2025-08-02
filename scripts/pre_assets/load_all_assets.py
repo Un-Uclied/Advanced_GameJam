@@ -14,40 +14,63 @@ def load_tilemap_assets():
 
 def load_entity_animations():
     anims = {}
-    
-    # 기본 애니메이션 셋팅 (이미지는 두배로) (이미지가 작아서 좌표 스케일 자체가 작아지면, 움직임 계산에 문제가 많아서 적당히 크게 하기)
-    def anim_set(path, speed, loop, tint=None):
-        return Animation(load_images(path, scale=2, tint_color=tint), speed, loop)
 
-    enemies = {
-        "one_alpha": {"idle": (.05, True), "run": (.15, True)},
-        "one_beta": {"idle": (.05, True), "run": (.15, True)},
-        "two_alpha": {"idle": (.05, True), "run": (.15, True)},
-        "two_beta": {"idle": (.05, True), "run": (.15, True)},
-        "three_alpha": {"attack": (.05, False), "run": (.15, True)},
-        "three_beta": {"attack": (.05, False), "run": (.15, True)},
-        "four_alpha": {"idle": (.05, True), "run": (.08, True)},
-        "four_beta": {"idle": (.05, True), "run": (.03, True)},
-        "five_omega": {"idle": (.05, True), "run": (.15, True)},
-    }
-
-    for name, actions in enemies.items():
-        anims[name] = {}
-        for action, (speed, loop) in actions.items():
-            anims[name][action] = anim_set(f"entities/enemies/{name}/" + action, speed, loop)
-
+    # 플레이어 애니메이션
     anims["player"] = {
-        "idle": anim_set("entities/player/idle", .05, True),
-        "run": anim_set("entities/player/run", .08, True),
-        "jump": anim_set("entities/player/jump", 1.0, False),
+        "idle": Animation(load_images("entities/player/idle", 2, None), 0.05, True),
+        "run": Animation(load_images("entities/player/run", 2, None), 0.08, True),
+        "jump": Animation(load_images("entities/player/jump", 2, None), 1.0, False),
     }
 
+    # 소울 애니메이션
     anims["soul"] = {
-        "idle": anim_set("entities/soul/idle", .05, True, tint="cyan")
+        "idle": Animation(load_images("entities/soul/idle", 2, "cyan"), 0.05, True),
     }
 
+    # 포탈 애니메이션
     anims["portal"] = {
-        "idle": anim_set("entities/portal/idle", .05, True)
+        "idle": Animation(load_images("entities/portal/idle", 2, None), 0.05, True),
+    }
+
+    # 적군 애니메이션 (각 적의 스케일과 속도 등을 직접 명시)
+    anims["one_alpha"] = {
+        "idle": Animation(load_images("entities/enemies/one_alpha/idle", 2, None), 0.05, True),
+        "run": Animation(load_images("entities/enemies/one_alpha/run", 2, None), 0.15, True),
+    }
+    anims["one_beta"] = {
+        "idle": Animation(load_images("entities/enemies/one_beta/idle", 2, None), 0.05, True),
+        "run": Animation(load_images("entities/enemies/one_beta/run", 2, None), 0.15, True),
+    }
+    anims["two_alpha"] = {
+        "idle": Animation(load_images("entities/enemies/two_alpha/idle", 2, None), 0.05, True),
+        "run": Animation(load_images("entities/enemies/two_alpha/run", 2, None), 0.15, True),
+    }
+    anims["two_beta"] = {
+        "idle": Animation(load_images("entities/enemies/two_beta/idle", 2, None), 0.05, True),
+        "run": Animation(load_images("entities/enemies/two_beta/run", 2, None), 0.15, True),
+    }
+    anims["three_alpha"] = {
+        "attack": Animation(load_images("entities/enemies/three_alpha/attack", 2, None), 0.05, False),
+        "run": Animation(load_images("entities/enemies/three_alpha/run", 2, None), 0.15, True),
+    }
+    anims["three_beta"] = {
+        "attack": Animation(load_images("entities/enemies/three_beta/attack", 2, None), 0.05, False),
+        "run": Animation(load_images("entities/enemies/three_beta/run", 2, None), 0.15, True),
+    }
+    anims["four_alpha"] = {
+        "idle": Animation(load_images("entities/enemies/four_alpha/idle", 2, None), 0.05, True),
+        "run": Animation(load_images("entities/enemies/four_alpha/run", 2, None), 0.08, True),
+    }
+    anims["four_beta"] = {
+        "idle": Animation(load_images("entities/enemies/four_beta/idle", 2, None), 0.05, True),
+        "run": Animation(load_images("entities/enemies/four_beta/run", 2, None), 0.03, True),
+    }
+    # five_omega만 스케일이 1인 점에 유의
+    anims["five_omega"] = {
+        "idle": Animation(load_images("entities/enemies/five_omega/idle", 1.5, None), 0.05, True),
+        "run": Animation(load_images("entities/enemies/five_omega/run", 1.5, None), 0.08, True),
+        "scythe_attack" : Animation(load_images("entities/enemies/five_omega/scythe_attack", 1.5, None), 0.02, False),
+        "turn_eye" : Animation(load_images("entities/enemies/five_omega/turn_eye", 1.5, None), 0.05, False),
     }
 
     return anims
@@ -55,12 +78,22 @@ def load_entity_animations():
 def load_vfx_animations():
     return {
         "hurt": Animation(load_images("particles/hurt", scale=2), .03, False),
-        "enemy_attack": Animation(load_images("particles/enemy_attack", scale=2, tint_color="grey"), .03, False),
-        "enemy_die": Animation(load_images("particles/enemy_die", scale=2, tint_color="black"), .03, False),
-        "soul_collect": Animation(load_images("particles/soul_collect", scale=2), .03, False),
-        "enemy_alpha_projectile_destroy": Animation(load_images("particles/destroy", scale=2, tint_color="purple"), .03, False),
-        "enemy_beta_projectile_destroy": Animation(load_images("particles/destroy", scale=2, tint_color="red"), .03, False),
-        "player_projectile_destroy": Animation(load_images("particles/destroy", scale=2), .03, False),
+        "explosion": Animation(load_images("particles/explosion", scale=4), .03, False),
+        "enemy" : {
+            "attack" : Animation(load_images("particles/enemy/attack", scale=2, tint_color="grey"), .03, False),
+            "die": Animation(load_images("particles/enemy/die", scale=2, tint_color="black"), .03, False),
+        },
+        "soul" : {
+            "interact" : Animation(load_images("particles/soul/interact", scale=2), .03, False),
+        },
+        "portal" : {
+            "interact": Animation(load_images("particles/portal/interact", scale=5), .03, False),
+        },
+        "projectile_destroy" : {
+            "enemy_alpha": Animation(load_images("particles/destroy", scale=2, tint_color="purple"), .03, False),
+            "enemy_beta": Animation(load_images("particles/destroy", scale=2, tint_color="red"), .03, False),
+            "player": Animation(load_images("particles/destroy", scale=2), .03, False),
+        },
     }
 
 def load_projectile_animations():
@@ -85,9 +118,15 @@ def load_sound_assets():
             "hurt": snd("enemy/hurt"),
             "die": snd("enemy/die"),
             "projectile": snd("enemy/projectile"),
+            "boss" : {
+                "scythe" : snd("enemy/boss/scythe")
+            }
         },
         "soul": {
             "interact": snd("soul/interact"),
+        },
+        "portal" : {
+            "interact" : snd("portal/interact")
         },
         "ui" : {
             "button" : {
@@ -138,7 +177,7 @@ def load_all_assets():
             "projectiles": load_projectile_animations(),
         },
         "fonts": {
-            "default": "PF\uc2a4\ud0c0\ub354\uc2a4\ud2b8 3.0 Bold.ttf"
+            "default": "PF스타더스트 3.0 Bold.ttf"
         },
         "sounds": load_sound_assets(),
         "ui": load_ui_assets(),

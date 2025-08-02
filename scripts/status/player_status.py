@@ -22,7 +22,11 @@ class PlayerStatus:
 
         #MainGameScene에서 on_death_event.append(메소드)이렇게 하면 플레이어가 죽을때 그 메소드가 불림.
         self.on_death_event = []
-    
+
+        app = self.scene.app
+        self.hurt_sound = app.ASSETS["sounds"]["player"]["hurt"]
+        self.hurt_particle_anim = app.ASSETS["animations"]["vfxs"]["hurt"]
+
     def on_dead(self):
         for event in self.on_death_event:
             event(self)
@@ -41,13 +45,15 @@ class PlayerStatus:
         self._health = max(min(value, MAX_HEALTH), 0) #0~100 넘기지 않게
 
         #체력이 깎였을때
+        app = self.scene.app
+        camera = self.scene.camera
         if before_health > self._health:
             self.current_invincible_timer = MAX_INVINCIBLE_TIME              #무적 시간을 늘리면 무적 상태가 됨.
-            self.scene.camera.shake_amount += (before_health - self._health) * 2   #받은 대미지의 두배만큼 카메라 흔들기
+            camera.shake_amount += (before_health - self._health) * 2   #받은 대미지의 두배만큼 카메라 흔들기
 
             #맞는 소리 재생, 맞는 파티클 생성
-            self.scene.app.sound_manager.play_sfx(self.scene.app.ASSETS["sounds"]["player"]["hurt"])
-            AnimatedParticle("hurt", pg.Vector2(self.player_character.rect.center))
+            app.sound_manager.play_sfx(self.hurt_sound)
+            AnimatedParticle(self.hurt_particle_anim, pg.Vector2(self.player_character.rect.center))
 
         if self.health <= 0:
             self.on_dead()

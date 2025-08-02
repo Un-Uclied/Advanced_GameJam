@@ -18,10 +18,12 @@ class ProjectileAlpha(Projectile):
         
         # TwoAlpha 클래스의 적 탄환 생성 소리 재생
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["enemy"]["projectile"])
-    
+
+        self.destroy_particle_anim = self.app.ASSETS["animations"]["vfxs"]["projectile_destroy"]["player"]
+
     def destroy(self):
         # TwoAlpha 클래스의 적 탄환 제거 파티클 생성
-        AnimatedParticle("enemy_alpha_projectile_destroy", self.position)
+        AnimatedParticle(self.destroy_particle_anim, self.position)
         super().destroy()
         
     def update(self):

@@ -13,7 +13,7 @@ class Scene:
         self.app = App.singleton
     
     def on_scene_start(self):
-        self.camera = Camera2D(scale=1, position=pg.Vector2(0, 0))
+        self.camera = Camera2D(position=pg.Vector2(0, 0))
         self.fps_text_renderer = TextRenderer("??", pg.Vector2(SCREEN_SIZE.x - 55, 10), color="green")
         
     def on_scene_end(self):

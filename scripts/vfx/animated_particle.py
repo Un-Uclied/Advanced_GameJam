@@ -2,6 +2,7 @@ import pygame as pg
 
 from scripts.constants import *
 from scripts.camera import *
+from scripts.pre_assets.animation import Animation
 
 from scripts.objects import GameObject
 
@@ -16,14 +17,12 @@ class AnimatedParticle(GameObject):
     파티클 애니메이션이 끝나면 자동으로 제거됨.
     """
 
-    def __init__(self, particle_name: str, position: pg.Vector2, anchor: pg.Vector2 = pg.Vector2(.5, .5)):
+    def __init__(self, anim : Animation, position: pg.Vector2, anchor: pg.Vector2 = pg.Vector2(.5, .5)):
         super().__init__()
 
+        self.anim = anim.copy()
         self.position = position
         self.anchor = anchor
-
-        # 파티클 애니메이션 갖고오기
-        self.anim = self.app.ASSETS["animations"]["vfxs"][particle_name].copy()
 
     def update(self):
         super().update()

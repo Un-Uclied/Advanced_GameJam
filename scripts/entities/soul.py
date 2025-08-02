@@ -31,13 +31,15 @@ class Soul(PhysicsEntity):
         self.light = Light(250, pg.Vector2(self.rect.center))
         self.light_follow_speed = 5
 
+        self.collect_particle_anim = self.app.ASSETS["animations"]["vfxs"]["soul"]["interact"]
+
     def destroy(self):
         # 자기가 생성한 빛, 아웃라인도 직접 제거
         self.light.destroy()
         self.outline.destroy()
 
         # 파티클 생성, 소리 재생, 카메라 흔들림
-        AnimatedParticle("soul_collect", pg.Vector2(self.rect.center))
+        AnimatedParticle(self.collect_particle_anim, pg.Vector2(self.rect.center))
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["soul"]["interact"])
         self.app.scene.camera.shake_amount += 10
 

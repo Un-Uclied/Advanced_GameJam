@@ -16,6 +16,13 @@ class EnemyStatus:
         self.max_health = max_health
         self._health = self.max_health
 
+        app = self.enemy.app
+        self.hurt_sound = app.ASSETS["sounds"]["enemy"]["hurt"]
+        self.hurt_particle_anim = app.ASSETS["animations"]["vfxs"]["hurt"]
+        
+        self.die_sound = app.ASSETS["sounds"]["enemy"]["die"]
+        self.die_particle_anim = app.ASSETS["animations"]["vfxs"]["enemy"]["die"]
+
     @property
     def health(self):
         return self._health
@@ -35,11 +42,11 @@ class EnemyStatus:
 
             #죽을때와 체력이 깎일때 효과음 | 파티클이 다르게끔
             if self._health > 0:
-                app.sound_manager.play_sfx(app.ASSETS["sounds"]["enemy"]["hurt"])
-                AnimatedParticle("hurt", pg.Vector2(self.enemy.rect.center))
+                app.sound_manager.play_sfx(self.hurt_sound)
+                AnimatedParticle(self.hurt_particle_anim, pg.Vector2(self.enemy.rect.center))
             else:
-                app.sound_manager.play_sfx(app.ASSETS["sounds"]["enemy"]["die"])
-                AnimatedParticle("enemy_die", pg.Vector2(self.enemy.rect.center))
+                app.sound_manager.play_sfx(self.die_sound)
+                AnimatedParticle(self.die_particle_anim, pg.Vector2(self.enemy.rect.center))
         
         #0이 되면 제거
         if self._health <= 0:

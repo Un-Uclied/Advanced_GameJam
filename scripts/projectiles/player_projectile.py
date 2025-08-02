@@ -19,9 +19,11 @@ class PlayerProjectile(Projectile):
         # 플레이어 탄환 생성 소리 재생
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["player"]["projectile"])
 
+        self.destroy_particle_anim = self.app.ASSETS["animations"]["vfxs"]["projectile_destroy"]["player"]
+
     def destroy(self):
         # 플레이어 탄환 제거 파티클 생성
-        AnimatedParticle("player_projectile_destroy", self.position)
+        AnimatedParticle(self.destroy_particle_anim, self.position)
         super().destroy()
         
     def update(self):

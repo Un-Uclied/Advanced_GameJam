@@ -117,5 +117,5 @@ class ChaseAI:
 
         # 방향 계산
         self.direction = self.target_position - entity_center
-        if self.direction.length_squared() > 0: # 길이가 0인 벡터 정규화 할려고 하면 에러나서 길이가 0 넘으면 정규화
+        if self.direction.length() > 0: # 길이가 0인 벡터 정규화 할려고 하면 에러나서 길이가 0 넘으면 정규화
             self.direction = self.direction.normalize() 

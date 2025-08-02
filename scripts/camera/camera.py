@@ -7,7 +7,7 @@ from scripts.constants import *
 SHAKE_DECREASE = 200
 
 class Camera2D(GameObject):
-    def __init__(self, scale, position, anchor=pg.Vector2(0.5, 0.5)):
+    def __init__(self, position, anchor=pg.Vector2(0.5, 0.5)):
         super().__init__()
         self.position = position
         self.anchor = anchor

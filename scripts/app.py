@@ -23,9 +23,9 @@ class SoundManager:
                 ch.play(sound)
                 return
 
-    def play_bgm(self, music_path: str, loop: bool = True, fade_ms: int = 0):
+    def play_bgm(self, bgm_name : str, loop: bool = True, fade_ms: int = 0):
         """배경음악 재생 (streaming 방식)"""
-        pg.mixer.music.load(music_path)
+        pg.mixer.music.load(f"assets/bgms/{bgm_name}.wav")
         pg.mixer.music.set_volume(self.bgm_volume)
         pg.mixer.music.play(-1 if loop else 0, fade_ms=fade_ms)
 
@@ -144,7 +144,7 @@ class App:
 
     def clear_surfaces(self):
         '''메인 화면 초기화, 다른 surface들은 알파채널까지 없애기'''
-        self.screen.fill("red")
+        self.screen.fill("black")
         for surface in self.surfaces.values():
             surface.fill(pg.Color(0, 0, 0, 0))
 

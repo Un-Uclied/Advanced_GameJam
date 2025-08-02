@@ -33,11 +33,12 @@ class TileMapEditScene(Scene):
         self.in_collision_view = False  # 콜리션을 파랗게 보여주는지 여부
 
         # UI 텍스트 표시 (TextRenderer도 GameObject를 상속 받기에 자동으로 업뎃 | 렌더)
-        TextRenderer("[WASD] 움직이기 | [Q,E]로 줌 인,아웃", pg.Vector2(10, 10), color="white")
+        TextRenderer("[WASD] 움직이기", pg.Vector2(10, 10), color="white")
         TextRenderer("[B] 오토 타일", pg.Vector2(10, 110), color="white")
         TextRenderer("[휠] 타일 종류 변경 | [SHIFT + 휠] 타일 인덱스 변경", pg.Vector2(10, 135), color="white")
         TextRenderer("[O] 저장하기 (temp.json에 저장됨.)", pg.Vector2(10, 190), color="white")
         TextRenderer("[컨트롤 Z] 되돌리기 (인 그리드는 잘 안됨)", pg.Vector2(10, 215), color="white")
+        TextRenderer("[U] 다 지워버렷", pg.Vector2(10, 240), color="green")
 
         # 상태 표시 UI (텍스트 변경이 필요한건 따로 변수에 저장.)
         self.collide_mode_text_renderer = TextRenderer("", pg.Vector2(10, 35), color="blue")
@@ -102,6 +103,8 @@ class TileMapEditScene(Scene):
                     self.tilemap.autotile()
                 elif event.key == pg.K_o:
                     self.tilemap.save_file()
+                elif event.key == pg.K_u:
+                    self.erase_all()
                 elif event.key == pg.K_z and keys[pg.K_LCTRL]:
                     #컨트롤 + Z
                     self.undo()
@@ -265,6 +268,11 @@ class TileMapEditScene(Scene):
                     self.save_undo_state()
                     if obj_data in self.tilemap.off_grid:
                         self.tilemap.off_grid.remove(obj_data)
+
+    def erase_all(self):
+        self.tilemap.in_grid = {}
+        self.tilemap.off_grid = []
+        self.save_undo_state()
 
     def update(self):
         super().update()

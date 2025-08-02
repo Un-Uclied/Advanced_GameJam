@@ -28,12 +28,14 @@ class MainGameScene(Scene):
         # 현재 레벨을 한 횟수
         self.level_count = 0
         # 현재 난이도
-        self.current_difficulty = 0
+        self.current_difficulty = 6
 
         # 깊은복사 => 랜덤을 돌려서 가능한 레벨이 들어있음. (연속으로 같은 레벨을 하면 재미없기 때문에, 한번한 레벨은 여기에서 지움.)
         self.remaining_tilemap_files = copy.deepcopy(TILEMAP_FILES)
 
     def on_scene_start(self):
+        super().on_scene_start()
+
         # 가능한 타일맵 들중 난이도에 맞게 랜덤으로 선택
         self.tilemap = Tilemap(random.choice(self.remaining_tilemap_files[str(self.current_difficulty)]))
         # 플레이어는 제외하고 모든 엔티티 (적, 빛 포함) 생성
@@ -43,12 +45,13 @@ class MainGameScene(Scene):
         spawn_pos = self.tilemap.get_pos_by_data("spawners_entities", 0)[0]
         #self.player_status에서 접근 가능하게 직접 여기서 연결 (조금 위험)
         self.player_status.player_character = PlayerCharacter(spawn_pos)
+        self.camera.position = pg.Vector2(self.player_status.player_character.rect.center)
 
         Sky()
         Clouds()
         Fog()
 
-        super().on_scene_start()
+        self.app.sound_manager.play_bgm("boss_bgm")
 
     def update(self):
         # !!!여기서 직접 관리!!!
