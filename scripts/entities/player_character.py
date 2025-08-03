@@ -141,8 +141,10 @@ class PlayerCharacter(PhysicsEntity):
         super().update()
 
         # 플레이어는 인풋 방향에만 따라 좌우 반전하게 함. (그래야 예쁨)
-        self.flip_x = self.input_drection.x < 0
-        self.anim.flip_x = self.flip_x
+        if self.input_drection.x < 0:
+            self.anim.flip_x = not self.invert_x
+        elif self.input_drection.x > 0:
+            self.anim.flip_x = self.invert_x
 
         self.control_animation()
         self.follow_light_and_camera()

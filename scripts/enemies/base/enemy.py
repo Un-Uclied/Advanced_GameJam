@@ -37,7 +37,9 @@ class PhysicsEnemy(PhysicsEntity, EnemyBase):
 
     def update(self):
         super().update()
-
+        if not hasattr(self.entity.app.scene, "player_status") or not hasattr(self.entity.app.scene.player_status, "player_character"):
+            return
+    
         ps = self.entity.app.scene.player_status
         pc = ps.player_character
 
@@ -53,7 +55,7 @@ class ProjectileEnemy(PhysicsEnemy):
         self.projectile_class = projectile_class
 
     def fire(self):
-        direction = pg.Vector2(1, 0) if self.flip_x else pg.Vector2(-1, 0)
+        direction = pg.Vector2(1, 0) if self.anim.flip_x else pg.Vector2(-1, 0)
         self.projectile_class(pg.Vector2(self.rect.center), direction)
 
     def update(self):

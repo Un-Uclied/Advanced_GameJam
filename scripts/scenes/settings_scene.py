@@ -7,7 +7,10 @@ from .base import Scene
 
 class SettingsScene(Scene):
     def on_scene_start(self):
+        TextRenderer("[ESC]", pg.Vector2(10, 10), font_name="bold", font_size=20, anchor=pg.Vector2(0, 0))
+
         super().on_scene_start()
+        
         Sky()
 
     def update(self):

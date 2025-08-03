@@ -63,6 +63,7 @@ class App:
 
         #메인 디스플레이로, 접근은 App에서만
         self.screen = pg.display.set_mode(SCREEN_SIZE, SCREEN_FLAGS)
+        pg.display.set_icon(load_image("app_icon.png"))
 
         #레이어 별로 surface를 만들고, GameObject를 상속받는 클래스마다 원하는곳에 그리거나 접근 가능.
         self.surfaces = {
@@ -108,6 +109,7 @@ class App:
         self.scene = self.registered_scenes[start_scene_name]
         self.scene.on_scene_start()
         self.transition = False
+        ScreenFader(1, False) # 초기 화면 페이드
 
     def load_assets(self):
         '''모든 에셋 로드'''

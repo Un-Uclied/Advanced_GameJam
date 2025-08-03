@@ -22,7 +22,7 @@ class TextRenderer(GameObject):
 
     def __init__(self,
                  start_text : str,
-                 pos : pg.Vector2,
+                 position : pg.Vector2,
                  font_name : str = "default",
                  font_size : int = 24,
                  color : pg.Color = pg.Color(255, 255, 255),
@@ -31,7 +31,7 @@ class TextRenderer(GameObject):
         super().__init__()
 
         self.text = start_text
-        self.pos = pos
+        self.pos = position
         self.color = pg.Color(color)
         self.anchor = anchor
         self._alpha = 255

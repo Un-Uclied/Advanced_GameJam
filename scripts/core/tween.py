@@ -22,12 +22,13 @@ class Tween(GameObject):
     :param end_value: 끝 값 (숫자, Vector2, Color 지원)
     :param duration: 트윈 시간 (초)
     :param easing: 이징 함수 (기본: linear, pytweening 쓰면 EZ)
+    :param use_unscaled_time: 트윈 시간 계산에 게임 시간 스케일을 적용할지 여부 (기본: False)
     '''
 
     def __init__(self, target, attr_name: str,
                  start_value, end_value,
                  duration: float,
-                 easing=pt.linear):
+                 easing=pt.linear, use_unscaled_time: bool = False):
         super().__init__()
 
         self.target = target
@@ -36,6 +37,7 @@ class Tween(GameObject):
         self.end_value = end_value
         self.duration = max(0.0001, duration)
         self.easing = easing
+        self.use_unscaled_time = use_unscaled_time
 
         self.elapsed = 0.0
         self.on_complete = []
@@ -45,7 +47,7 @@ class Tween(GameObject):
 
     def update(self):
         super().update()
-        dt = self.app.dt
+        dt = self.app.unscaled_dt if self.use_unscaled_time else self.app.dt
         self.elapsed += dt
 
         t = min(self.elapsed / self.duration, 1.0)

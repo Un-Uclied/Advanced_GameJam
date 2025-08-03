@@ -157,6 +157,10 @@ def load_ui_assets():
                 "on_hover": load_image("ui/buttons/app_quit/on_hover.png", scale=2),
                 "on_not_hover": load_image("ui/buttons/app_quit/on_not_hover.png", scale=2)
             }
+        },
+        "vignette" : {
+            "black" : load_image("ui/vignette.png", scale=4, tint_color="black"),
+            "red" : load_image("ui/vignette.png", scale=4, tint_color="red"),
         }
     }
 
@@ -179,7 +183,8 @@ def load_all_assets():
         },
         "fonts": {
             "default": "PF스타더스트 3.0 Bold.ttf",
-            "title": "DNFBitBitv2.ttf",
+            "gothic" : "Jacquard24-Regular.ttf",
+            "bold": "DNFBitBitv2.ttf",
         },
         "sounds": load_sound_assets(),
         "ui": load_ui_assets(),

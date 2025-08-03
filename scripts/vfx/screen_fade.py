@@ -13,7 +13,7 @@ class ScreenFader(GameObject):
     :param on_complete: 끝났을때 할꺼 함수
     '''
 
-    def __init__(self, duration : float, fade_in : bool, on_complete):
+    def __init__(self, duration : float, fade_in : bool, on_complete = None):
         super().__init__()
         self.surface = pg.Surface(SCREEN_SIZE, pg.SRCALPHA)
         self.surface.fill((0, 0, 0))
@@ -24,7 +24,7 @@ class ScreenFader(GameObject):
         self.on_complete = on_complete
 
         # 트윈 추가
-        Tween(self, "alpha", self.alpha, 255 if fade_in else 0, duration, pt.easeInCubic).on_complete.append(self.fade_done)
+        Tween(self, "alpha", self.alpha, 255 if fade_in else 0, duration, pt.easeInCubic, use_unscaled_time=True).on_complete.append(self.fade_done)
 
     def fade_done(self):
         if self.on_complete is not None:

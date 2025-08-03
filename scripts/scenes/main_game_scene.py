@@ -28,8 +28,6 @@ class MainGameScene(Scene):
         self.current_level = 0
 
     def on_scene_start(self):
-        super().on_scene_start()
-
         chapter_str = str(self.current_chapter)
         chapter_maps = TILEMAP_FILES_BY_CHAPTER.get(chapter_str)
 
@@ -59,12 +57,6 @@ class MainGameScene(Scene):
         # 플레이어 스폰
         spawn_pos = self.tilemap.get_pos_by_data("spawners_entities", 0)[0]
         self.player_status.player_character = PlayerCharacter(spawn_pos)
-        self.camera.position = pg.Vector2(self.player_status.player_character.rect.center)
-
-        # 배경 효과
-        Sky()
-        Clouds()
-        Fog()
 
         # BGM 재생
         # self.app.sound_manager.play_bgm("boss_bgm")
@@ -72,11 +64,19 @@ class MainGameScene(Scene):
         self.level_name_text = TextRenderer(
             LEVEL_NAMES_BY_CHAPTER[str(self.current_chapter)][self.current_level],
             SCREEN_SIZE.elementwise() / 2,
-            "title", 50, anchor=pg.Vector2(0.5, 0.5),
+            "bold", 50, anchor=pg.Vector2(0.5, 0.5),
         )
         Tween(self.level_name_text, "alpha", 0, 255, duration=1, easing=pt.easeInQuad).on_complete.append(
             lambda: Tween(self.level_name_text, "alpha", 255, 0, duration=2, easing=pt.easeOutQuad)
         )
+
+        super().on_scene_start()
+        self.camera.position = pg.Vector2(self.player_status.player_character.rect.center)
+
+        # 배경 효과
+        Sky()
+        Clouds()
+        Fog()
 
     def update(self):
         self.player_status.update()

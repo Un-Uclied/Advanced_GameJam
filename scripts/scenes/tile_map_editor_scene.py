@@ -14,9 +14,6 @@ MAX_UNDO_STACK = 10
 
 class TileMapEditScene(Scene):
     def on_scene_start(self):
-        super().on_scene_start()
-        Sky()
-
         # data/tilmap/temp.json을 로드함.
         # temp.json에 작업하고, 복사후 원하는곳에 붙여넣기
         self.tilemap = Tilemap("temp.json")
@@ -49,6 +46,10 @@ class TileMapEditScene(Scene):
         # 마우스 관련 변수
         self.mouse_world_pos = pg.Vector2(0, 0)
         self.tile_pos = pg.Vector2(0, 0)
+
+        super().on_scene_start()
+        
+        Sky()
 
     def save_undo_state(self):
         '''변경사항이 생길때마다 호출 필요'''

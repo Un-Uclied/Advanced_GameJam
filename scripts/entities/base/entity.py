@@ -15,7 +15,6 @@ class Entity(GameObject):
 
         self.current_action: str = ""
         self.invert_x = invert_x
-        self.flip_x: bool = False
 
         self.flip_offset: dict[bool, pg.Vector2] = {
             False: pg.Vector2(0, 0),
@@ -43,14 +42,10 @@ class Entity(GameObject):
     def update(self):
         super().update()
 
-        # flip 방향 결정
         if self.movement.x < 0:
-            self.flip_x = not self.invert_x
+            self.anim.flip_x = not self.invert_x
         elif self.movement.x > 0:
-            self.flip_x = self.invert_x
-
-        # flip 적용
-        self.anim.flip_x = self.flip_x
+            self.anim.flip_x = self.invert_x
         self.anim.update(self.app.dt)
 
     def draw_debug(self):
@@ -68,7 +63,7 @@ class Entity(GameObject):
         cam = self.app.scene.camera
 
         img = self.anim.img()
-        world_pos = pg.Vector2(self.rect.topleft) + self.flip_offset[self.flip_x]
+        world_pos = pg.Vector2(self.rect.topleft) + self.flip_offset[self.anim.flip_x]
         img_rect = pg.Rect(world_pos, img.get_size())
 
         if not CameraView.is_in_view(cam, img_rect):

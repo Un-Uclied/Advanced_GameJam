@@ -56,13 +56,20 @@ class Soul(PhysicsEntity):
         self.light.position = self.light.position.lerp(self.rect.center, max(min(self.app.dt * self.light_follow_speed, 1), 0))
 
     def handle_input(self):
+        if not hasattr(self.app.scene, "player_status") or not hasattr(self.app.scene.player_status, "player_character"):
+            return
+    
+        ps = self.app.scene.player_status
+        pc = ps.player_character
+        
         for event in self.app.events:
-            ps = self.app.scene.player_status
-            pc = ps.player_character
             if event.type == pg.KEYDOWN and event.key == pg.K_e and self.rect.colliderect(pc.rect):
                 self.destroy()
 
     def handle_hint_ui(self):
+        if not hasattr(self.app.scene, "player_status") or not hasattr(self.app.scene.player_status, "player_character"):
+            return
+    
         self.hint_ui.pos = pg.Vector2(self.rect.centerx, self.rect.top - 30)
 
         ps = self.app.scene.player_status

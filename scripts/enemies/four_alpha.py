@@ -45,6 +45,9 @@ class FourAlpha(PhysicsEnemy):
 
     @property
     def is_player_nearby(self):
+        if not hasattr(self.app.scene, "player_status") or not hasattr(self.app.scene.player_status, "player_character"):
+            return False
+
         ps = self.app.scene.player_status
         pc = ps.player_character
         entity_center = pg.Vector2(self.rect.center)

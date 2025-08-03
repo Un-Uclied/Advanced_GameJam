@@ -1,4 +1,4 @@
-IS_DEBUG = True
+IS_DEBUG = False
 
 class GameObject:
     '''GameObject()이렇게 하지말고 GameObject를 상속받는 클래스를 만들고 그걸 생성하세여'''
