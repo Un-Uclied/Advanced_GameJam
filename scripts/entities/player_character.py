@@ -18,7 +18,7 @@ MAX_JUMP_COUNT = 2
 
 ACCEL_POWER = 7
 DECCEL_POWER = 5
-PLAYER_PROJECTILE_KNOCKBACK = 800
+PLAYER_PROJECTILE_KNOCKBACK = 400
 
 LIGHT_FOLLOW_SPEED = 3
 CAMERA_FOLLOW_SPEED = 5
@@ -95,7 +95,7 @@ class PlayerCharacter(PhysicsEntity):
         direction = (CameraMath.screen_to_world(camera, pg.Vector2(pg.mouse.get_pos())) - plr_pos).normalize()
         PlayerProjectile(plr_pos, direction)
 
-        self.velocity += -direction * PLAYER_PROJECTILE_KNOCKBACK  # 탄환 발사시 플레이어가 밀려나도록
+        self.velocity += -pg.Vector2(direction.x, 0) * PLAYER_PROJECTILE_KNOCKBACK  # 탄환 발사시 플레이어가 밀려나도록 (y축은 무시)
 
     def jump(self):
         '''점프 시도'''
