@@ -20,16 +20,9 @@ class PlayerStatus:
         self.is_invincible = False
         self.current_invincible_timer = 0
 
-        #MainGameScene에서 on_death_event.append(메소드)이렇게 하면 플레이어가 죽을때 그 메소드가 불림.
-        self.on_death_event = []
-
         app = self.scene.app
         self.hurt_sound = app.ASSETS["sounds"]["player"]["hurt"]
         self.hurt_particle_anim = app.ASSETS["animations"]["vfxs"]["hurt"]
-
-    def on_dead(self):
-        for event in self.on_death_event:
-            event(self)
 
     @property
     def health(self):
@@ -56,7 +49,6 @@ class PlayerStatus:
             AnimatedParticle(self.hurt_particle_anim, pg.Vector2(self.player_character.rect.center))
 
         if self.health <= 0:
-            self.on_dead()
             self.player_character.destroy()
 
             # 이렇게 하면 아무도 참조 안해서 GC가 가져감

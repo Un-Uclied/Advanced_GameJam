@@ -36,15 +36,15 @@ class Light(GameObject):
     def bound_box(self):
         '''월드 rect를 반환'''
         bound_box = pg.Rect(self.position, self.surface.get_size())
-        bound_box.center = self.position  #이렇게 해야 빛의 중앙이 position으로 맞춰짐.
+        bound_box.center = self.position  # 이렇게 해야 빛의 중앙이 position으로 맞춰짐.
         return bound_box
 
     @classmethod
     def draw_lights(cls, camera : Camera2D, surface: pg.Surface):
         '''받은 surface에 BLEND_RGBA_SUB로 빛 효과를 냄 (surface에 구멍을 뚫음)'''
-        all_lights = GameObject.get_objects_by_types([Light])
+        all_lights = GameObject.get_objects_by_types(Light)
         for light in all_lights:
-            #최적화를 위해 화면 밖에 있으면 건너뜀.
+            # 최적화를 위해 화면 밖에 있으면 건너뜀.
             if not CameraView.is_in_view(camera, light.bound_box): continue
 
             rect = CameraView.world_rect_to_screen(camera, light.bound_box)
