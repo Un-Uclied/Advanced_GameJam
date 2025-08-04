@@ -15,6 +15,7 @@ class ImageButton(GameObject):
     :param on_hover: hover시 실행될 함수 (self, 상태 ("enter", "exit"))
     :param button: 사용할 마우스 버튼 (기본 1 = 좌클릭)
     :param anchor: 앵커 기준 (기본 중앙)
+    :param data: 버튼에 달고 싶은 아무 데이터 딕셔너리로 넣으면 됨
     '''
     def __init__(self, 
                  name: str, 
@@ -22,13 +23,15 @@ class ImageButton(GameObject):
                  on_click = None, 
                  on_hover = None,
                  button: int = 1,
-                 anchor: pg.Vector2 = pg.Vector2(0.5, 0.5)):
+                 anchor: pg.Vector2 = pg.Vector2(0.5, 0.5),
+                 data : dict = {}):
         
         super().__init__()
         self.name = name
         self.pos = position
         self.anchor = anchor
         self.button = button
+        self.data = data
 
         self.on_click = on_click
         self.on_hover = on_hover

@@ -1,6 +1,7 @@
 import pygame as pg
 
 from scripts.constants import *
+from scripts.camera import *
 from scripts.core import *
 
 class ImageRenderer(GameObject):
@@ -12,12 +13,13 @@ class ImageRenderer(GameObject):
     :param scale: 렌더할 이미지의 스케일 (기본값 1, 에셋 로드 할때 이미 스케일을 바꿨다면 바꾼 상태에서 또 scale하는거임)
     :param anchor: 렌더할 이미지의 앵커 (기본값은 중앙, 0.5, 0.5)
     '''
-    def __init__(self, image : pg.Surface, position : pg.Vector2, scale : float = 1, anchor : pg.Vector2 = pg.Vector2(.5, .5)):
+    def __init__(self, image : pg.Surface, position : pg.Vector2, scale : float = 1, anchor : pg.Vector2 = pg.Vector2(.5, .5), use_camera = False):
         super().__init__()
         self.image = image
         self.scale = scale
         self.pos = position
         self.anchor = anchor
+        self.use_camera = use_camera
 
     @property
     def size(self) -> pg.Vector2:
@@ -39,4 +41,9 @@ class ImageRenderer(GameObject):
 
         surface = self.app.surfaces[LAYER_INTERFACE]
         scaled_image = pg.transform.scale_by(self.image, self.scale)
-        surface.blit(scaled_image, self.screen_pos)
+
+        draw_pos = self.screen_pos
+        if self.use_camera:
+            draw_pos = CameraMath.world_to_screen(self.app.scene.camera, draw_pos)
+            
+        surface.blit(scaled_image, draw_pos)

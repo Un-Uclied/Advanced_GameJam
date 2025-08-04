@@ -1,6 +1,7 @@
 import pygame as pg
 
 from scripts.core import *
+from scripts.constants import *
 from .load_image import *
 
 def load_tilemap_assets():
@@ -158,11 +159,36 @@ def load_ui_assets():
             "app_quit": {
                 "on_hover": load_image("ui/buttons/app_quit/on_hover.png", scale=2),
                 "on_not_hover": load_image("ui/buttons/app_quit/on_not_hover.png", scale=2)
-            }
+            },
+            "select_one": {
+                "on_hover": load_image("ui/buttons/chapters/one/on_hover.png"),
+                "on_not_hover": load_image("ui/buttons/chapters/one/on_not_hover.png")
+            },
+            "select_two": {
+                "on_hover": load_image("ui/buttons/chapters/two/on_hover.png"),
+                "on_not_hover": load_image("ui/buttons/chapters/two/on_not_hover.png")
+            },
+            "select_three": {
+                "on_hover": load_image("ui/buttons/chapters/three/on_hover.png"),
+                "on_not_hover": load_image("ui/buttons/chapters/three/on_not_hover.png")
+            },
+            "select_boss": {
+                "on_hover": load_image("ui/buttons/chapters/boss/on_hover.png"),
+                "on_not_hover": load_image("ui/buttons/chapters/boss/on_not_hover.png")
+            },
         },
         "vignette" : {
             "black" : load_image("ui/vignette.png", scale=4, tint_color="black"),
             "red" : load_image("ui/vignette.png", scale=4, tint_color="red"),
+        },
+        "soul_icons" : {
+            SOUL_KIND_A : load_image("ui/soul_icons/kind_soul_a_icon.png", scale=2),
+            SOUL_KIND_B : load_image("ui/soul_icons/kind_soul_b_icon.png", scale=2),
+            SOUL_KIND_C : load_image("ui/soul_icons/kind_soul_c_icon.png", scale=2),
+            
+            SOUL_EVIL_A : load_image("ui/soul_icons/evil_soul_a_icon.png", scale=2),
+            SOUL_EVIL_B : load_image("ui/soul_icons/evil_soul_b_icon.png", scale=2),
+            SOUL_EVIL_C : load_image("ui/soul_icons/evil_soul_c_icon.png", scale=2)
         }
     }
 

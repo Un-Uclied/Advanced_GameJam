@@ -42,10 +42,22 @@ class Light(GameObject):
     @classmethod
     def draw_lights(cls, camera : Camera2D, surface: pg.Surface):
         '''받은 surface에 BLEND_RGBA_SUB로 빛 효과를 냄 (surface에 구멍을 뚫음)'''
-        all_lights = GameObject.get_objects_by_types(Light)
+        all_lights = GameObject.get_objects_by_types(cls)
         for light in all_lights:
             # 최적화를 위해 화면 밖에 있으면 건너뜀.
             if not CameraView.is_in_view(camera, light.bound_box): continue
 
             rect = CameraView.world_rect_to_screen(camera, light.bound_box)
             surface.blit(light.surface, rect.topleft, special_flags=pg.BLEND_RGBA_SUB)
+
+    @classmethod
+    def is_rect_in_light(cls, rect : pg.Rect):
+        all_lights = GameObject.get_objects_by_types(cls)
+        for light in all_lights:
+            # 최적화를 위해 화면 밖에 있으면 건너뜀.
+            if not CameraView.is_in_view(camera, light.bound_box): continue
+
+            if light.bound_box.colliderect(rect):
+                return True
+        
+        return False

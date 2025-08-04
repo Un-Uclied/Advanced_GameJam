@@ -3,5 +3,6 @@ from .text_renderer import TextRenderer
 from .image_renderer import ImageRenderer
 from .text_button import TextButton
 from .cut_scene import CutScene
+from .slider import Slider
 
-ALL_UI_TYPE = (ImageButton, ImageRenderer, TextButton, CutScene, TextRenderer)
+ALL_UI_TYPE = (ImageButton, ImageRenderer, TextButton, CutScene, TextRenderer, Slider)

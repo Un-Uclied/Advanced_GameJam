@@ -1,9 +1,9 @@
 {
-    "is_first_start": false,
+    "is_first_start": true,
     "progress": {
         "1": [
             true,
-            true,
+            false,
             false,
             false,
             false
@@ -22,9 +22,7 @@
             false,
             false
         ],
-        "4": [
-            false
-        ]
+        "4": [false]
     },
     "vfx_volume": 0.5,
     "bgm_volume": 0.5

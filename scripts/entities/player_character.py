@@ -20,7 +20,6 @@ ACCEL_POWER = 7
 DECCEL_POWER = 5
 PLAYER_PROJECTILE_KNOCKBACK = 400
 
-LIGHT_FOLLOW_SPEED = 3
 CAMERA_FOLLOW_SPEED = 5
 
 LIGHT_SIZE = 500
@@ -40,14 +39,6 @@ class PlayerCharacter(PhysicsEntity):
         self.lerped_movement = pg.Vector2()
 
         self.flip_offset = FLIP_OFFSET
-
-        # 플레이어 주변 따라 다니는 빛
-        self.light = Light(LIGHT_SIZE, pg.Vector2(self.rect.center))
-
-    def destroy(self):
-        # 내가 생성한 빛도 제거
-        self.light.destroy()
-        super().destroy()
 
     def handle_input(self):
         '''인풋 핸들'''
@@ -133,7 +124,6 @@ class PlayerCharacter(PhysicsEntity):
         target_pos = self.rect.center
 
         camera.position = camera.position.lerp(target_pos, max(min(self.app.dt * CAMERA_FOLLOW_SPEED, 1), 0))
-        self.light.position = self.light.position.lerp(target_pos, max(min(self.app.dt * LIGHT_FOLLOW_SPEED, 1), 0))
 
     def update(self):
         self.handle_input()

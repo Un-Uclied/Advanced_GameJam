@@ -81,7 +81,7 @@ class FiveOmega(PhysicsEnemy):
 
     def update_movement(self):
         if self.can_move:
-            self.velocity.x = self.x_direction * MOVE_SPEED * 100
+            self.velocity.x = self.ai.direction.x * ((MOVE_SPEED + EVIL_A_SPEED_UP) if self.status.soul_type == SOUL_EVIL_A else MOVE_SPEED) * 100
 
     def update_attack(self):
         if self.player_distance_len < SCYTHE_ATTACK_TRIGGER_RANGE:

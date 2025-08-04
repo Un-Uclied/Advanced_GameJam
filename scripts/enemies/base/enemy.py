@@ -8,17 +8,21 @@ from scripts.entities.base import *
 PLAYER_HIT_KNOCKBACK = 1000
 
 class EnemyBase:
-    def __init__(self, entity: Entity):
-        self.entity = entity
-        self.attack_particle_anim = self.entity.app.ASSETS["animations"]["vfxs"]["enemy"]["attack"]
-        self.attack_sound = self.entity.app.ASSETS["sounds"]["enemy"]["attack"]
+    def __init__(self, enemy: Entity):
+        self.enemy = enemy
+        self.attack_particle_anim = self.enemy.app.ASSETS["animations"]["vfxs"]["enemy"]["attack"]
+        self.attack_sound = self.enemy.app.ASSETS["sounds"]["enemy"]["attack"]
 
     def do_attack(self, damage: int, pos: pg.Vector2, shake: int = 0):
-        ps = self.entity.app.scene.player_status
+        # SOUL_EVIL_C가 타입이면 여기서 주는 대미지 더함
+        if self.enemy.status.soul_type == SOUL_EVIL_B:
+            damage += EVIL_B_DAMAGE_UP
+
+        ps = self.enemy.app.scene.player_status
         pc = ps.player_character
         ps.health -= damage
         AnimatedParticle(self.attack_particle_anim, pos)
-        self.entity.app.sound_manager.play_sfx(self.attack_sound)
+        self.enemy.app.sound_manager.play_sfx(self.attack_sound)
         if shake:
             cam = self.app.scene.camera
             cam.shake_amount += shake
@@ -37,10 +41,10 @@ class PhysicsEnemy(PhysicsEntity, EnemyBase):
 
     def update(self):
         super().update()
-        if not hasattr(self.entity.app.scene, "player_status") or not hasattr(self.entity.app.scene.player_status, "player_character"):
+        if not hasattr(self.enemy.app.scene, "player_status") or not hasattr(self.enemy.app.scene.player_status, "player_character"):
             return
     
-        ps = self.entity.app.scene.player_status
+        ps = self.enemy.app.scene.player_status
         pc = ps.player_character
 
         if self.rect.colliderect(pc.rect) and not ps.is_invincible:
@@ -91,7 +95,7 @@ class GhostEnemy(Entity, EnemyBase):
     def update(self):
         super().update()
 
-        ps = self.entity.app.scene.player_status
+        ps = self.enemy.app.scene.player_status
         pc = ps.player_character
 
         if not self.is_attacking:

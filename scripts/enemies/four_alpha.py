@@ -69,4 +69,4 @@ class FourAlpha(PhysicsEnemy):
             self.ai.min_change_timer = MIN_CHANGE_TIMER_NORMAL
             self.ai.max_change_timer = MAX_CHANGE_TIMER_NORMAL
 
-        self.velocity.x = self.ai.direction.x * self.current_move_speed * 100
+        self.velocity.x = self.ai.direction.x * ((self.current_move_speed + EVIL_A_SPEED_UP) if self.status.soul_type == SOUL_EVIL_A else self.current_move_speed) * 100

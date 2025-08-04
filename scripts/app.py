@@ -8,26 +8,24 @@ from scripts.vfx import *
 
 class SoundManager:
     def __init__(self):
-        # BGM 전용 mixer.music 사용
-        self.bgm_volume = 1.0
+        self.app = App.singleton
 
         # 효과음 채널 풀 만들기
         pg.mixer.set_num_channels(MIXER_CHANNEL_COUNT)
         self.sfx_channels = [pg.mixer.Channel(i) for i in range(MIXER_CHANNEL_COUNT)]
-        self.sfx_volume = 1.0
 
     def play_sfx(self, sound: pg.mixer.Sound, volume: float = 1.0):
         """사용 가능한 채널 찾아서 효과음 재생"""
         for ch in self.sfx_channels:
             if not ch.get_busy():
-                ch.set_volume(volume * self.sfx_volume)
+                ch.set_volume(volume * self.app.player_data["vfx_volume"])
                 ch.play(sound)
                 return
 
     def play_bgm(self, bgm_name : str, loop: bool = True, fade_ms: int = 0):
         """배경음악 재생 (streaming 방식)"""
         pg.mixer.music.load(f"assets/bgms/{bgm_name}.wav")
-        pg.mixer.music.set_volume(self.bgm_volume)
+        pg.mixer.music.set_volume(self.app.player_data["bgm_volume"])
         pg.mixer.music.play(-1 if loop else 0, fade_ms=fade_ms)
 
     def stop_bgm(self, fade_ms: int = 0):
@@ -35,10 +33,6 @@ class SoundManager:
             pg.mixer.music.fadeout(fade_ms)
         else:
             pg.mixer.music.stop()
-
-    def set_bgm_volume(self, volume: float):
-        self.bgm_volume = max(0.0, min(1.0, volume))
-        pg.mixer.music.set_volume(self.bgm_volume)
 
     def set_sfx_volume(self, volume: float):
         self.sfx_volume = max(0.0, min(1.0, volume))
@@ -76,9 +70,6 @@ class App:
             LAYER_INTERFACE : pg.Surface(SCREEN_SIZE, SURFACE_FLAGS).convert_alpha(),
         }
 
-        # 사운드 매니저!!
-        self.sound_manager = SoundManager()    
-
         #모든 애셋 로드, 너무 많으면 프리징 현상 발생
         self.load_assets()
         self.load_player_data()
@@ -99,9 +90,12 @@ class App:
 
         self.update_time()
         self.update_event()
+        # 사운드 매니저!!
+        self.sound_manager = SoundManager()    
 
         self.registered_scenes = {
             "main_menu_scene" : MainMenuScene(),
+            "chapter_select_scene" : ChapterSelectScene(),
             "settings_scene" : SettingsScene(),
             "info_scene" : InfoScene(),
             "main_game_scene" : MainGameScene(),
@@ -112,7 +106,9 @@ class App:
         # 메인메뉴를 가려는데 처음 게임을 튼다면 오프닝 컷씬으로
         if self.player_data["is_first_start"] and start_scene_name == "main_menu_scene":
             start_scene_name = "opening_cut_scene"
-        self.scene = self.registered_scenes[start_scene_name]
+        # 씬 설정
+        from scripts.scenes.base import Scene
+        self.scene : Scene = self.registered_scenes[start_scene_name]
         self.scene.on_scene_start()
         self.transition = False
         ScreenFader(1, False) # 초기 화면 페이드
@@ -126,6 +122,14 @@ class App:
         '''플레이어 데이터 저장! 앱 꺼질때 불림'''
         with open('data/player_data.json','w', encoding="utf-8") as f:
             json.dump(self.player_data, f, ensure_ascii=False, indent=4)
+
+    def reset_player_data(self):
+        '''데이터 리셋후 저장 (initial_player_data에 있는걸 그대로 붙여넣기.)'''
+        with open("data/inital_player_data.json", "r", encoding="utf-8") as f:
+            initial_data = json.load(f)
+        with open('data/player_data.json','w', encoding="utf-8") as f:
+            json.dump(initial_data, f, ensure_ascii=False, indent=4)
+        self.load_player_data()
 
     def load_assets(self):
         '''모든 에셋 로드'''

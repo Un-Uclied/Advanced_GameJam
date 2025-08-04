@@ -41,4 +41,4 @@ class OneBeta(PhysicsEnemy):
         self.ai.update()
         self.control_animation()
         
-        self.velocity.x = self.ai.direction.x * MOVE_SPEED * 100
+        self.velocity.x = self.ai.direction.x * ((MOVE_SPEED + EVIL_A_SPEED_UP) if self.status.soul_type == SOUL_EVIL_A else MOVE_SPEED) * 100
