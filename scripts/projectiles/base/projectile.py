@@ -10,7 +10,7 @@ TIME_OUT = 5
 DATA_PATH = "data/projectile_data.json"
 
 # Projectile 생성할때 대미지나 속도 같은게 인수로 들어오면 더러워져서 여기서 모든 탄환 데이터 로드
-with open(DATA_PATH, 'r') as f:
+with open(DATA_PATH, 'r', encoding="utf-8") as f:
     data = json.load(f)
     ALL_PROJECTILE_DATA = data
 

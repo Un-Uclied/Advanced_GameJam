@@ -134,7 +134,9 @@ def load_sound_assets():
                 "hover_enter" : snd("ui/button/hover_enter"),
                 "hover_exit" : snd("ui/button/hover_exit"),
                 "click" : snd("ui/button/click")
-            }
+            },
+            "confirm" : snd("ui/confirm"),
+            "next" : snd("ui/next")
         }
     }
 
@@ -172,6 +174,11 @@ def load_background_assets():
         "clouds": load_images("clouds", scale=1.5, tint_color="grey")
     }
 
+def load_cut_scene_assets():
+    return {
+        "opening" : load_images("cut_scene/opening", scale=2),
+    }
+
 def load_all_assets():
     '''엄청 무거우니깐 App클래스에서 딱 한번만 실행하세여'''
     return {
@@ -188,5 +195,6 @@ def load_all_assets():
         },
         "sounds": load_sound_assets(),
         "ui": load_ui_assets(),
+        "cut_scene": load_cut_scene_assets(),
         "backgrounds": load_background_assets(),
     }

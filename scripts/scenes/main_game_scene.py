@@ -13,7 +13,7 @@ from scripts.ui import *
 from .base import Scene
 
 # 타일맵 경로 불러오기
-with open("data/tilemap_data.json", 'r') as f:
+with open("data/tilemap_data.json", 'r', encoding="utf-8") as f:
     data = json.load(f)
     TILEMAP_FILES_BY_CHAPTER = data["maps"]
     LEVEL_NAMES_BY_CHAPTER = data["names"]

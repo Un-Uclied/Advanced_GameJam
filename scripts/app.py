@@ -1,4 +1,5 @@
 import pygame as pg #파이게임 커뮤니티 에디션
+import json
 
 from scripts.constants import * #앱이름, 해상도, 화면 설정, 레이어 등이 있음.
 from scripts.scenes import *
@@ -80,6 +81,7 @@ class App:
 
         #모든 애셋 로드, 너무 많으면 프리징 현상 발생
         self.load_assets()
+        self.load_player_data()
 
         self.clock = pg.time.Clock()
 
@@ -103,13 +105,27 @@ class App:
             "settings_scene" : SettingsScene(),
             "info_scene" : InfoScene(),
             "main_game_scene" : MainGameScene(),
-            "editor_scene"    : TileMapEditScene()
-        }
+            "editor_scene"    : TileMapEditScene(),
 
+            "opening_cut_scene" : OpeningScene()
+        }
+        # 메인메뉴를 가려는데 처음 게임을 튼다면 오프닝 컷씬으로
+        if self.player_data["is_first_start"] and start_scene_name == "main_menu_scene":
+            start_scene_name = "opening_cut_scene"
         self.scene = self.registered_scenes[start_scene_name]
         self.scene.on_scene_start()
         self.transition = False
         ScreenFader(1, False) # 초기 화면 페이드
+
+    def load_player_data(self):
+        '''플레이어 데이터 로드'''
+        with open("data/player_data.json", "r", encoding="utf-8") as f:
+            self.player_data = json.load(f)
+
+    def save_player_data(self):
+        '''플레이어 데이터 저장! 앱 꺼질때 불림'''
+        with open('data/player_data.json','w', encoding="utf-8") as f:
+            json.dump(self.player_data, f, ensure_ascii=False, indent=4)
 
     def load_assets(self):
         '''모든 에셋 로드'''
@@ -156,16 +172,17 @@ class App:
     def run(self):
         '''메인 게임 루프'''
         while not self.window_should_be_closed:
-            self.update_event()     #1. 제일먼저 이벤트 리슨
-            self.check_for_quit()   #2. 종료 확인
-            self.scene.update()     #3. 현재 씬 업데이트
+            self.update_event()     # 1. 제일먼저 이벤트 리슨
+            self.check_for_quit()   # 2. 종료 확인
+            self.scene.update()     # 3. 현재 씬 업데이트
 
-            self.clear_surfaces()   #4. 화면 초기화
+            self.clear_surfaces()   # 4. 화면 초기화
             
-            self.scene.draw()       #5.현재 씬 드로우
-            self.draw_surfaces()    #6.surfaces에 그려진것들을 메인 화면에 드로우
+            self.scene.draw()       # 5.현재 씬 드로우
+            self.draw_surfaces()    # 6.surfaces에 그려진것들을 메인 화면에 드로우
 
-            pg.display.flip()       #7.화면 업데이트
-            self.update_time()      #8.시간 업데이트
-        
-        pg.quit()                   #a. 루프 탈출시 정상적으로 종료
+            pg.display.flip()       # 7.화면 업데이트
+            self.update_time()      # 8.시간 업데이트
+
+        self.save_player_data()     # a. 플레이어 데이터 저장
+        pg.quit()                   # a. 루프 탈출시 정상적으로 종료

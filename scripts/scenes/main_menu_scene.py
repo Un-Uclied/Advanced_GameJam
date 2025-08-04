@@ -8,9 +8,11 @@ from scripts.volume import *
 from scripts.tilemap import *
 from .base import Scene
 
-def on_click(name : str, button : ImageButton):
+def on_click(button : ImageButton):
     from scripts.app import App
     app = App.singleton
+    
+    name = button.name
 
     if name == "game_start":
         app.change_scene("main_game_scene")
@@ -35,6 +37,7 @@ class MainMenuScene(Scene):
         ImageButton("app_quit", pg.Vector2(SCREEN_SIZE.x / 2, 700), on_click, None)
         ImageRenderer(self.app.ASSETS["ui"]["vignette"]["black"], pg.Vector2(0, 0), anchor=pg.Vector2(0, 0))
         TextRenderer("< Limen >", pg.Vector2(SCREEN_SIZE.x / 2, 150), font_name="gothic", font_size=170, anchor=pg.Vector2(0.5, 0.5))
+        TextRenderer("팀 후라이맨즈", SCREEN_SIZE - pg.Vector2(25, 25), anchor=pg.Vector2(1, 1))
 
         super().on_scene_start()
         self.app.time_scale = .5

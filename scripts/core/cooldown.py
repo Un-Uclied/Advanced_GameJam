@@ -7,9 +7,6 @@ class Cooldown(GameObject):
         self.time_left = 0
         self.auto_destroy = auto_destroy
 
-    def trigger(self):
-        self.time_left = self.duration
-
     def reset(self):
         self.time_left = self.duration
 

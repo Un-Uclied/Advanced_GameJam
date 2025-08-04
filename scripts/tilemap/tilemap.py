@@ -38,7 +38,7 @@ class Tilemap(GameObject):
         super().__init__()
         self.file_name = file_name
 
-        with open(BASE_TILEMAP_PATH + self.file_name, 'r') as f:
+        with open(BASE_TILEMAP_PATH + self.file_name, 'r', encoding="utf-8") as f:
             json_data = json.load(f)
 
         self.tile_size = json_data["tile_size"]
@@ -126,7 +126,7 @@ class Tilemap(GameObject):
 
     def save_file(self, file_name: str = "temp.json"):
         '''현재 데이터 저장'''
-        with open(BASE_TILEMAP_PATH + '/' + file_name, 'w') as f:
+        with open(BASE_TILEMAP_PATH + '/' + file_name, 'w', encoding="utf-8") as f:
             json.dump({
                 "tile_size": self.tile_size,
                 "in_grid": self.in_grid,

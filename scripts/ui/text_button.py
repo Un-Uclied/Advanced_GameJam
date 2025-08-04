@@ -3,11 +3,11 @@ import pytweening as pt
 
 from scripts.constants import *
 from scripts.core import *
-from .image_renderer import ImageRenderer
+from .text_renderer import TextRenderer
 
-class ImageButton(GameObject):
+class TextButton(GameObject):
     '''
-    스크린 UI 버튼 (hover, click, tween 지원)
+    스크린 UI 텍스트 버튼 (hover, click, tween 지원)
 
     :param name: 버튼 이름 (애셋 키)
     :param position: 기준 위치
@@ -17,15 +17,18 @@ class ImageButton(GameObject):
     :param anchor: 앵커 기준 (기본 중앙)
     '''
     def __init__(self, 
-                 name: str, 
-                 position: pg.Vector2, 
+                 text : str,
+                 position: pg.Vector2,
                  on_click = None, 
                  on_hover = None,
+                 font_name = "default",
+                 font_size = 24,
+                 not_hover_color = pg.Color("white"),
+                 hover_color = pg.Color("blue"),
                  button: int = 1,
                  anchor: pg.Vector2 = pg.Vector2(0.5, 0.5)):
         
         super().__init__()
-        self.name = name
         self.pos = position
         self.anchor = anchor
         self.button = button
@@ -33,13 +36,10 @@ class ImageButton(GameObject):
         self.on_click = on_click
         self.on_hover = on_hover
 
-        # 이미지 로드
-        self.default_img = self.app.ASSETS["ui"]["image_button"][name]["on_not_hover"]
-        self.hover_img   = self.app.ASSETS["ui"]["image_button"][name]["on_hover"]
-        self._render_img = self.default_img
-
-        # 이미지 렌더러 내부 포함
-        self.renderer = ImageRenderer(self._render_img, self.pos, 1.0, self.anchor)
+        # 텍스트 렌더러 내부 포함
+        self.not_hover_color = not_hover_color
+        self.hover_color = hover_color
+        self.renderer = TextRenderer(text, position, font_name, font_size, self.not_hover_color, anchor, False)
 
         # 사운드 로드
         self.hover_enter_sound = self.app.ASSETS["sounds"]["ui"]["button"]["hover_enter"]
@@ -58,20 +58,18 @@ class ImageButton(GameObject):
         super().update()
 
         now_hovered = self.is_hovered
-        self._render_img = self.hover_img if now_hovered else self.default_img
-        self.renderer.image = self._render_img
 
         # hover 상태 진입 or 나감
         if not self._was_hovered and now_hovered:
             if self.on_hover is not None:
                 self.on_hover(self, "enter")
+            self.renderer.color = self.hover_color
             self.app.sound_manager.play_sfx(self.hover_enter_sound)
-            Tween(self.renderer, "scale", self.renderer.scale, 1.2, .2, pt.easeOutBack, use_unscaled_time=True)
 
         elif self._was_hovered and not now_hovered:
             if self.on_hover is not None:
                 self.on_hover(self, "exit")
-            Tween(self.renderer, "scale", self.renderer.scale, 1.0, .2, pt.easeInBack, use_unscaled_time=True)
+            self.renderer.color = self.not_hover_color
             self.app.sound_manager.play_sfx(self.hover_exit_sound)
 
         # 클릭 처리
@@ -86,3 +84,6 @@ class ImageButton(GameObject):
     def destroy(self):
         self.renderer.destroy()
         super().destroy()
+
+    def draw_debug(self):
+        super().draw_debug()

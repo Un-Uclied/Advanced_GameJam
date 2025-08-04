@@ -1,6 +1,3 @@
 {
-    "is_first_start" : true,
-    "boss_cleared" : {
-        "one" : false, "two" : false, "three" : false
-    }
+    "is_first_start": false
 }
