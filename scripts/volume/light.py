@@ -51,7 +51,7 @@ class Light(GameObject):
             surface.blit(light.surface, rect.topleft, special_flags=pg.BLEND_RGBA_SUB)
 
     @classmethod
-    def is_rect_in_light(cls, rect : pg.Rect):
+    def is_rect_in_light(cls, camera : Camera2D, rect : pg.Rect):
         all_lights = GameObject.get_objects_by_types(cls)
         for light in all_lights:
             # 최적화를 위해 화면 밖에 있으면 건너뜀.

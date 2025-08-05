@@ -137,7 +137,8 @@ def load_sound_assets():
                 "click" : snd("ui/button/click")
             },
             "confirm" : snd("ui/confirm"),
-            "next" : snd("ui/next")
+            "next" : snd("ui/next"),
+            "reset" : snd("ui/reset")
         }
     }
 
@@ -176,12 +177,22 @@ def load_ui_assets():
                 "on_hover": load_image("ui/buttons/chapters/boss/on_hover.png"),
                 "on_not_hover": load_image("ui/buttons/chapters/boss/on_not_hover.png")
             },
+            "restart": {
+                "on_hover": load_image("ui/buttons/restart/on_hover.png", scale=2),
+                "on_not_hover": load_image("ui/buttons/restart/on_not_hover.png", scale=2)
+            },
+            "reset": {
+                "on_hover": load_image("ui/buttons/reset/on_hover.png", scale=2),
+                "on_not_hover": load_image("ui/buttons/reset/on_not_hover.png", scale=2)
+            },
         },
         "vignette" : {
             "black" : load_image("ui/vignette.png", scale=4, tint_color="black"),
             "red" : load_image("ui/vignette.png", scale=4, tint_color="red"),
         },
+        "pause_bg" : load_image("ui/pause_menu.png", scale=4),
         "soul_icons" : {
+            SOUL_DEFAULT : load_image("ui/soul_icons/soul_default_icon.png", scale=2),
             SOUL_KIND_A : load_image("ui/soul_icons/kind_soul_a_icon.png", scale=2),
             SOUL_KIND_B : load_image("ui/soul_icons/kind_soul_b_icon.png", scale=2),
             SOUL_KIND_C : load_image("ui/soul_icons/kind_soul_c_icon.png", scale=2),

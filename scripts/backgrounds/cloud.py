@@ -5,8 +5,8 @@ from scripts.constants import *
 from scripts.camera import *
 from scripts.core import *
 
-CLOUD_MIN_SPEED = .45
-CLOUD_MAX_SPEED = 1.2
+CLOUD_MIN_SPEED = 1
+CLOUD_MAX_SPEED = 3
 
 CLOUD_MIN_DEPTH = .2
 CLOUD_MAX_DEPTH = .8
@@ -27,8 +27,8 @@ class Cloud:
 
         self.img.set_alpha(CLOUD_ALPHA)
 
-    def update(self):
-        self.pos.x += self.speed
+    def update(self, dt):
+        self.pos.x += self.speed * dt * 100
 
     def draw(self, camera : Camera2D, surface : pg.Surface):
         depth_pos = self.pos - (camera.position * self.depth)   #depth에 따라 카메라가 스크롤하는 량이 달라짐. (Parallax 효과 만들기)
@@ -66,7 +66,7 @@ class Clouds(GameObject):
     def update(self):
         super().update()
         for cloud in self.all_clouds:
-            cloud.update()
+            cloud.update(self.app.dt)
 
     def draw(self):
         super().draw()

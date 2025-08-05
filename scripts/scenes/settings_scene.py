@@ -41,6 +41,8 @@ class SettingsScene(Scene):
             self.sfx_volume_slider.update_rects()
             self.bgm_volume_slider.update_rects()
 
+            self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["ui"]["reset"])
+
             self.app.change_scene("main_menu_scene")
         else:
             self.reset_button.renderer.text = RESET_MSGS[self.button_click_stack]

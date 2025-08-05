@@ -20,8 +20,19 @@ class Fog(GameObject):
     def __init__(self, fog_color : pg.Color = pg.Color(0, 0, 0, 250)):
         '''Fog()하고 타일맵 만들면 안되고, 타일맵 만든후에 Fog()하세여'''
         super().__init__()
-        self.fog_color = fog_color
+        self._fog_color = fog_color
         self.fog_surface = pg.Surface(SCREEN_SIZE, flags=pg.SRCALPHA)
+
+    @property
+    def fog_color(self):
+        # 만약 씬에 player_status가 없으면 메인 게임 씬이 아닌것으로 간주, 별다른 계산 없이 그대로 리턴
+        if not hasattr(self.app.scene, "player_status"):
+            return self._fog_color
+        ps = self.app.scene.player_status
+        color = pg.Color(self._fog_color)
+        if SOUL_KIND_B in ps.soul_queue:
+            color.a -= KIND_B_FOG_ALPHA_DOWN
+        return color
 
     def draw(self):
         super().draw()

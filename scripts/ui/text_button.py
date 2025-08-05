@@ -31,7 +31,6 @@ class TextButton(GameObject):
                  data : dict = {}):
         
         super().__init__()
-        self.anchor = anchor
         self.button = button
         self.data = data
 
@@ -86,6 +85,3 @@ class TextButton(GameObject):
     def destroy(self):
         self.renderer.destroy()
         super().destroy()
-
-    def draw_debug(self):
-        super().draw_debug()

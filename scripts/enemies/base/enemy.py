@@ -16,7 +16,7 @@ class EnemyBase:
     def do_attack(self, damage: int, pos: pg.Vector2, shake: int = 0):
         # SOUL_EVIL_C가 타입이면 여기서 주는 대미지 더함
         if self.enemy.status.soul_type == SOUL_EVIL_B:
-            damage += EVIL_B_DAMAGE_UP
+            damage += ENEMY_EVIL_B_DAMAGE_UP
 
         ps = self.enemy.app.scene.player_status
         pc = ps.player_character
@@ -55,8 +55,13 @@ class ProjectileEnemy(PhysicsEnemy):
         super().__init__(name, rect, collide_attack_damage)
 
         self.fire_range = fire_range
-        self.cooldown = Cooldown(fire_cooltime)
+        self.cooldown = Timer(fire_cooltime, None, auto_destroy=False)
         self.projectile_class = projectile_class
+
+    def destroy(self):
+        # 만든 쿨타임 오브젝트도 지우기
+        self.cooldown.destroy()
+        super().destroy()
 
     def fire(self):
         direction = pg.Vector2(1, 0) if self.anim.flip_x else pg.Vector2(-1, 0)
@@ -68,7 +73,7 @@ class ProjectileEnemy(PhysicsEnemy):
         pc = self.app.scene.player_status.player_character
         dist = pg.Vector2(self.rect.center).distance_to(pg.Vector2(pc.rect.center))
 
-        if dist <= self.fire_range and self.cooldown.ready():
+        if dist <= self.fire_range and self.cooldown.current_time <= 0:
             self.fire()
             self.cooldown.reset()
 

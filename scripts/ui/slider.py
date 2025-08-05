@@ -5,9 +5,9 @@ from scripts.core import *
 
 class Slider(GameObject):
     """
-    슬라이더 UI 컴포넌트.
+    슬라이더 UI
 
-    :param pos: 슬라이더 중심 좌표
+    :param pos: 슬라이더 좌표
     :param size: (width, height)
     :param init_val: 초기값 (min_val ~ max_val 사이)
     :param min_val: 최소값

@@ -39,6 +39,13 @@ class Projectile(GameObject):
         # 탄환 애니메이션
         self.anim : Animation = self.app.ASSETS["animations"]["projectiles"][projectile_name].copy()
 
+    def update_tilemap_collision(self):
+        '''타일맵과 닿으면 삭제'''
+        for rect in self.app.scene.tilemap.physic_tiles_around(self.position):
+            if rect.collidepoint(self.position):
+                self.destroy()
+                break
+
     def update(self):
         super().update()
 
@@ -53,11 +60,8 @@ class Projectile(GameObject):
         if self.time_out_timer <= 0:
             self.destroy()
 
-        # 타일맵과 닿으면 삭제
-        for rect in self.app.scene.tilemap.physic_tiles_around(self.position):
-            if rect.collidepoint(self.position):
-                self.destroy()
-                break
+        self.update_tilemap_collision()
+        
 
     def draw(self):
         super().draw()

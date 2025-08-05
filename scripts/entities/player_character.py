@@ -1,5 +1,6 @@
 import pygame as pg
 
+from scripts.constants import *
 from scripts.camera import *
 from scripts.projectiles import *
 from scripts.volume import *
@@ -79,14 +80,25 @@ class PlayerCharacter(PhysicsEntity):
 
     def projectile_attack(self):
         '''탄환 공격'''
-        camera = self.app.scene.camera
+        ps = self.app.scene.player_status
+        attack_cooltime = ps.attack_cooltime
+        # 공격 쿨타임 중이면 리턴
+        if attack_cooltime.current_time > 0: 
+            return
+        # 공격 쿨타임 초기화
+        attack_cooltime.reset()
 
+        camera = self.app.scene.camera
         # 마우스 위치 (스크린 좌표계)를 월드 좌표계로 변환후 방향 계산
         plr_pos = pg.Vector2(self.rect.center)
         direction = (CameraMath.screen_to_world(camera, pg.Vector2(pg.mouse.get_pos())) - plr_pos).normalize()
         PlayerProjectile(plr_pos, direction)
 
-        self.velocity += -pg.Vector2(direction.x, 0) * PLAYER_PROJECTILE_KNOCKBACK  # 탄환 발사시 플레이어가 밀려나도록 (y축은 무시)
+        # SOUL_EVIL_A가지고 있다면 넉백 증가
+        nuckback = PLAYER_PROJECTILE_KNOCKBACK
+        if SOUL_EVIL_A in ps.soul_queue:
+            nuckback += EVIL_A_NUCK_BACK_UP
+        self.velocity += -pg.Vector2(direction.x, 0) * nuckback  # 탄환 발사시 플레이어가 밀려나도록 (y축은 무시)
 
     def jump(self):
         '''점프 시도'''
@@ -107,8 +119,17 @@ class PlayerCharacter(PhysicsEntity):
     def physics_movement(self):
         # super().physics_movement() | super().physics_movement()는 움직임이 플레이어 인풋 계산 까지 포함 안되서 안 부름.
 
+        move_speed = MOVE_SPEED
+
+        # 영혼 타입에 맞게 이동속도 맞추기
+        ps = self.app.scene.player_status
+        if SOUL_KIND_A in ps.soul_queue:
+            move_speed -= KIND_A_SPEED_DOWN
+        if SOUL_KIND_C in ps.soul_queue:
+            move_speed += KIND_C_SPEED_UP
+
         self.lerped_movement = self.lerped_movement.lerp(
-            pg.Vector2(self.input_drection.x * MOVE_SPEED * 100, 0),
+            pg.Vector2(self.input_drection.x * move_speed * 100, 0),
             max(min((ACCEL_POWER if self.is_accel else DECCEL_POWER) * self.app.dt, 1), 0)
         )
 

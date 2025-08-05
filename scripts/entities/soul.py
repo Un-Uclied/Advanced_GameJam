@@ -52,13 +52,7 @@ class Soul(PhysicsEntity):
 
         self.collect_particle_anim = self.app.ASSETS["animations"]["vfxs"]["soul"]["interact"]
 
-    def destroy(self):
-        # 자기가 생성한 오브젝트들 직접 제거
-        self.light.destroy()
-        if self.type_icon_image is not None:
-            self.type_icon_image.destroy()
-        self.hint_ui.destroy()
-
+    def interact(self):
         # 파티클 생성, 소리 재생, 카메라 흔들림
         AnimatedParticle(self.collect_particle_anim, pg.Vector2(self.rect.center))
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["soul"]["interact"])
@@ -66,6 +60,16 @@ class Soul(PhysicsEntity):
 
         self.app.scene.event_bus.emit("on_soul_interact", self.soul_type)
 
+        # 다시 랜덤으로 타입 변경
+        self.soul_type = random.choice(ALL_SOUL_TYPES)
+        self.type_icon_image.image = self.app.ASSETS["ui"]["soul_icons"][self.soul_type]
+        self.hint_ui.text = f"[E] {self.soul_type}"
+    
+    def destroy(self):
+        '''자기가 생성한것도 지우기 ㅇㅇ'''
+        self.light.destroy()
+        if self.type_icon_image is not None:
+            self.type_icon_image.destroy()
         super().destroy()
 
     def follow_objects(self):
@@ -82,7 +86,7 @@ class Soul(PhysicsEntity):
         
         for event in self.app.events:
             if event.type == pg.KEYDOWN and event.key == pg.K_e and self.rect.colliderect(pc.rect):
-                self.destroy()
+                self.interact()
 
     def handle_hint_ui(self):
         if not hasattr(self.app.scene, "player_status") or not hasattr(self.app.scene.player_status, "player_character"):

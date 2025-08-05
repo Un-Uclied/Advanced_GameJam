@@ -34,7 +34,7 @@ class ThreeAlpha(GhostEnemy):
         super().update()
         
         self.ai.update()
-        self.movement = self.ai.direction * ((MOVE_SPEED + EVIL_A_SPEED_UP) if self.status.soul_type == SOUL_EVIL_A else MOVE_SPEED) * 100
+        self.movement = self.ai.direction * ((MOVE_SPEED + ENEMY_EVIL_A_SPEED_UP) if self.status.soul_type == SOUL_EVIL_A else MOVE_SPEED) * 100
 
         # 공격 애니메이션 중에는 따라가지 않게
         if not self.current_action == "attack":

@@ -36,15 +36,28 @@ class GameObject:
 
     @classmethod
     def update_all(cls):
-        '''모든 오브젝트들을 업데이트함 (주의 : 오브젝트가 생성된 순서대로 업데이트됨)'''
+        '''모든 오브젝트들을 업데이트함 | 일시정지된 상태에선 update안되는 것들도 있음(주의 : 오브젝트가 생성된 순서대로 업데이트됨)'''
+
+        # 순환 참조 무서웡..
+        from scripts.entities.base import Entity
+        do_not_update_when_paused = (Entity)
+
         for obj in cls.all_objects:
-            obj.update()
+            scene = obj.app.scene
+            if not scene.scene_paused or not isinstance(obj, do_not_update_when_paused):
+                obj.update()
 
     @classmethod
     def draw_all(cls):
-        '''모든 오브젝트들을 그림 (주의 : 오브젝트가 생성된 순서대로 그려짐)'''
+        '''모든 오브젝트들을 그림 | 일시정지된 상태에선 draw안되는 것들도 있을수도 (주의 : 오브젝트가 생성된 순서대로 그려짐)'''
+
+        # 나중에 추가 가능
+        do_not_draw_when_paused = ()
+
         for obj in cls.all_objects:
-            obj.draw()
+            scene = obj.app.scene
+            if not scene.scene_paused or not isinstance(obj, do_not_draw_when_paused):
+                obj.draw()
 
     @classmethod
     def get_objects_by_types(cls, target_classes: tuple[type] | type) -> list["GameObject"]:

@@ -1,6 +1,7 @@
 import pygame as pg
 
 from scripts.core import *
+from scripts.constants import *
 from scripts.vfx import AnimatedParticle
 from .base import Projectile
 
@@ -16,6 +17,8 @@ class PlayerProjectile(Projectile):
                          start_position,
                          start_direction)
         
+        self.attacked_enemies = []
+
         # 플레이어 탄환 생성 소리 재생
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["player"]["projectile"])
 
@@ -25,16 +28,42 @@ class PlayerProjectile(Projectile):
         # 플레이어 탄환 제거 파티클 생성
         AnimatedParticle(self.destroy_particle_anim, self.position)
         super().destroy()
-        
+    
+    def update_tilemap_collision(self):
+        '''SOUL_EVIL_A를 장착중이면 타일맵에 충돌됐을때도 부숴지지 않음'''
+        ps = self.app.scene.player_status
+        if SOUL_EVIL_A in ps.soul_queue:
+            return
+        else:
+            super().update_tilemap_collision()
+
     def update(self):
         super().update()
-        
-        
+        ps = self.app.scene.player_status
+
+        # SOUL_EVIL_A를 장착하고 있다면 그만큼 추가적으로 많이 움직이기
+        if SOUL_EVIL_A in ps.soul_queue:
+            self.position += self.direction * EVIL_A_PROJECTILE_SPEED_UP * self.app.dt
+
         from scripts.enemies import ALL_ENEMY_TYPE # 순환 참조 피하기;;
         # 생성된 적 반복문 돌아서 닿으면 대미지 주고 자기자신 제거
         all_enemies = GameObject.get_objects_by_types(ALL_ENEMY_TYPE)
         for enemy in all_enemies:
             if enemy.rect.collidepoint(self.position):
-                enemy.status.health -= self.data["damage"]
-                self.destroy()
-                break
+                # 한 탄환이 한 적을 여러번 공격 못하게
+                if enemy in self.attacked_enemies:
+                    continue
+                self.attacked_enemies.append(enemy)
+
+                damage = self.data["damage"]
+                # 영혼 타입에 맞춰서 대미지 바꾸기
+                if SOUL_KIND_B in ps.soul_queue:
+                    damage -= KIND_B_ATTACK_DAMAGE_DOWN
+                
+                # 적 대미지 깎기
+                enemy.status.health -= damage
+
+                # SOUL_EVIL_A를 장착하고 있다면 적을 맞혀도 사라지지 않음
+                if not SOUL_EVIL_A in ps.soul_queue:
+                    self.destroy()
+                    break

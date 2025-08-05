@@ -27,7 +27,7 @@ class TextRenderer(GameObject):
                  position: pg.Vector2,
                  font_name: str = "default",
                  font_size: int = 24,
-                 color: pg.Color = pg.Color(255, 255, 255),
+                 color: pg.Color = pg.Color("white"),
                  anchor: pg.Vector2 = pg.Vector2(0, 0),
                  use_camera: bool = False):
         super().__init__()
@@ -96,8 +96,31 @@ class TextRenderer(GameObject):
         self.rerender()
 
     def rerender(self):
-        '''텍스트나 색 바뀌면 호출해서 이미지 새로 만듦'''
-        self.image = self.font.render(self._text, True, self._color)
+        """텍스트나 색 바뀌면 호출해서 이미지 새로 만듦 (줄바꿈 지원)"""
+        
+        if not self._text.strip():
+            # 비어있을 때는 최소한의 투명 surface라도 만들어야 draw에서 안 터짐
+            self.image = pg.Surface((1, 1), pg.SRCALPHA)
+            self.image.set_alpha(self._alpha)
+            return
+    
+        lines = self._text.splitlines()  # \n 기준 줄바꿈
+
+        # 줄별 surface 렌더
+        line_surfaces = [self.font.render(line, True, self._color) for line in lines]
+
+        # 전체 이미지 사이즈 계산
+        width = max(surf.get_width() for surf in line_surfaces)
+        height = sum(surf.get_height() for surf in line_surfaces)
+
+        # 최종 이미지 surface 생성
+        self.image = pg.Surface((width, height), pg.SRCALPHA)
+
+        y = 0
+        for surf in line_surfaces:
+            self.image.blit(surf, (0, y))
+            y += surf.get_height()
+
         self.image.set_alpha(self._alpha)
 
     def draw(self):
