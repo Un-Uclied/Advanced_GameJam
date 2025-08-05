@@ -162,6 +162,9 @@ class MainGameScene(Scene):
             TextRenderer("일시 정지", pg.Vector2(80, 20), font_name="bold", font_size=55)
         )
         self.pause_menu_objects.append(
+            TextRenderer("챕터 선택으로", pg.Vector2(150, 580), font_size=25, anchor=pg.Vector2(0.5, 0.5))
+        )
+        self.pause_menu_objects.append(
             # lambda _:가 뭐냐면 버튼의 on_click은 ImageButton을 받을 인수가 있어야하는데, lambda:는 인수를 받지 않아서 에러 터짐. 하지만 ImageButton은 필요하지 않기 때문에 _로 놔둠.
             ImageButton("app_quit", pg.Vector2(150, 650), lambda _: self.app.change_scene("chapter_select_scene"), None)
         )
