@@ -19,16 +19,16 @@ class AnimatedParticle(GameObject):
         super().__init__()
 
         self.anim = anim.copy()
+        # 애니메이션 끝나면 자동으로 제거
+        self.anim.auto_destroy = True
+        self.anim.owner = self
+
         self.position = position
         self.anchor = anchor
 
     def update(self):
         super().update()
         self.anim.update(self.app.dt)
-
-        # 파티클 애니메이션 끝나면 자기 자신 제거
-        if self.anim.done:
-            self.destroy()
 
     def draw(self):
         super().draw()

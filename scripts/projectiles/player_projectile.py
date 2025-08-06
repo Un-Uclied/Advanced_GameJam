@@ -40,6 +40,7 @@ class PlayerProjectile(Projectile):
     def update(self):
         super().update()
         ps = self.app.scene.player_status
+        pc = ps.player_character
 
         # SOUL_EVIL_A를 장착하고 있다면 그만큼 추가적으로 많이 움직이기
         if SOUL_EVIL_A in ps.soul_queue:

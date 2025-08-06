@@ -47,8 +47,6 @@ class ThreeBeta(GhostEnemy):
         super().do_attack(damage, pos, shake)
 
     def update(self):
-        super().update()
-        
         self.ai.update()
         self.movement = self.ai.direction * ((MOVE_SPEED + ENEMY_EVIL_A_SPEED_UP) if self.status.soul_type == SOUL_EVIL_A else MOVE_SPEED) * 100
 
@@ -57,3 +55,5 @@ class ThreeBeta(GhostEnemy):
             dt = self.app.dt
             self.rect.x += self.movement.x * dt
             self.rect.y += self.movement.y * dt
+
+        super().update()

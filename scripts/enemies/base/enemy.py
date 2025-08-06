@@ -64,8 +64,18 @@ class ProjectileEnemy(PhysicsEnemy):
         super().destroy()
 
     def fire(self):
-        direction = pg.Vector2(1, 0) if self.anim.flip_x else pg.Vector2(-1, 0)
-        self.projectile_class(pg.Vector2(self.rect.center), direction)
+        pc = self.app.scene.player_status.player_character
+        plr_dir = pg.Vector2(pc.rect.center) - pg.Vector2(self.rect.center)
+
+        if plr_dir.length() == 0:
+            return  # 같은 위치면 발사 안함
+        else:
+            plr_dir = plr_dir.normalize()
+        
+        my_dir = pg.Vector2(1 if not self.anim.flip_x else -1, 0)
+
+        if plr_dir.dot(my_dir) > 0:
+            self.projectile_class(pg.Vector2(self.rect.center), plr_dir)
 
     def update(self):
         super().update()
@@ -98,8 +108,6 @@ class GhostEnemy(Entity, EnemyBase):
         self.attack_timer = Timer(self.attack_cool, lambda: setattr(self, "is_attacking", False))
 
     def update(self):
-        super().update()
-
         ps = self.enemy.app.scene.player_status
         pc = ps.player_character
 
@@ -108,3 +116,5 @@ class GhostEnemy(Entity, EnemyBase):
                 self.trigger_attack()
             else:
                 self.set_action("idle")
+
+        super().update()

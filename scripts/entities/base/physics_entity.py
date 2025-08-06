@@ -87,8 +87,7 @@ class PhysicsEntity(Entity):
         self.velocity = self.velocity.lerp(pg.Vector2(0, 0), max(min(self.app.dt * VELOCITY_DRAG, 1), 0))
 
     def update(self):
-        super().update()
-
         self.physics_movement()
         self.physics_collision()
         self.physics_gravity()
+        super().update()

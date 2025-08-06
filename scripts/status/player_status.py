@@ -12,7 +12,7 @@ INVINCIBLE_DURATION = 1.5
 HEALTH_RESTORE_INTERVAL = 1.0
 HEALTH_RESTORE_AMOUNT = 1
 
-ATTACK_COOLTIME = .8
+ATTACK_COOLTIME = .65
 
 class PlayerStatus(GameObject):
     def __init__(self, start_health : int):
@@ -77,12 +77,11 @@ class PlayerStatus(GameObject):
 
             self.on_damage(prev - self._health)
 
-        # 체력이 0이되면 해당 레벨을 다시 시작
-        if self._health <= 0:
-            self.app.change_scene("main_game_scene")
-
-        # 체력 바뀐 이벤트 emit
         scene = self.app.scene
+        # 체력이 0이되면 이벤트 emit
+        if self._health <= 0:
+            scene.event_bus.emit("on_player_died")
+        # 체력 바뀐 이벤트 emit
         scene.event_bus.emit("on_player_health_changed")
 
     def on_soul_interact(self, soul_type : str):

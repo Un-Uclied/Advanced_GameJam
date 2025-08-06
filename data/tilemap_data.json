@@ -1,6 +1,6 @@
 {
     "maps" : {
-        "1" : ["chap_1/a.json", "chap_1/b.json", "chap_1/c.json", "chap_1/d.json", "chap_1/e.json"],
+        "1" : ["temp.json", "chap_1/b.json", "chap_1/c.json", "chap_1/d.json", "chap_1/e.json"],
         "2" : ["chap_2/a.json", "chap_2/b.json", "chap_2/c.json", "chap_2/d.json", "chap_2/e.json"],
         "3" : ["chap_3/a.json", "chap_3/b.json", "chap_3/c.json", "chap_3/d.json", "chap_3/e.json"],
         "4" : ["boss/a.json"]

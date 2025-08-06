@@ -38,14 +38,18 @@ class Entity(GameObject):
             pg.Vector2(self.rect.bottomleft),
             pg.Vector2(self.rect.bottomright)
         ]
+    
+    def flip_anim(self):
+        direction = int(self.movement.x)
+        if direction < 0:
+            self.anim.flip_x = not self.invert_x
+        elif direction > 0:
+            self.anim.flip_x = self.invert_x
 
     def update(self):
         super().update()
 
-        if self.movement.x < 0:
-            self.anim.flip_x = not self.invert_x
-        elif self.movement.x > 0:
-            self.anim.flip_x = self.invert_x
+        self.flip_anim()
         self.anim.update(self.app.dt)
 
     def draw_debug(self):
@@ -68,6 +72,6 @@ class Entity(GameObject):
 
         if not CameraView.is_in_view(cam, img_rect):
             return
-
+        
         screen_pos = CameraMath.world_to_screen(cam, world_pos)
         self.app.surfaces[LAYER_ENTITY].blit(img, screen_pos)

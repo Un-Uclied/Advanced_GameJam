@@ -34,8 +34,13 @@ class Fog(GameObject):
             color.a -= KIND_B_FOG_ALPHA_DOWN
         return color
 
-    def draw(self):
-        super().draw()
+    def draw_fill(self):
+        '''싸게 그리기 (LAYER_VOLUME 전체를 채움)'''
+        self.app.surfaces[LAYER_VOLUME].fill(self.fog_color)
+        Light.draw_lights(self.app.scene.camera, self.app.surfaces[LAYER_VOLUME])
+
+    def draw_mult(self):
+        '''비싸게 그리기 (BLEND_RGBA_MULT)'''
         #알파 채널도 0으로
         self.fog_surface.fill((0, 0, 0, 0))
 
@@ -45,9 +50,21 @@ class Fog(GameObject):
 
         #BLEND_RGBA_MULT를 해서 다른 오브젝트들이 그려진 부분에만 색을 덮어 씌움.
         self.fog_surface.fill(self.fog_color, special_flags=pg.BLEND_RGBA_MULT)
-        
+            
         #self.fog_surface의 알파 채널값을 빼면 그 만큼 구멍이 생김.
         Light.draw_lights(self.app.scene.camera, self.fog_surface)
 
         #볼륨 레이어 surface에 최종적으로 그리기
         self.app.surfaces[LAYER_VOLUME].blit(self.fog_surface, (0, 0))
+
+    def draw(self):
+        super().draw()
+        if hasattr(self.app.scene, "player_status"):
+            ps = self.app.scene.player_status
+            # SOUL_EVIL_C가 있다면 시야 감소
+            if SOUL_EVIL_C in ps.soul_queue:
+                self.draw_fill()
+            else:
+                self.draw_mult()
+        else:
+            self.draw_mult()

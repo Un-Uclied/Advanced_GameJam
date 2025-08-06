@@ -66,9 +66,7 @@ class Animation:
 
     def img(self) -> pg.Surface:
         base = self.images[self.frame]
-        if self.flip_x or self.flip_y:
-            return pg.transform.flip(base, self.flip_x, self.flip_y)
-        return base
+        return pg.transform.flip(base, self.flip_x, self.flip_y)
 
     @property
     def frame_percent(self) -> float:

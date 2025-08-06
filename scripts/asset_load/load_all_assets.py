@@ -19,60 +19,66 @@ def load_entity_animations():
 
     # 플레이어 애니메이션
     anims["player"] = {
-        "idle": Animation(load_images("entities/player/idle", 2, None), 0.05, True),
-        "run": Animation(load_images("entities/player/run", 2, None), 0.08, True),
-        "jump": Animation(load_images("entities/player/jump", 2, None), 1.0, False),
+        "idle": Animation(load_images("entities/player/idle", 3), 0.08),
+        "run": Animation(load_images("entities/player/run", 3), 0.08),
+        "rush": Animation(load_images("entities/player/rush", 3), 0.05),
+        "jump": Animation(load_images("entities/player/jump", 3), 0.05),
+        "fall": Animation(load_images("entities/player/fall", 3), 0.05),
+        "attack" : Animation(load_images("entities/player/attack", 3), 0.04, False),
+        "change_soul" : Animation(load_images("entities/player/change_soul", 3), 0.05, False),
+        "hurt" : Animation(load_images("entities/player/hurt", 3), 0.25, False),
+        "die" : Animation(load_images("entities/player/die", 3), 0.04, False),
     }
 
     # 소울 애니메이션
     anims["soul"] = {
-        "idle": Animation(load_images("entities/soul/idle", 2, "cyan"), 0.05, True),
+        "idle": Animation(load_images("entities/soul/idle", 2, "cyan"), 0.05),
     }
 
     # 포탈 애니메이션
     anims["portal"] = {
-        "idle": Animation(load_images("entities/portal/idle", 2, None), 0.05, True),
+        "idle": Animation(load_images("entities/portal/idle", 2), 0.05),
     }
 
     # 적군 애니메이션 (각 적의 스케일과 속도 등을 직접 명시)
     anims["one_alpha"] = {
-        "idle": Animation(load_images("entities/enemies/one_alpha/idle", 2, None), 0.05, True),
-        "run": Animation(load_images("entities/enemies/one_alpha/run", 2, None), 0.15, True),
+        "idle": Animation(load_images("entities/enemies/one_alpha/idle", 2), 0.05),
+        "run": Animation(load_images("entities/enemies/one_alpha/run", 2), 0.15),
     }
     anims["one_beta"] = {
-        "idle": Animation(load_images("entities/enemies/one_beta/idle", 2, None), 0.05, True),
-        "run": Animation(load_images("entities/enemies/one_beta/run", 2, None), 0.15, True),
+        "idle": Animation(load_images("entities/enemies/one_beta/idle", 2), 0.05),
+        "run": Animation(load_images("entities/enemies/one_beta/run", 2), 0.15),
     }
     anims["two_alpha"] = {
-        "idle": Animation(load_images("entities/enemies/two_alpha/idle", 2, None), 0.05, True),
-        "run": Animation(load_images("entities/enemies/two_alpha/run", 2, None), 0.15, True),
+        "idle": Animation(load_images("entities/enemies/two_alpha/idle", 2), 0.05),
+        "run": Animation(load_images("entities/enemies/two_alpha/run", 2), 0.15),
     }
     anims["two_beta"] = {
-        "idle": Animation(load_images("entities/enemies/two_beta/idle", 2, None), 0.05, True),
-        "run": Animation(load_images("entities/enemies/two_beta/run", 2, None), 0.15, True),
+        "idle": Animation(load_images("entities/enemies/two_beta/idle", 2), 0.05),
+        "run": Animation(load_images("entities/enemies/two_beta/run", 2), 0.15),
     }
     anims["three_alpha"] = {
-        "attack": Animation(load_images("entities/enemies/three_alpha/attack", 2, None), 0.05, False),
-        "idle": Animation(load_images("entities/enemies/three_alpha/idle", 2, None), 0.15, True),
+        "attack": Animation(load_images("entities/enemies/three_alpha/attack", 2), 0.05, False),
+        "idle": Animation(load_images("entities/enemies/three_alpha/idle", 2), 0.15),
     }
     anims["three_beta"] = {
-        "attack": Animation(load_images("entities/enemies/three_beta/attack", 2, None), 0.05, False),
-        "idle": Animation(load_images("entities/enemies/three_beta/idle", 2, None), 0.15, True),
+        "attack": Animation(load_images("entities/enemies/three_beta/attack", 2), 0.05, False),
+        "idle": Animation(load_images("entities/enemies/three_beta/idle", 2), 0.15),
     }
     anims["four_alpha"] = {
-        "idle": Animation(load_images("entities/enemies/four_alpha/idle", 2, None), 0.05, True),
-        "run": Animation(load_images("entities/enemies/four_alpha/run", 2, None), 0.08, True),
+        "idle": Animation(load_images("entities/enemies/four_alpha/idle", 2), 0.05),
+        "run": Animation(load_images("entities/enemies/four_alpha/run", 2), 0.08),
     }
     anims["four_beta"] = {
-        "idle": Animation(load_images("entities/enemies/four_beta/idle", 2, None), 0.05, True),
-        "run": Animation(load_images("entities/enemies/four_beta/run", 2, None), 0.03, True),
+        "idle": Animation(load_images("entities/enemies/four_beta/idle", 2), 0.05),
+        "run": Animation(load_images("entities/enemies/four_beta/run", 2), 0.03),
     }
     # five_omega만 스케일이 1인 점에 유의
     anims["five_omega"] = {
-        "idle": Animation(load_images("entities/enemies/five_omega/idle", 1.5, None), 0.05, True),
-        "run": Animation(load_images("entities/enemies/five_omega/run", 1.5, None), 0.08, True),
-        "scythe_attack" : Animation(load_images("entities/enemies/five_omega/scythe_attack", 1.5, None), 0.02, False),
-        "turn_eye" : Animation(load_images("entities/enemies/five_omega/turn_eye", 1.5, None), 0.05, False),
+        "idle": Animation(load_images("entities/enemies/five_omega/idle", 1.5), 0.05),
+        "run": Animation(load_images("entities/enemies/five_omega/run", 1.5), 0.08),
+        "scythe_attack" : Animation(load_images("entities/enemies/five_omega/scythe_attack", 1.5), 0.02, False),
+        "turn_eye" : Animation(load_images("entities/enemies/five_omega/turn_eye", 1.5), 0.05, False),
     }
 
     return anims
@@ -192,14 +198,14 @@ def load_ui_assets():
         },
         "pause_bg" : load_image("ui/pause_menu.png", scale=4),
         "soul_icons" : {
-            SOUL_DEFAULT : load_image("ui/soul_icons/soul_default_icon.png", scale=2),
-            SOUL_KIND_A : load_image("ui/soul_icons/kind_soul_a_icon.png", scale=2),
-            SOUL_KIND_B : load_image("ui/soul_icons/kind_soul_b_icon.png", scale=2),
-            SOUL_KIND_C : load_image("ui/soul_icons/kind_soul_c_icon.png", scale=2),
+            SOUL_DEFAULT : load_image("ui/soul_icons/soul_default_icon.png"),
+            SOUL_KIND_A : load_image("ui/soul_icons/kind_soul_a_icon.png"),
+            SOUL_KIND_B : load_image("ui/soul_icons/kind_soul_b_icon.png"),
+            SOUL_KIND_C : load_image("ui/soul_icons/kind_soul_c_icon.png"),
             
-            SOUL_EVIL_A : load_image("ui/soul_icons/evil_soul_a_icon.png", scale=2),
-            SOUL_EVIL_B : load_image("ui/soul_icons/evil_soul_b_icon.png", scale=2),
-            SOUL_EVIL_C : load_image("ui/soul_icons/evil_soul_c_icon.png", scale=2)
+            SOUL_EVIL_A : load_image("ui/soul_icons/evil_soul_a_icon.png"),
+            SOUL_EVIL_B : load_image("ui/soul_icons/evil_soul_b_icon.png"),
+            SOUL_EVIL_C : load_image("ui/soul_icons/evil_soul_c_icon.png")
         }
     }
 
