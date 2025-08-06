@@ -15,7 +15,7 @@ MOVE_SPEED = 7
 MIN_CHANGE_TIMER = 0.1
 MAX_CHANGE_TIMER = 0.2
 
-COLLIDE_ATTACK_DAMAGE = 20
+COLLIDE_ATTACK_DAMAGE = 22
 
 class FourBeta(PhysicsEnemy):
     def __init__(self, spawn_position : pg.Vector2):

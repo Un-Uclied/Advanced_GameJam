@@ -28,7 +28,7 @@ class EnemyBase:
             cam.shake_amount += shake
         
         direction = pg.Vector2(pc.rect.center) - pos
-        if direction.length() > 0:
+        if direction.length_squared() > 0:
             direction = direction.normalize()
         pc.velocity += direction * PLAYER_HIT_KNOCKBACK
 

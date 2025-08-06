@@ -21,7 +21,7 @@ MOVE_SPEED_CRAZY = 7
 MIN_CHANGE_TIMER_CRAZY = 0.05
 MAX_CHANGE_TIMER_CRAZY = 0.2
 
-COLLIDE_ATTACK_DAMAGE = 10
+COLLIDE_ATTACK_DAMAGE = 20
 
 class FourAlpha(PhysicsEnemy):
     def __init__(self, spawn_position : pg.Vector2):

@@ -15,7 +15,7 @@ MOVE_SPEED = 3
 MIN_CHANGE_TIMER = 0.3
 MAX_CHANGE_TIMER = 0.9
 
-COLLIDE_ATTACK_DAMAGE = 15
+COLLIDE_ATTACK_DAMAGE = 12
 
 class OneBeta(PhysicsEnemy):
     def __init__(self, spawn_position : pg.Vector2):
