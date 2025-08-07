@@ -30,7 +30,6 @@ class MainGameScene(Scene):
 
         # 어두운 비네트 미리 깔아놓기 (FPS 글자 안 가리게)
         self.vignette = ImageRenderer(self.app.ASSETS["ui"]["vignette"]["black"], pg.Vector2(0, 0), anchor=pg.Vector2(0, 0))
-
         super().on_scene_start()
 
         # 다음 진행상황 미리 등록
@@ -64,6 +63,9 @@ class MainGameScene(Scene):
         Sky()
         Clouds()
         Fog()
+
+        # 메인메뉴 또는 이전 판에서 시작된 브금 끄기
+        self.app.sound_manager.stop_bgm()
 
     def update_next_progress(self):
         """진행 정보 업데이트 (현재 챕터 마지막이면 다음 챕터로)"""

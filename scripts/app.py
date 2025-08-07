@@ -22,13 +22,13 @@ class SoundManager:
                 ch.play(sound)
                 return
 
-    def play_bgm(self, bgm_name : str, loop: bool = True, fade_ms: int = 0):
+    def play_bgm(self, bgm_name : str, loop: bool = True, fade_ms: int = 1):
         """배경음악 재생 (streaming 방식)"""
         pg.mixer.music.load(f"assets/bgms/{bgm_name}.wav")
         pg.mixer.music.set_volume(self.app.player_data["bgm_volume"])
         pg.mixer.music.play(-1 if loop else 0, fade_ms=fade_ms)
 
-    def stop_bgm(self, fade_ms: int = 0):
+    def stop_bgm(self, fade_ms: int = 1):
         if fade_ms > 0:
             pg.mixer.music.fadeout(fade_ms)
         else:
