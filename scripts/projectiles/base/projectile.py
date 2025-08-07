@@ -25,7 +25,7 @@ class Projectile(GameObject):
     '''
 
     def __init__(self, projectile_name : str,
-                 start_position : pg.Vector2, start_direction : pg.Vector2):
+                 start_position : pg.Vector2, start_direction : pg.Vector2, life_time = 3):
         super().__init__()
 
         #여기에 속도, 대미지가 들어가 있음
@@ -33,8 +33,6 @@ class Projectile(GameObject):
 
         self.position = start_position
         self.direction = start_direction
-
-        self.time_out_timer = TIME_OUT
 
         # 탄환 애니메이션
         self.anim : Animation = self.app.ASSETS["animations"]["projectiles"][projectile_name].copy()
@@ -55,14 +53,8 @@ class Projectile(GameObject):
         # 탄환 애니메이션 업데이트
         self.anim.update(self.app.dt)
 
-        # 일정 시간 지나면 자동으로 삭제
-        self.time_out_timer -= self.app.dt
-        if self.time_out_timer <= 0:
-            self.destroy()
-
         self.update_tilemap_collision()
         
-
     def draw(self):
         super().draw()
 

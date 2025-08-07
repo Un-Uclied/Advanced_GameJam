@@ -5,6 +5,8 @@ from scripts.constants import *
 from scripts.vfx import AnimatedParticle
 from .base import Projectile
 
+DEFAULT_LIFE_TIME = 4
+
 class PlayerProjectile(Projectile):
     '''
     플레이어의 탄환!!
@@ -18,6 +20,13 @@ class PlayerProjectile(Projectile):
                          start_direction)
         
         self.attacked_enemies = []
+
+        # 일정 시간후에 삭제
+        life_time = DEFAULT_LIFE_TIME
+        ps = self.app.scene.player_status
+        if SOUL_EVIL_A in ps.soul_queue:
+            life_time -= EVIL_A_LIFE_TIME_DOWN 
+        Timer(life_time, lambda: self.destroy())
 
         # 플레이어 탄환 생성 소리 재생
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["player"]["projectile"])

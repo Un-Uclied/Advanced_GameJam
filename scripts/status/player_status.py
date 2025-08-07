@@ -86,7 +86,7 @@ class PlayerStatus(GameObject):
 
     def on_soul_interact(self, soul_type : str):
         # 이미 있는걸 먹을때 다시 같은걸 먹지 않도록 리턴
-        if soul_type in self.soul_queue:
+        if soul_type in self.soul_queue and not soul_type == SOUL_DEFAULT:
             # 엄청 간단한 팝업
             PopupText(f"\"{soul_type}는 이미 있다.\"", pg.Vector2(SCREEN_SIZE.x / 2, 700))
             return

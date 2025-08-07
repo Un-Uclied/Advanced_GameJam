@@ -15,15 +15,16 @@ KIND_C_SPEED_UP = 1.8
 KIND_C_MAX_HEALTH_DOWN = 20
 
 # 나쁜거 !! (risky but cool)
-SOUL_EVIL_A = "Ruin"   # 관통 되는 탄환 | 빠른 탄속 | 대신 쿨타임 좀 긺 | 플레이어가 공격했을때 넉백 증가 (적이 갖고 있으면 이속 증가)
-SOUL_EVIL_B = "Vex"   # 쿨타임 엄청 짧아짐 | 체력 떡락                              (적이 갖고 있으면 대미지 증가)
+SOUL_EVIL_A = "Ruin"   # 관통 되는 탄환 | 빠른 탄속 | 대신 쿨타임 좀 긺 | 탄의 생명주기 짧아짐 |플레이어가 공격했을때 넉백 증가 (적이 갖고 있으면 이속 증가)
+SOUL_EVIL_B = "Vex"   # 쿨타임 짧아짐 | 체력 떡락                              (적이 갖고 있으면 대미지 증가)
 SOUL_EVIL_C = "Morix"   # 트리플 점프 가능 | 대미지 나락 (적이 갖고 있으면 체력 증가)
 
 EVIL_A_NUCK_BACK_UP = 1200
+EVIL_A_LIFE_TIME_DOWN = 3.2 # 이 수치는 플레이어에게 알려주지 않음. 원래 LifeTime이 4초인데, 4초동안 탄이 멀리까지 날아가서 너무 많은 적들을 죽일수 있기 때문에 밸런스로 필요
 EVIL_A_COOLTIME_UP = .35
 EVIL_A_PROJECTILE_SPEED_UP = 500
 
-EVIL_B_COOLTIME_DOWN = .65
+EVIL_B_COOLTIME_DOWN = .45
 EVIL_B_MAX_HEALTH_DOWN = 40
 
 SOUL_DESCRIPTION = {

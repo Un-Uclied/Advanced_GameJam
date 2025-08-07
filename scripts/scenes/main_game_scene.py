@@ -145,9 +145,7 @@ class MainGameScene(Scene):
         """무적 슬롯 초기화 버튼 클릭 시 처리"""
         self.scene_paused = False
         for _ in range(len(self.player_status.soul_queue)):
-            self.player_status.soul_queue.append(SOUL_DEFAULT)
-        self.on_player_soul_changed()
-        self.on_player_health_changed()
+            self.player_status.on_soul_interact(SOUL_DEFAULT)
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["ui"]["reset"])
 
     def on_pause_start(self):

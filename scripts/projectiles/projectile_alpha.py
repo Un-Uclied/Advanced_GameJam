@@ -1,7 +1,10 @@
 import pygame as pg
 
 from scripts.vfx import *
+from scripts.core import *
 from .base import Projectile
+
+DEFAULT_LIFE_TIME = 3
 
 class ProjectileAlpha(Projectile):
     '''
@@ -16,6 +19,8 @@ class ProjectileAlpha(Projectile):
                          start_position,
                          start_direction)
         
+        Timer(DEFAULT_LIFE_TIME, lambda: self.destroy())
+
         # TwoAlpha 클래스의 적 탄환 생성 소리 재생
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["enemy"]["projectile"])
 

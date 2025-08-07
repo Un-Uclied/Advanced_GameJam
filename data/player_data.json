@@ -4,9 +4,9 @@
         "1": [
             true,
             true,
-            false,
-            false,
-            false
+            true,
+            true,
+            true
         ],
         "2": [
             false,
