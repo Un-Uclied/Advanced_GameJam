@@ -103,7 +103,7 @@ class App:
             "editor_scene"    : TileMapEditScene(),
 
             "opening_cut_scene" : OpeningScene(),
-            "tutorial_one_cut_scene" : Tutorial1Scene()
+            "tutorial_one_scene" : Tutorial1Scene()
         }
         # 메인메뉴를 가려는데 처음 게임을 튼다면 오프닝 컷씬으로
         if self.player_data["is_first_start"] and start_scene_name == "main_menu_scene":

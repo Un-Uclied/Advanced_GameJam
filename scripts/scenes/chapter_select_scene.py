@@ -97,6 +97,11 @@ class ChapterSelectScene(Scene):
         '''플레이 가능한 원드 버튼을 눌렀을때 change_scene하기 전에 먼저 플레이할 챕터와 월드 인덱스 설정후, change_scene'''
         self.app.registered_scenes["main_game_scene"].current_chapter = self.selected_chapter
         self.app.registered_scenes["main_game_scene"].current_level = button.data["index"]
+        if self.selected_chapter == 1 and button.data["index"] == 0:
+            print("WWWWWWWWWWWWWWWWWWW")
+            self.app.change_scene("tutorial_one_scene")
+            return
+        
         self.app.change_scene("main_game_scene")
 
     def on_world_blocked_click(self, button: TextButton):

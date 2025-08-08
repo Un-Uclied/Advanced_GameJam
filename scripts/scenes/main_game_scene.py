@@ -170,11 +170,6 @@ class MainGameScene(Scene):
     def on_scene_start(self):
         """씬이 시작될 때 호출. 배경, 플레이어, UI 등을 초기화"""
 
-        # 1-1d이면 메인 게임말고 컷씬으로
-        if self.current_chapter == 1 and self.current_level == 1:
-            self.app.change_scene("tutorial_one_cut_scene")
-            return
-
         # 어두운 비네트 미리 깔아놓기 (FPS 글자 안 가리게)
         self.vignette = ImageRenderer(self.app.ASSETS["ui"]["vignette"]["black"], pg.Vector2(0, 0), anchor=pg.Vector2(0, 0))
         super().on_scene_start()

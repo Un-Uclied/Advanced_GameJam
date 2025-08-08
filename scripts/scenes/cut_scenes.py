@@ -5,7 +5,7 @@ from scripts.ui import *
 from scripts.core import *
 from .base import Scene
 
-class CutScene(Scene):
+class OpeningScene(Scene):
     def on_scene_start(self):
         CutScene("opening", self.cut_scene_end)
         super().on_scene_start()
@@ -27,9 +27,9 @@ class Tutorial1Scene(Scene):
         super().on_scene_start()
 
     def cut_scene_end(self):
-        self.app.registered_scenes["main_menu_scene"].current_chapter = 1
-        self.app.registered_scenes["main_menu_scene"].current_level = 1
-        self.app.change_scene("main_menu_scene")
+        self.app.registered_scenes["main_game_scene"].current_chapter = 1
+        self.app.registered_scenes["main_game_scene"].current_level = 0
+        self.app.change_scene("main_game_scene")
 
     def draw(self):
         # 배경을 검정색으로 칠하기
