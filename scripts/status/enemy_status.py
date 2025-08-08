@@ -15,7 +15,6 @@ class EnemyUI(GameObject):
         self.enemy = enemy
         self.soul_type = soul_type
         self.max_health = max_health
-        self.app = self.enemy.app
         self._create_ui_elements()
 
     def _create_ui_elements(self):

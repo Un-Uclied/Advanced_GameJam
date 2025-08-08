@@ -27,6 +27,7 @@ class TileMapEditor:
         self.current_tile_type_index = 0
         self.current_tile_variant = 0
         self.undo_stack = []
+        self.last_placed_tile_pos = None
 
         self.can_collide = True
         self.in_grid_mode = True
@@ -108,6 +109,9 @@ class TileMapEditor:
             if event.type == pg.MOUSEBUTTONDOWN and not self.in_grid_mode:
                 if event.button == 1:
                     self.place_tile_offgrid()
+            if event.type == pg.MOUSEBUTTONUP:
+                if event.button == 1:
+                    self.last_placed_tile_pos = None
             elif event.type == pg.MOUSEWHEEL:
                 if keys[pg.K_LSHIFT]:
                     tile_type_name = self.tile_types[self.current_tile_type_index]
@@ -201,14 +205,21 @@ class TileMapEditor:
             return
         if self.tile_types[self.current_tile_type_index] not in IN_GRID_TILES:
             return
-        self.save_undo_state()
+        
         key = f"{int(self.tile_pos.x)},{int(self.tile_pos.y)}"
+
+        if self.last_placed_tile_pos == key:
+            return
+        self.save_undo_state()
+
         self.tilemap.in_grid[key] = {
             "pos": [int(self.tile_pos.x), int(self.tile_pos.y)],
             "type": self.tile_types[self.current_tile_type_index],
             "variant": self.current_tile_variant,
             "can_collide": self.can_collide
         }
+        self.last_placed_tile_pos = key
+        self.tilemap.rerender()
 
     def place_tile_offgrid(self):
         '''그리드 밖에 있는거 설치'''
@@ -220,6 +231,7 @@ class TileMapEditor:
             "type": self.tile_types[self.current_tile_type_index],
             "variant": self.current_tile_variant
         })
+        self.tilemap.rerender()
 
     def remove_tile(self):
         '''그리드 모드에 맞게 타일을 지움'''
@@ -239,11 +251,13 @@ class TileMapEditor:
                     self.save_undo_state()
                     if obj_data in self.tilemap.off_grid:
                         self.tilemap.off_grid.remove(obj_data)
+        self.tilemap.rerender()
 
     def erase_all(self):
         self.tilemap.in_grid = {}
         self.tilemap.off_grid = []
         self.save_undo_state()
+        self.tilemap.rerender()
 
     def update(self):
         self.update_mouse_position()

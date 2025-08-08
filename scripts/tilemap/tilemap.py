@@ -25,6 +25,10 @@ AUTO_TILE_TILES = ["dirt"]
 IN_GRID_TILES = ["dirt"]
 DO_NOT_RENDER_TILES = ["spawners_entities", "spawners_enemies"]
 
+# big ass number
+CACHE_SURFACE_SIZE = pg.Vector2(10000, 10000)
+DRAW_OFFSET = pg.Vector2(5000, 5000)
+
 BASE_TILEMAP_PATH = "data/tilemaps/"
 
 class Tilemap(GameObject):
@@ -44,6 +48,9 @@ class Tilemap(GameObject):
         self.tile_size = json_data["tile_size"]
         self.in_grid: dict[str, dict] = json_data["in_grid"]
         self.off_grid: list = json_data["off_grid"]
+
+        self.cache = pg.Surface(CACHE_SURFACE_SIZE, pg.SRCALPHA)
+        self.rerender()
 
     def get_pos_by_data(self, tile_type: str, variant: int = 0) -> list[pg.Vector2]:
         '''타일 타입이랑 인덱스 주면 그 타일들의 위치 반환 (그리드 안, 밖 전부)'''
@@ -88,41 +95,42 @@ class Tilemap(GameObject):
             if tile['type'] in AUTO_TILE_TILES and sorted_neighbors in AUTOTILE_MAP:
                 tile['variant'] = AUTOTILE_MAP[sorted_neighbors]
 
-    def draw_tile(self, surface: pg.Surface, camera, data: dict):
+    def rerender(self):
+        # 순환 참조 피하기
+        from scripts.scenes import TileMapEditScene
+        self.cache.fill((0, 0, 0, 0)) # 캐시를 초기화합니다.
+
+        for data in self.off_grid:
+            if data["type"] in DO_NOT_RENDER_TILES and not isinstance(self.app.scene, TileMapEditScene):
+                continue
+            # 수정된 draw_tile 호출
+            self.draw_tile(self.cache, data)
+
+        for data in self.in_grid.values():
+            if data["type"] in DO_NOT_RENDER_TILES and not isinstance(self.app.scene, TileMapEditScene):
+                continue
+            # 수정된 draw_tile 호출
+            self.draw_tile(self.cache, data)
+
+    def draw_tile(self, surface: pg.Surface, data: dict):
         tile_asset = self.app.ASSETS["tilemap"]
         world_pos = pg.Vector2(data["pos"]) * self.tile_size
 
         image = tile_asset[data["type"]][data["variant"]]
-
-        # 최적화를 위해 화면 밖이면 렌더 안하기
-        # 타일맵 스케일이 작으면 오히려 독이 되겠지만, 타일 개수가 커질수록 fps가 내려가는것을 막아줌.
-        # rect = pg.Rect(world_pos, image.get_size())
-        # if not CameraView.is_in_view(camera, rect):
-        #     return
-
-        # 시야 안에 있을 때만 렌더링
-        screen_pos = CameraMath.world_to_screen(camera, world_pos)
-        surface.blit(image, (round(screen_pos.x), round(screen_pos.y)))
+        
+        # 캐시에 그릴 때 월드 좌표에 DRAW_OFFSET을 더하여 절대 위치에 렌더링
+        cache_pos = world_pos + DRAW_OFFSET
+        surface.blit(image, (round(cache_pos.x), round(cache_pos.y)))
 
     def draw(self):
         super().draw()
 
         surface = self.app.surfaces[LAYER_OBJ]
         camera = self.app.scene.camera
-
-        #순환 참조 피하기
-        from scripts.scenes import TileMapEditScene
-        for data in self.off_grid:
-            #렌더하면 안되는 타일 && 현재 씬이 타일맵 에디터가 아니라면 건너뛰기
-            if data["type"] in DO_NOT_RENDER_TILES and not isinstance(self.app.scene, TileMapEditScene):
-                continue
-            self.draw_tile(surface, camera, data)
-
-        for data in self.in_grid.values():
-            #렌더하면 안되는 타일 && 현재 씬이 타일맵 에디터가 아니라면 건너뛰기
-            if data["type"] in DO_NOT_RENDER_TILES and not isinstance(self.app.scene, TileMapEditScene):
-                continue
-            self.draw_tile(surface, camera, data)
+        
+        # 캐시의 월드 시작점(-DRAW_OFFSET)을 화면 좌표로 변환
+        cache_screen_pos = CameraMath.world_to_screen(camera, -DRAW_OFFSET)
+        surface.blit(self.cache, cache_screen_pos)
 
     def save_file(self, file_name: str = "temp.json"):
         '''현재 데이터 저장'''

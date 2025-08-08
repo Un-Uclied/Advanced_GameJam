@@ -20,6 +20,7 @@ class Entity(GameObject):
             False: pg.Vector2(0, 0),
             True: pg.Vector2(0, 0)
         }
+        self.is_being_drawn = True
 
         self.set_action(start_action)
 
@@ -70,7 +71,9 @@ class Entity(GameObject):
         world_pos = pg.Vector2(self.rect.topleft) + self.flip_offset[self.anim.flip_x]
         img_rect = pg.Rect(world_pos, img.get_size())
 
+        self.is_being_drawn = True
         if not CameraView.is_in_view(cam, img_rect):
+            self.is_being_drawn = False
             return
         
         screen_pos = CameraMath.world_to_screen(cam, world_pos)

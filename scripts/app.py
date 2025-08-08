@@ -1,5 +1,6 @@
 import pygame as pg #파이게임 커뮤니티 에디션
 import json
+from multiprocessing import Process
 
 from scripts.constants import * #앱이름, 해상도, 화면 설정, 레이어 등이 있음.
 from scripts.scenes import *

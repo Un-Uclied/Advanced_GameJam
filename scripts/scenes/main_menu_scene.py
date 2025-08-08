@@ -62,12 +62,12 @@ class MainMenuScene(Scene):
 
     def on_scene_start(self):
         """씬 시작 시 타일맵, 배경, UI를 초기화"""
+        super().on_scene_start()
+        
         self.tilemap = Tilemap("main_menu.json")
         spawn_all_entities(self.tilemap)
 
         self.main_menu_ui = MainMenuUI(self)
-        
-        super().on_scene_start()
         
         # 엔티티들의 속도를 느리게 설정
         self.app.time_scale = .5

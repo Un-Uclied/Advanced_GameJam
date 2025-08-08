@@ -14,6 +14,8 @@ with open("data/tilemap_data.json", 'r', encoding="utf-8") as f:
 
 class ChapterSelectScene(Scene):
     def on_scene_start(self):
+        super().on_scene_start()
+        
         # 타일맵 만들고
         self.tilemap = Tilemap("main_menu.json")
         spawn_all_entities(self.tilemap)
@@ -33,7 +35,6 @@ class ChapterSelectScene(Scene):
         # 생성된 월드 플레이 버튼
         self.buttons = []
 
-        super().on_scene_start()
         # 엔티티들이 움직이는 속도가 너무 빨라서 느리게 하기
         self.app.time_scale = .5
 

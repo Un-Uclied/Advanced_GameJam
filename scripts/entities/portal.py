@@ -5,7 +5,7 @@ from scripts.vfx import *
 from scripts.core import Tween
 from .base import Entity
 
-HIT_BOX_SIZE = (90, 120)
+HIT_BOX_SIZE = (180, 210)
 LIGHT_SIZE = 500
 
 class Portal(Entity):

@@ -137,6 +137,11 @@ class TextRenderer(GameObject):
     def draw(self):
         '''앵커랑 스케일 계산해서 텍스트 그려줌'''
         super().draw()
+
+        # 최적화 발악
+        if self.alpha <= 0:
+            return
+
         surface = self.app.surfaces[LAYER_INTERFACE]
 
         draw_pos = self.screen_pos

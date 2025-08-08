@@ -104,12 +104,12 @@ class GameUI:
         self.player_health_warning_text.alpha = 0
     
     def _create_score_ui(self):
-        self.score_text = TextRenderer(str(self.scene.score), pg.Vector2(25, 25), "gothic", 64)
+        self.score_text = TextRenderer(f"[ {self.scene.score} ]", pg.Vector2(25, 25), "gothic", 64)
 
-        def score_changed():
-            self.score_text.text = str(self.scene.score)
+        def score_changed(score_up):
+            self.score_text.text = f"[ {self.scene.score} ]"
 
-        self.scene.event_bus.connect("on_score_changed", lambda: score_changed())
+        self.scene.event_bus.connect("on_score_changed", score_changed)
         
 class PauseUI:
     def __init__(self, scene, player_status):
@@ -220,9 +220,9 @@ class MainGameScene(Scene):
         self._score += value
 
         if prev < self._score:
-            print("점수가 오름")
+            self.event_bus.emit("on_score_changed", True)
         elif prev > self._score:
-            print("점수 내려감;")
+            self.event_bus.emit("on_score_changed", False)
 
     def update_next_progress(self):
         """진행 정보 업데이트 (현재 챕터 마지막이면 다음 챕터로)"""
