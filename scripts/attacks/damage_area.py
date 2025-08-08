@@ -47,6 +47,7 @@ class DamageArea(GameObject):
                 return
 
             ps.health -= self.damage
+            self.app.scene.event_bus.emit("on_player_hurt", self.damage)
             self._has_damaged = True
 
             if self.knockback:

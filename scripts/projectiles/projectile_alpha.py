@@ -41,4 +41,5 @@ class ProjectileAlpha(Projectile):
         pc = ps.player_character
         if pc.rect.collidepoint(self.position):
             ps.health -= self.data["damage"]
+            self.app.scene.event_bus.emit("on_player_hurt", self.data["damage"])
             self.destroy()

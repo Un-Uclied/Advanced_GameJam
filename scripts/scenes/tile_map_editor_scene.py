@@ -95,6 +95,7 @@ class TileMapEditor:
                     self.in_collision_view = not self.in_collision_view
                 elif event.key == pg.K_b:
                     self.tilemap.autotile()
+                    self.tilemap.rerender()
                 elif event.key == pg.K_o:
                     self.tilemap.save_file()
                 elif event.key == pg.K_u:
@@ -207,7 +208,6 @@ class TileMapEditor:
             return
         
         key = f"{int(self.tile_pos.x)},{int(self.tile_pos.y)}"
-
         if self.last_placed_tile_pos == key:
             return
         self.save_undo_state()

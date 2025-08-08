@@ -55,7 +55,7 @@ class GameUI:
                 self.vignette.image = self.scene.app.ASSETS["ui"]["vignette"]["black"]
                 self.player_health_warning_text.alpha = 0
 
-        self.scene.event_bus.connect("on_player_health_changed", lambda: on_player_health_changed())
+        self.scene.event_bus.connect("on_player_health_changed", lambda _: on_player_health_changed())
 
     def _create_invincibility_ui(self):
         """플레이어 무적 상태 UI 생성"""
@@ -104,10 +104,13 @@ class GameUI:
         self.player_health_warning_text.alpha = 0
     
     def _create_score_ui(self):
-        self.score_text = TextRenderer(f"[ {self.scene.score} ]", pg.Vector2(25, 25), "gothic", 64)
-
+        self.score_text = TextRenderer(f"[ {self.scene.score} ]", pg.Vector2(100, 50), "gothic", 64, anchor=pg.Vector2(0.5, 0.5))
         def score_changed(score_up):
             self.score_text.text = f"[ {self.scene.score} ]"
+            if score_up:
+                Tween(self.score_text, "scale", 2, 1, .15, pt.easeInOutQuad, use_unscaled_time=True)
+            else:
+                Tween(self.score_text, "scale", .5, 1, .15, pt.easeInOutQuad, use_unscaled_time=True)
 
         self.scene.event_bus.connect("on_score_changed", score_changed)
         
@@ -156,17 +159,21 @@ class PauseUI:
 
 class MainGameScene(Scene):
     """
-    메인 인게임 씬 클래스. 
-    핵심 게임 로직(타일맵, 플레이어)과 UI 클래스를 제어합니다.
+    메인 인게임 씬 클래스
+    핵심 게임 로직(타일맵, 플레이어)과 UI 클래스를 제어
     """
     def __init__(self):
         super().__init__()
         self.current_chapter = 1
         self.current_level = 0
-        self._score = 0
 
     def on_scene_start(self):
-        """씬이 시작될 때 호출. 배경, 플레이어, UI 등을 초기화한다."""
+        """씬이 시작될 때 호출. 배경, 플레이어, UI 등을 초기화"""
+
+        # 1-1d이면 메인 게임말고 컷씬으로
+        if self.current_chapter == 1 and self.current_level == 1:
+            self.app.change_scene("tutorial_one_cut_scene")
+            return
 
         # 어두운 비네트 미리 깔아놓기 (FPS 글자 안 가리게)
         self.vignette = ImageRenderer(self.app.ASSETS["ui"]["vignette"]["black"], pg.Vector2(0, 0), anchor=pg.Vector2(0, 0))
@@ -177,17 +184,29 @@ class MainGameScene(Scene):
 
         # 플레이어 상태 생성
         self.player_status = PlayerStatus(start_health=100)
+        self._score = 0
+        # 플레이어 체력 깎이면 250점 깎기
+        self.event_bus.connect("on_player_hurt", lambda _: setattr(self, "score", self.score - 250))
+
+        # 1초가 지날때마다 15점씩 점수 깎기
+        def on_time_out():
+            self.score_down_timer.reset()
+            self.score -= 15
+        self.score_down_timer = Timer(1, on_time_out, auto_destroy=False)
 
         # 타일맵 로드 및 엔티티 생성
         chapter_str = str(self.current_chapter)
         file_path = TILEMAP_FILES_BY_CHAPTER[chapter_str][self.current_level]
         self.tilemap = Tilemap(file_path)
         spawn_all_entities(self.tilemap)
-        self.event_bus.connect("on_enemy_died", self.on_enemy_died)
+        self.event_bus.connect("on_enemy_died", lambda instance: setattr(self, "score", self.score + SCORE_UP_MAP[instance.__class__]))
 
         # 플레이어 생성
         spawn_pos = self.tilemap.get_pos_by_data("spawners_entities", 0)[0]
-        self.player_status.player_character = PlayerCharacter(spawn_pos)
+        pc = PlayerCharacter(spawn_pos)
+        # 직접 연결 ^^;
+        self.player_status.player_character = pc
+        self.player_status.abilities.player_character = pc
         
         # 죽으면 다시 재시작할수 있게
         self.event_bus.connect("on_player_died", lambda: self.app.change_scene("main_game_scene"))
@@ -217,7 +236,7 @@ class MainGameScene(Scene):
     @score.setter
     def score(self, value):
         prev = self._score
-        self._score += value
+        self._score = max(value, 0)
 
         if prev < self._score:
             self.event_bus.emit("on_score_changed", True)
@@ -249,8 +268,7 @@ class MainGameScene(Scene):
 
     def on_enemy_died(self, enemy_instance):
         """적 사망 시 점수 업데이트"""
-        self.score += SCORE_UP_MAP[enemy_instance.__class__]
-
+        
     def on_pause_start(self):
         """일시정지 진입 시 메뉴 UI 생성"""
         super().on_pause_start()
@@ -273,5 +291,9 @@ class MainGameScene(Scene):
 
     def on_level_end(self):
         """레벨 종료 시 다음 맵으로 이동"""
+        self.app.player_data["scores"][str(self.current_chapter)][self.current_level] = self._score
+        self._score = 0
         self.current_level += 1
         self.app.change_scene("main_game_scene")
+        # 레벨 전환 할때도 데이터 저장
+        self.app.save_player_data()

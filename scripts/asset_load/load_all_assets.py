@@ -220,6 +220,7 @@ def load_background_assets():
 def load_cut_scene_assets():
     return {
         "opening" : load_images("cut_scene/opening", scale=2),
+        "tutorial_1" : load_images("cut_scene/tutorial_1", scale=2),
     }
 
 def load_all_assets():

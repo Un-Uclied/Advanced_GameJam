@@ -6,6 +6,14 @@ from scripts.backgrounds import *
 from scripts.ui import *
 from .base import Scene
 
+ASSET_LINKS = [
+    "https://cainos.itch.io/pixel-art-platformer-village-props",
+    "https://xyezawr.itch.io/free",
+    "https://bdragon1727.itch.io/1050-rpg-effects-64x64",
+    "https://xyezawr.itch.io/gif-free-pixel-effects-pack-5-blood-effects",
+    "https://xyezawr.itch.io/free-pixel-effects-pack-4-explosions"
+]
+
 class InfoUI:
     """정보 화면의 모든 UI 요소를 관리하는 클래스"""
     def __init__(self, scene):
@@ -21,7 +29,10 @@ class InfoUI:
         TextRenderer("서준범 (팀장)", pg.Vector2(SCREEN_SIZE.x / 2, 320), anchor=pg.Vector2(0.5, 0.5))
         TextRenderer("심규원", pg.Vector2(SCREEN_SIZE.x / 2, 370), anchor=pg.Vector2(0.5, 0.5))
         TextRenderer("이준영", pg.Vector2(SCREEN_SIZE.x / 2, 420), anchor=pg.Vector2(0.5, 0.5))
-        self.github_button = TextButton("[github 페이지 바로 가기]", pg.Vector2(SCREEN_SIZE.x / 2, SCREEN_SIZE.y - 50), None, None, font_size=48)
+        self.github_button = TextButton("[github 페이지 바로 가기]", pg.Vector2(SCREEN_SIZE.x / 2, 470), None, None, font_size=48)
+        TextRenderer("[사용된 무료 에셋 (itch.io)]", pg.Vector2(SCREEN_SIZE.x / 2, 540), font_name="bold", font_size=60, anchor=pg.Vector2(0.5, 0.5))
+        for i, link in enumerate(ASSET_LINKS):
+            TextRenderer(link, pg.Vector2(SCREEN_SIZE.x / 2, 600 + i * 40), anchor=pg.Vector2(0.5, 0.5))
 
     def _connect_events(self):
         """UI 요소에 이벤트 핸들러 연결"""

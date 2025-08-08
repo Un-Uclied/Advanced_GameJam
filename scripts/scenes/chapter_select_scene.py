@@ -75,9 +75,9 @@ class ChapterSelectScene(Scene):
         # 버튼 생성
         for i, name in enumerate(world_names):
             can_play = i <= available_idx
-
+            score = self.app.player_data["scores"][chapter_str][i]
             btn = TextButton(
-                f"< {name} >",
+                f"< {name} > : [ {score} ]",
                 pg.Vector2(200, 400 + i * 60),
                 self.on_world_start_click if can_play else self.on_world_blocked_click, # 플레이 가능한것과 아닌건 버튼을 눌렀을때 불리는 메소드가 다름.
                 None,

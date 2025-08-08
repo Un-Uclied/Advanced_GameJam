@@ -16,8 +16,9 @@ ATTACK_COOLTIME = .65
 
 class PlayerAbilities:
     """
-    플레이어의 특수 능력 및 상태에 따른 효과를 관리합니다.
-    대미지 처리, 체력 회복, 영혼 상호작용 로직을 담당합니다.
+    플레이어의 특수 능력 및 상태에 따른 효과를 관리
+    대미지 처리, 체력 회복, 영혼 상호작용 로직을 담당 ㅇㅇ
+    (주의 : 밖에서 player_character연결 해줘야함!!!!)
     """
     def __init__(self, status):
         self.status = status
@@ -91,6 +92,7 @@ class PlayerAbilities:
 class PlayerStatus(GameObject):
     """
     플레이어의 상태(체력, 무적, 영혼 큐)를 관리하는 핵심 클래스
+    (주의 : 밖에서 player_character연결 해줘야함!!!!)
     """
     def __init__(self, start_health: int):
         super().__init__()
@@ -137,6 +139,8 @@ class PlayerStatus(GameObject):
 
     @health.setter
     def health(self, value):
+        scene = self.app.scene
+        
         prev = self._health
         self._health = max(min(value, self.max_health), 0)
         
@@ -144,12 +148,13 @@ class PlayerStatus(GameObject):
             if self.is_invincible:
                 self._health = prev
                 return
+            scene.event_bus.emit("on_player_health_changed", False)
             self.abilities.on_damage(prev - self._health)
+        else:
+            scene.event_bus.emit("on_player_health_changed", True)
         
-        scene = self.app.scene
         if self._health <= 0:
             scene.event_bus.emit("on_player_died")
-        scene.event_bus.emit("on_player_health_changed")
-
+        
     def update(self):
         Light.is_rect_in_light(self.app.scene.camera, self.player_character.rect)

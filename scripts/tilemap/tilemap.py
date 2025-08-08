@@ -26,8 +26,7 @@ IN_GRID_TILES = ["dirt"]
 DO_NOT_RENDER_TILES = ["spawners_entities", "spawners_enemies"]
 
 # big ass number
-CACHE_SURFACE_SIZE = pg.Vector2(10000, 10000)
-DRAW_OFFSET = pg.Vector2(5000, 5000)
+CACHE_SURFACE_SIZE = pg.Vector2(15000, 15000)
 
 BASE_TILEMAP_PATH = "data/tilemaps/"
 
@@ -119,7 +118,7 @@ class Tilemap(GameObject):
         image = tile_asset[data["type"]][data["variant"]]
         
         # 캐시에 그릴 때 월드 좌표에 DRAW_OFFSET을 더하여 절대 위치에 렌더링
-        cache_pos = world_pos + DRAW_OFFSET
+        cache_pos = world_pos + CACHE_SURFACE_SIZE / 2
         surface.blit(image, (round(cache_pos.x), round(cache_pos.y)))
 
     def draw(self):
@@ -129,7 +128,7 @@ class Tilemap(GameObject):
         camera = self.app.scene.camera
         
         # 캐시의 월드 시작점(-DRAW_OFFSET)을 화면 좌표로 변환
-        cache_screen_pos = CameraMath.world_to_screen(camera, -DRAW_OFFSET)
+        cache_screen_pos = CameraMath.world_to_screen(camera, -CACHE_SURFACE_SIZE/2)
         surface.blit(self.cache, cache_screen_pos)
 
     def save_file(self, file_name: str = "temp.json"):

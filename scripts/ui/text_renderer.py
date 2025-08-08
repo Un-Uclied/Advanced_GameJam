@@ -61,7 +61,7 @@ class TextRenderer(GameObject):
     @property
     def size(self) -> pg.Vector2:
         '''스케일 포함된 이미지 크기 반환함'''
-        return pg.Vector2(self.image.get_size()) * self.scale
+        return pg.Vector2(self.image.get_size())
 
     @property
     def screen_pos(self) -> pg.Vector2:
@@ -108,31 +108,33 @@ class TextRenderer(GameObject):
 
     def rerender(self):
         """텍스트나 색 바뀌면 호출해서 이미지 새로 만듦 (줄바꿈 지원)"""
-        
         if not self._text.strip():
-            # 비어있을 때는 최소한의 투명 surface라도 만들어야 draw에서 안 터짐
             self.image = pg.Surface((1, 1), pg.SRCALPHA)
             self.image.set_alpha(self._alpha)
             return
     
-        lines = self._text.splitlines()  # \n 기준 줄바꿈
+        lines = self._text.splitlines()
+        line_surfaces = [self.font.render(line, False, self._color) for line in lines]
 
-        # 줄별 surface 렌더
-        line_surfaces = [self.font.render(line, True, self._color) for line in lines]
-
-        # 전체 이미지 사이즈 계산
         width = max(surf.get_width() for surf in line_surfaces)
         height = sum(surf.get_height() for surf in line_surfaces)
 
-        # 최종 이미지 surface 생성
-        self.image = pg.Surface((width, height), pg.SRCALPHA)
-
+        # 원본 텍스트 이미지를 먼저 합침
+        base_image = pg.Surface((width, height), pg.SRCALPHA)
         y = 0
         for surf in line_surfaces:
-            self.image.blit(surf, (0, y))
+            base_image.blit(surf, (0, y))
             y += surf.get_height()
 
-        self.image.set_alpha(self._alpha)
+        base_image.set_alpha(self._alpha)
+
+        # 💥 여기서 스케일링 처리!
+        if self.scale != 1:
+            scaled_size = (round(base_image.get_width() * self.scale),
+                           round(base_image.get_height() * self.scale))
+            self.image = pg.transform.smoothscale(base_image, scaled_size)
+        else:
+            self.image = base_image
 
     def draw(self):
         '''앵커랑 스케일 계산해서 텍스트 그려줌'''

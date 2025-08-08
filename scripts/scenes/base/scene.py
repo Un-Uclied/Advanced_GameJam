@@ -13,7 +13,6 @@ class Scene:
     
     def on_scene_start(self):
         self.camera = Camera2D(position=pg.Vector2(0, 0))
-        self.fps_text_renderer = TextRenderer("??", pg.Vector2(SCREEN_SIZE.x - 55, 10), color="green")
         self.event_bus = EventBus()
         
         self._scene_paused = False
@@ -49,9 +48,6 @@ class Scene:
     
     def update(self):
         '''GameObject.update_all()이 불리는 메소드'''
-
-        self.fps_text_renderer.text = str(round(self.app.clock.get_fps()))
-        
         GameObject.update_all()
 
     def draw(self):

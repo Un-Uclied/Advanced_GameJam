@@ -21,6 +21,7 @@ class EnemyBase:
         ps = self.enemy.app.scene.player_status
         pc = ps.player_character
         ps.health -= damage
+        self.app.scene.event_bus.emit("on_player_hurt", damage)
         AnimatedParticle(self.attack_particle_anim, pos)
         self.enemy.app.sound_manager.play_sfx(self.attack_sound)
         if shake:

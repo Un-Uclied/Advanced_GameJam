@@ -1,11 +1,11 @@
 import pygame as pg #파이게임 커뮤니티 에디션
 import json
-from multiprocessing import Process
 
 from scripts.constants import * #앱이름, 해상도, 화면 설정, 레이어 등이 있음.
 from scripts.scenes import *
 from scripts.asset_load import *
 from scripts.vfx import *
+from scripts.ui import *
 
 class SoundManager:
     def __init__(self):
@@ -102,7 +102,8 @@ class App:
             "main_game_scene" : MainGameScene(),
             "editor_scene"    : TileMapEditScene(),
 
-            "opening_cut_scene" : OpeningScene()
+            "opening_cut_scene" : OpeningScene(),
+            "tutorial_one_cut_scene" : Tutorial1Scene()
         }
         # 메인메뉴를 가려는데 처음 게임을 튼다면 오프닝 컷씬으로
         if self.player_data["is_first_start"] and start_scene_name == "main_menu_scene":
@@ -112,6 +113,10 @@ class App:
         self.scene : Scene = self.registered_scenes[start_scene_name]
         self.scene.on_scene_start()
         self.transition = False
+        # FPS 텍스트 (on_scene_start이후에 그려야 최상단에 그려짐)
+        fps_txt = TextRenderer("??", pg.Vector2(SCREEN_SIZE.x, 0), color="green", anchor=pg.Vector2(1, 0))
+        fps_txt.update = lambda: setattr(fps_txt, "text", str(int(self.clock.get_fps())))
+
         ScreenFader(1, False) # 초기 화면 페이드
 
     def load_player_data(self):
@@ -153,6 +158,11 @@ class App:
             self.scene.on_scene_end()
             self.scene = self.registered_scenes[name]
             self.scene.on_scene_start()
+
+            # FPS 텍스트 (on_scene_start이후에 그려야 최상단에 그려짐)
+            fps_txt = TextRenderer("??", pg.Vector2(SCREEN_SIZE.x, 0), color="green", anchor=pg.Vector2(1, 0))
+            fps_txt.update = lambda: setattr(fps_txt, "text", str(int(self.clock.get_fps())))
+
             ScreenFader(1, False, on_complete=on_fade_out_end)
         self.transition = True
         ScreenFader(1, True, on_complete=on_fade_in_end)

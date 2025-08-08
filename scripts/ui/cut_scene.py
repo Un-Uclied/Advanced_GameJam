@@ -34,7 +34,7 @@ class CutScene(GameObject):
         self.load_current_step_data()
 
         # 렌더러 생성
-        self.image_renderer = ImageRenderer(self.img(), pg.Vector2(SCREEN_SIZE.x / 2, 250))
+        self.image_renderer = ImageRenderer(self.current_image, pg.Vector2(SCREEN_SIZE.x / 2, 250))
         self.text_renderer = TextRenderer("", pg.Vector2(SCREEN_SIZE.x / 2, 600), anchor=pg.Vector2(0.5, 0.5))
 
         # 타자기 텍스트 출력용 타이머
@@ -86,7 +86,7 @@ class CutScene(GameObject):
             self.text_index = 0
             self.current_text = ""
             self.text_renderer.text = ""
-            self.image_renderer.image = self.img()
+            self.image_renderer.image = self.current_image
             self.char_timer.reset()
         else:
             self.end_cut_scene()
