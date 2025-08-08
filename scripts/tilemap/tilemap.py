@@ -95,10 +95,10 @@ class Tilemap(GameObject):
         image = tile_asset[data["type"]][data["variant"]]
 
         # 최적화를 위해 화면 밖이면 렌더 안하기
-        # 타일맵 스케일이 작으면 오히려 독이 되겠지만, 스케일이 커질수록 fps가 내려가는것을 막아줌.
-        rect = pg.Rect(world_pos, image.get_size())
-        if not CameraView.is_in_view(camera, rect):
-            return
+        # 타일맵 스케일이 작으면 오히려 독이 되겠지만, 타일 개수가 커질수록 fps가 내려가는것을 막아줌.
+        # rect = pg.Rect(world_pos, image.get_size())
+        # if not CameraView.is_in_view(camera, rect):
+        #     return
 
         # 시야 안에 있을 때만 렌더링
         screen_pos = CameraMath.world_to_screen(camera, world_pos)

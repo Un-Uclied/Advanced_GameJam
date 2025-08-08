@@ -26,7 +26,7 @@ class PlayerProjectile(Projectile):
         ps = self.app.scene.player_status
         if SOUL_EVIL_A in ps.soul_queue:
             life_time -= EVIL_A_LIFE_TIME_DOWN 
-        Timer(life_time, lambda: self.destroy())
+        self.timer = Timer(life_time, lambda: self.destroy())
 
         # 플레이어 탄환 생성 소리 재생
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["player"]["projectile"])
@@ -35,6 +35,7 @@ class PlayerProjectile(Projectile):
 
     def destroy(self):
         # 플레이어 탄환 제거 파티클 생성
+        self.timer.destroy()
         AnimatedParticle(self.destroy_particle_anim, self.position)
         super().destroy()
     

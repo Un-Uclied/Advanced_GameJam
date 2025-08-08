@@ -7,7 +7,7 @@
     },
 
     "names" : {
-        "1" : ["chap_1/a", "chap_1/b", "chap_1/c", "chap_1/d", "chap_1/e"],
+        "1" : ["중간계 시작 A", "중간계 시작 B", "중간계 시작 C", "중간계 시작 D", "중간계 시작 E"],
         "2" : ["chap_2/a", "chap_2/b", "chap_2/c", "chap_2/d", "chap_2/e"],
         "3" : ["chap_3/a", "chap_3/b", "chap_3/c", "chap_3/d", "chap_3/e"],
         "4" : ["boss/a"]

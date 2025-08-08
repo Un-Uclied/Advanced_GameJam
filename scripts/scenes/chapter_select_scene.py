@@ -76,7 +76,7 @@ class ChapterSelectScene(Scene):
             can_play = i <= available_idx
 
             btn = TextButton(
-                f"월드 {name} 시작",
+                f"< {name} >",
                 pg.Vector2(200, 400 + i * 60),
                 self.on_world_start_click if can_play else self.on_world_blocked_click, # 플레이 가능한것과 아닌건 버튼을 눌렀을때 불리는 메소드가 다름.
                 None,

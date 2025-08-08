@@ -39,13 +39,24 @@ class TextRenderer(GameObject):
 
         self._color = pg.Color(color)
         self._alpha = 255
-        self.scale = 1  # Tween용
+        self._scale = 1  # Tween용
 
         font_path = BASE_FONT_PATH + self.app.ASSETS["fonts"][font_name]
         self.font = pg.font.Font(font_path, font_size)
 
         self.image = self.font.render(self.text, True, self._color)
         self.image.set_alpha(self._alpha)
+
+    @property
+    def scale(self):
+        return self._scale
+    
+    @scale.setter
+    def scale(self, value):
+        if self._scale == value:
+            return
+        self._scale = value
+        self.rerender()
 
     @property
     def size(self) -> pg.Vector2:
@@ -132,5 +143,4 @@ class TextRenderer(GameObject):
         if self.use_camera:
             draw_pos = CameraMath.world_to_screen(self.app.scene.camera, draw_pos)
 
-        img = pg.transform.scale_by(self.image, self.scale)
-        surface.blit(img, draw_pos)
+        surface.blit(self.image, draw_pos)

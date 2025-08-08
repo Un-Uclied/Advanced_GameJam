@@ -45,7 +45,12 @@ class PlayerCharacter(PhysicsEntity):
         # 이벤트 등록
         self.app.scene.event_bus.connect("on_player_soul_changed", lambda: self.set_action("change_soul"))
         self.app.scene.event_bus.connect("on_player_died", lambda: self.set_action("die"))
-        self.app.scene.event_bus.connect("on_player_invincible_start", lambda: self.set_action("hurt"))
+
+        def on_player_invincible(started):
+            if started:
+                self.set_action("hurt")
+
+        self.app.scene.event_bus.connect("on_player_invincible", on_player_invincible)
 
     def handle_input(self):
         '''인풋 핸들'''

@@ -18,5 +18,5 @@ class OpeningScene(Scene):
     def draw(self):
         # 배경을 검정색으로 칠하기
         surface = self.app.surfaces[LAYER_INTERFACE]
-        pg.draw.rect(surface, "black", surface.get_rect())
+        pg.draw.rect(surface, "black", surface.get_frect())
         super().draw()

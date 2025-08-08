@@ -31,7 +31,7 @@ class PhysicsEntity(Entity):
         # 여기서 movement.x만큼 rect를 직접 움직임.
         self.rect.x += int(self.movement.x * self.app.dt)
         # 내 히트박스의 꼭짓점 마다
-        for point in self.get_rect_points():
+        for point in self.get_frect_points():
             # 꼭짓점 주변 타일맵의 충돌가능한 rect들 갖고오고 
             for rect in self.app.scene.tilemap.physic_tiles_around(point):
                 # 충돌하고 있는데
@@ -50,7 +50,7 @@ class PhysicsEntity(Entity):
         # 여기서 movement.y만큼 rect를 직접 움직임.
         self.rect.y += int(self.movement.y * self.app.dt)
         # 내 히트박스의 꼭짓점 마다
-        for point in self.get_rect_points():
+        for point in self.get_frect_points():
             for rect in self.app.scene.tilemap.physic_tiles_around(point):
                 # 꼭짓점 주변 타일맵의 충돌가능한 rect들 갖고오고 
                 if rect.colliderect(self.rect):

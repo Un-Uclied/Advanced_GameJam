@@ -30,7 +30,7 @@ class Entity(GameObject):
         self.current_action = action_name
         self.anim = self.app.ASSETS["animations"]["entities"][self.name][action_name].copy()
 
-    def get_rect_points(self) -> list[pg.Vector2]:
+    def get_frect_points(self) -> list[pg.Vector2]:
         '''히트박스의 꼭짓점 좌표를 반환'''
         return [
             pg.Vector2(self.rect.topleft),

@@ -19,7 +19,7 @@ class ProjectileBeta(Projectile):
                          start_position,
                          start_direction)
         
-        Timer(DEFAULT_LIFE_TIME, lambda: self.destroy())
+        self.timer = Timer(DEFAULT_LIFE_TIME, lambda: self.destroy())
 
         # TwoBeta 클래스의 적 탄환 생성 소리 재생
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["enemy"]["projectile"])
@@ -28,6 +28,7 @@ class ProjectileBeta(Projectile):
 
     def destroy(self):
         # TwoBeta 클래스의 적 탄환 제거 파티클 생성
+        self.timer.destroy()
         AnimatedParticle(self.destroy_particle_anim, self.position)
         super().destroy()
         
