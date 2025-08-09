@@ -8,19 +8,23 @@ BASE_FONT_PATH = "assets/fonts/"
 
 class TextRenderer(GameObject):
     """
-    스크린 기준 UI 텍스트 렌더러.
+    UI 텍스트 렌더러 클래스
 
-    - text, position, color는 런타임 중 변경 가능
-    - 폰트 종류와 크기는 생성 시 고정 (성능상 이유)
-    - use_camera=True면 월드 좌표 사용하며 카메라 이펙트 받음
+    특징:
+    - 런타임 중 텍스트, 색상, 위치, 스케일, 알파값 자유롭게 변경 가능
+    - 폰트는 생성 시 로드 (성능 최적화용)
+    - 앵커(기준점) 지정 가능 (좌상단, 중앙 등)
+    - 월드 좌표 대응 옵션(use_camera)
+    - 줄바꿈 지원
 
-    :param start_text: 초기 텍스트 내용
-    :param position: 텍스트 위치 (pg.Vector2)
-    :param font_name: 사용할 폰트 이름 (ASSETS["fonts"] 키)
-    :param font_size: 폰트 크기
-    :param color: 텍스트 색상
-    :param anchor: 기준점 (0,0=좌상단, 0.5,0.5=중앙 등)
-    :param use_camera: 카메라 적용 여부
+    Args:
+        start_text (str): 초기 텍스트 내용
+        position (pg.Vector2): 화면 또는 월드 위치
+        font_name (str): 폰트 이름 (ASSETS["fonts"]에 등록된 키)
+        font_size (int): 폰트 크기
+        color (pg.Color): 텍스트 색상
+        anchor (pg.Vector2): 기준점 (0,0: 좌상단, 0.5,0.5: 중앙)
+        use_camera (bool): True면 월드 좌표 + 카메라 적용
     """
     def __init__(self,
                  start_text: str,
@@ -39,13 +43,12 @@ class TextRenderer(GameObject):
 
         self._color = pg.Color(color)
         self._alpha = 255
-        self._scale = 1  # Tween용
+        self._scale = 1  # 스케일 기본값
 
         font_path = BASE_FONT_PATH + self.app.ASSETS["fonts"][font_name]
         self.font = pg.font.Font(font_path, font_size)
 
-        self.image = self.font.render(self.text, True, self._color)
-        self.image.set_alpha(self._alpha)
+        self._render_text_image()
 
     @property
     def scale(self):
@@ -56,91 +59,82 @@ class TextRenderer(GameObject):
         if self._scale == value:
             return
         self._scale = value
-        self.rerender()
+        self._render_text_image()
 
     @property
     def size(self) -> pg.Vector2:
-        '''스케일 포함된 이미지 크기 반환함'''
+        """현재 렌더된 텍스트 이미지 크기 반환 (스케일 적용 포함)"""
         return pg.Vector2(self.image.get_size())
 
     @property
     def screen_pos(self) -> pg.Vector2:
-        '''앵커 계산해서 실제 화면에 그릴 좌표 반환함'''
+        """앵커 기준으로 계산된 화면 그릴 좌표"""
         return self.pos - self.size.elementwise() * self.anchor
 
     @property
     def rect(self) -> pg.Rect:
-        '''마우스랑 충돌 체크할 때 쓰는 사각형 반환함'''
+        """마우스 충돌 체크용 텍스트 사각형"""
         return pg.Rect(self.screen_pos, self.size)
 
     @property
     def color(self) -> pg.Color:
-        '''텍스트 색상 가져옴'''
         return self._color
 
     @color.setter
     def color(self, value: pg.Color):
-        '''텍스트 색상 바꾸면 자동으로 다시 렌더됨'''
         self._color = pg.Color(value)
-        self.rerender()
+        self._render_text_image()
 
     @property
     def alpha(self) -> int:
-        '''알파 값 반환 (0~255)'''
         return self._alpha
 
     @alpha.setter
     def alpha(self, value: int):
-        '''알파 값 변경 (0~255로 제한)'''
         self._alpha = max(0, min(255, value))
-        self.image.set_alpha(self._alpha)
+        if hasattr(self, 'image'):
+            self.image.set_alpha(self._alpha)
 
     @property
     def text(self) -> str:
-        '''텍스트 문자열 반환'''
         return self._text
 
     @text.setter
     def text(self, value: str):
-        '''텍스트 바꾸면 자동으로 다시 렌더됨'''
         self._text = value
-        self.rerender()
+        self._render_text_image()
 
-    def rerender(self):
-        """텍스트나 색 바뀌면 호출해서 이미지 새로 만듦 (줄바꿈 지원)"""
+    def _render_text_image(self):
+        """텍스트, 색상, 스케일 변화 있을 때마다 이미지 새로 렌더링"""
         if not self._text.strip():
             self.image = pg.Surface((1, 1), pg.SRCALPHA)
             self.image.set_alpha(self._alpha)
             return
-    
+        
         lines = self._text.splitlines()
-        line_surfaces = [self.font.render(line, False, self._color) for line in lines]
+        rendered_lines = [self.font.render(line, True, self._color) for line in lines]
 
-        width = max(surf.get_width() for surf in line_surfaces)
-        height = sum(surf.get_height() for surf in line_surfaces)
+        width = max(line.get_width() for line in rendered_lines)
+        height = sum(line.get_height() for line in rendered_lines)
 
-        # 원본 텍스트 이미지를 먼저 합침
-        base_image = pg.Surface((width, height), pg.SRCALPHA)
-        y = 0
-        for surf in line_surfaces:
-            base_image.blit(surf, (0, y))
-            y += surf.get_height()
+        base_surface = pg.Surface((width, height), pg.SRCALPHA)
+        y_offset = 0
+        for line in rendered_lines:
+            base_surface.blit(line, (0, y_offset))
+            y_offset += line.get_height()
 
-        base_image.set_alpha(self._alpha)
+        base_surface.set_alpha(self._alpha)
 
-        # 💥 여기서 스케일링 처리!
-        if self.scale != 1:
-            scaled_size = (round(base_image.get_width() * self.scale),
-                           round(base_image.get_height() * self.scale))
-            self.image = pg.transform.smoothscale(base_image, scaled_size)
+        if self._scale != 1:
+            scaled_size = (round(width * self._scale), round(height * self._scale))
+            self.image = pg.transform.smoothscale(base_surface, scaled_size)
         else:
-            self.image = base_image
+            self.image = base_surface
 
     def draw(self):
-        '''앵커랑 스케일 계산해서 텍스트 그려줌'''
+        """앵커와 카메라 적용해 화면에 텍스트 그리기"""
         super().draw()
 
-        # 최적화 발악
         if self.alpha <= 0:
             return
 

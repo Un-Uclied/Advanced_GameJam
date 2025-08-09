@@ -5,27 +5,36 @@ from scripts.camera import *
 from scripts.core import *
 
 class ProgressBar(GameObject):
-    '''
-    베리베리 간단한 바 (체력바나 로딩 바에 가능 ㅇㅇ)
-    (경고 : 가로만 됨!! 세로 바는 안됨 ㅇㅇ;)
-    :param pos: 위치
-    :param size: 두께, 높이
-    :param current_val: 시작하는 값
-    :param min_val: 최소값 (0이 제일 일반적)
-    :param max_val: 최대값
-    :param bg_color: 바의 배경색
-    :param fg_color: 바의 색깔
-    :param anchor: 그냥 앵커 (기본은 중앙인데, (0, .5)쓰거나 뭐 다양하게 가능)
-    '''
+    """
+    심플한 가로형 프로그레스 바 (체력바, 로딩바 등 용)
+
+    특징:
+    - 가로 방향만 지원 (세로 바는 따로 만들어야 함)
+    - 값 변경 시 자동으로 표시 갱신
+    - 앵커 설정 가능 (기본 중앙)
+    - 월드 좌표 기준(use_camera=True) 옵션 지원
+
+    Args:
+        pos (pg.Vector2): 기준 위치 (앵커 기준)
+        size (pg.Vector2): 크기 (가로 너비, 세로 높이)
+        current_val (float): 초기 값 (min_val ~ max_val 사이)
+        min_val (float): 최소값 (보통 0)
+        max_val (float): 최대값
+        bg_color (pg.Color): 배경 바 색상 (기본 회색)
+        fg_color (pg.Color): 채워진 바 색상 (기본 빨강)
+        anchor (pg.Vector2): 앵커 기준점 (0~1, 기본 중앙 (0.5, 0.5))
+        use_camera (bool): 월드 좌표 기반 여부 (기본 False)
+    """
     def __init__(self,
                  pos: pg.Vector2,
                  size: pg.Vector2,
-                 current_val : float,
-                 min_val : float,
-                 max_val : float,
-                 bg_color = pg.Color("grey"),
-                 fg_color = pg.Color("red"),
-                 anchor: pg.Vector2 = pg.Vector2(0.5, 0.5), use_camera = False):
+                 current_val: float,
+                 min_val: float,
+                 max_val: float,
+                 bg_color=pg.Color("grey"),
+                 fg_color=pg.Color("red"),
+                 anchor: pg.Vector2 = pg.Vector2(0.5, 0.5),
+                 use_camera: bool = False):
         super().__init__()
 
         self._pos = pos
@@ -34,46 +43,48 @@ class ProgressBar(GameObject):
 
         self.min_val = min_val
         self.max_val = max_val
-        self._val = max(min(current_val, max_val), min_val)
+        self._value = max(min(current_val, max_val), min_val)
 
         self.bg_color = bg_color
         self.fg_color = fg_color
 
+        self.use_camera = use_camera
+
         self.bg_rect = pg.Rect((0, 0), size)
         self.fg_rect = pg.Rect((0, 0), size)
 
-        self.use_camera = use_camera
+        self._update_rects()
 
-        self.update_rects()
-    
     @property
-    def value(self):
-        return self._val
-    
+    def value(self) -> float:
+        return self._value
+
     @value.setter
-    def value(self, change_val):
-        self._val = max(min(change_val, self.max_val), self.min_val)
-        self.update_rects()
+    def value(self, new_val: float):
+        self._value = max(min(new_val, self.max_val), self.min_val)
+        self._update_rects()
 
     @property
-    def pos(self):
+    def pos(self) -> pg.Vector2:
         return self._pos
-    
-    @pos.setter
-    def pos(self, value):
-        self._pos = value
-        self.update_rects()
 
-    def get_anchored_pos(self) -> pg.Vector2:
+    @pos.setter
+    def pos(self, new_pos: pg.Vector2):
+        self._pos = new_pos
+        self._update_rects()
+
+    def _get_anchored_pos(self) -> pg.Vector2:
+        """앵커를 고려한 실제 좌표 계산"""
         return self._pos - self.size.elementwise() * self.anchor
 
-    def update_rects(self):
-        '''위치나 값 바뀌었을때 부르기!'''
-        anchor_pos = self.get_anchored_pos()
-        self.bg_rect.topleft = anchor_pos
-        self.fg_rect.topleft = anchor_pos
+    def _update_rects(self):
+        """값이나 위치 변경 시 호출: rect 위치 및 크기 업데이트"""
+        anchored_pos = self._get_anchored_pos()
+        self.bg_rect.topleft = anchored_pos
+        self.fg_rect.topleft = anchored_pos
 
-        self.fg_rect.w = self.size.x * (self.value / self.max_val)
+        fill_ratio = (self._value - self.min_val) / (self.max_val - self.min_val) if self.max_val != self.min_val else 0
+        self.fg_rect.width = self.size.x * fill_ratio
 
     def draw(self):
         super().draw()

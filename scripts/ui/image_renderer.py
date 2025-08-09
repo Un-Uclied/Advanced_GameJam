@@ -5,15 +5,22 @@ from scripts.camera import *
 from scripts.core import *
 
 class ImageRenderer(GameObject):
-    '''
-    베리 베리 간단한 UI용 이미지 렌더러 (포지션, scale Tween가능 ㅇㅇ)
+    """
+    UI용 이미지 렌더러 (포지션, 스케일, 앵커 지원 + Tween 가능)
 
-    :param image: 렌더할 이미지 (절대 에셋 키 아님!! pg.Surface여야함!! (직접 이미지에 접근 하라는뜻 ㅇㅇ))
-    :param position: 렌더할 위치 (스크린 좌표)
-    :param scale: 렌더할 이미지의 스케일 (기본값 1, 에셋 로드 할때 이미 스케일을 바꿨다면 바꾼 상태에서 또 scale하는거임)
-    :param anchor: 렌더할 이미지의 앵커 (기본값은 중앙, 0.5, 0.5)
-    '''
-    def __init__(self, image : pg.Surface, position : pg.Vector2, scale : float = 1, anchor : pg.Vector2 = pg.Vector2(.5, .5), use_camera = False):
+    Args:
+        image (pg.Surface): 렌더할 이미지 (절대 에셋 키 아님, 직접 Surface 전달)
+        position (pg.Vector2): 렌더 위치 (스크린 좌표)
+        scale (float): 이미지 스케일 (기본 1.0)
+        anchor (pg.Vector2): 앵커 기준 (0~1, 기본 중앙 0.5,0.5)
+        use_camera (bool): 월드 좌표 기준 렌더링 여부 (기본 False)
+    """
+    def __init__(self, 
+                 image: pg.Surface, 
+                 position: pg.Vector2, 
+                 scale: float = 1.0, 
+                 anchor: pg.Vector2 = pg.Vector2(0.5, 0.5), 
+                 use_camera: bool = False):
         super().__init__()
         self.image = image
         self.scale = scale
@@ -23,27 +30,29 @@ class ImageRenderer(GameObject):
 
     @property
     def size(self) -> pg.Vector2:
-        '''현재 렌더되는 이미지 크기 (트윈 할거면 scale을 트윈하세여!!)'''
+        """스케일 적용된 이미지 크기 반환"""
         return pg.Vector2(self.image.get_size()) * self.scale
 
     @property
     def screen_pos(self) -> pg.Vector2:
-        '''앵커를 계산한 렌더 위치'''
+        """앵커 기준 실제 렌더링 위치 계산"""
         return self.pos - self.size.elementwise() * self.anchor
 
     @property
     def rect(self) -> pg.Rect:
-        '''마우스 충돌 판정 rect'''
+        """마우스 충돌 판정용 사각형"""
         return pg.Rect(self.screen_pos, self.size)
 
     def draw(self):
         super().draw()
 
         surface = self.app.surfaces[LAYER_INTERFACE]
-        scaled_image = pg.transform.scale_by(self.image, self.scale)
+
+        # 스케일 적용 이미지 생성 (스무스 스케일 아님, 필요 시 바꿔도 됨)
+        scaled_img = pg.transform.scale_by(self.image, self.scale)
 
         draw_pos = self.screen_pos
         if self.use_camera:
             draw_pos = CameraMath.world_to_screen(self.app.scene.camera, draw_pos)
-            
-        surface.blit(scaled_image, draw_pos)
+
+        surface.blit(scaled_img, draw_pos)

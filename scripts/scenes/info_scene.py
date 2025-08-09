@@ -27,15 +27,15 @@ class InfoUI:
     def _create_ui_elements(self):
         """UI 요소 생성 및 초기 설정"""
         TextRenderer("[ESC]", pg.Vector2(10, 10), font_name="bold", font_size=20, anchor=pg.Vector2(0, 0))
-        TextRenderer("팀 [후라이맨즈]", pg.Vector2(SCREEN_SIZE.x / 2, 150), font_name="bold", font_size=100, anchor=pg.Vector2(0.5, 0.5))
-        TextRenderer("<팀원>", pg.Vector2(SCREEN_SIZE.x / 2, 250), anchor=pg.Vector2(0.5, 0.5))
-        TextRenderer("서준범 (팀장)", pg.Vector2(SCREEN_SIZE.x / 2, 320), anchor=pg.Vector2(0.5, 0.5))
-        TextRenderer("심규원", pg.Vector2(SCREEN_SIZE.x / 2, 370), anchor=pg.Vector2(0.5, 0.5))
-        TextRenderer("이준영", pg.Vector2(SCREEN_SIZE.x / 2, 420), anchor=pg.Vector2(0.5, 0.5))
-        self.github_button = TextButton("[github 페이지 바로 가기]", pg.Vector2(SCREEN_SIZE.x / 2, 470), None, None, font_size=48)
-        TextRenderer("[사용된 무료 에셋 (itch.io)]", pg.Vector2(SCREEN_SIZE.x / 2, 540), font_name="bold", font_size=60, anchor=pg.Vector2(0.5, 0.5))
+        TextRenderer("팀 [후라이맨즈]", pg.Vector2(SCREEN_SIZE.x / 2, 100), font_name="bold", font_size=100, anchor=pg.Vector2(0.5, 0.5))
+        TextRenderer("<팀원>", pg.Vector2(SCREEN_SIZE.x / 2, 200), anchor=pg.Vector2(0.5, 0.5))
+        TextRenderer("서준범 (팀장)", pg.Vector2(SCREEN_SIZE.x / 2, 250), anchor=pg.Vector2(0.5, 0.5))
+        TextRenderer("심규원", pg.Vector2(SCREEN_SIZE.x / 2, 280), anchor=pg.Vector2(0.5, 0.5))
+        TextRenderer("이준영", pg.Vector2(SCREEN_SIZE.x / 2, 310), anchor=pg.Vector2(0.5, 0.5))
+        self.github_button = TextButton("[github 페이지 바로 가기]", pg.Vector2(SCREEN_SIZE.x / 2, 370), None, None, font_size=48)
+        TextRenderer("[사용된 무료 에셋 (itch.io)]", pg.Vector2(SCREEN_SIZE.x / 2, 450), font_name="bold", font_size=60, anchor=pg.Vector2(0.5, 0.5))
         for i, link in enumerate(ASSET_LINKS):
-            TextRenderer(link, pg.Vector2(SCREEN_SIZE.x / 2, 600 + i * 30), font_size=15, anchor=pg.Vector2(0.5, 0.5))
+            TextRenderer(link, pg.Vector2(SCREEN_SIZE.x / 2, 500 + i * 30), font_size=15, anchor=pg.Vector2(0.5, 0.5))
 
     def _connect_events(self):
         """UI 요소에 이벤트 핸들러 연결"""

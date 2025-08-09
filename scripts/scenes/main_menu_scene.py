@@ -10,11 +10,19 @@ from scripts.volume import *
 from scripts.tilemap import *
 from .base import Scene
 
+# 메인 메뉴용 타일맵 데이터 JSON 미리 로드 (한 번만)
 with open("data/tilemap_data.json", encoding="utf-8") as f:
     TILEMAP_DATA = json.load(f)
 
 class MainMenuUI:
-    """메인 메뉴 화면의 모든 UI 요소를 관리하는 클래스"""
+    """
+    메인 메뉴의 UI 전담 클래스
+    - 여러 버튼들 (시작, 설정, 정보, 종료)
+    - 배경 비네팅 이미지
+    - 타이틀, 팀명 텍스트
+
+    :param scene: 이 UI가 속한 씬 (MainMenuScene 인스턴스)
+    """
     def __init__(self, scene):
         self.scene = scene
         self._buttons : list[ImageButton] = []
@@ -22,28 +30,36 @@ class MainMenuUI:
         self._connect_events()
 
     def _create_ui_elements(self):
-        """UI 요소 생성 및 초기 설정"""
+        """UI 컴포넌트 생성 및 화면 위치 세팅"""
+        # 버튼들 생성, 화면 가운데 수평 정렬, Y 좌표만 다름
         self._buttons.extend(
-        [
-            ImageButton("game_start", pg.Vector2(SCREEN_SIZE.x / 2, 400), None, None),
-            ImageButton("app_settings", pg.Vector2(SCREEN_SIZE.x / 2, 500), None, None),
-            ImageButton("app_info", pg.Vector2(SCREEN_SIZE.x / 2, 600), None, None),
-            ImageButton("app_quit", pg.Vector2(SCREEN_SIZE.x / 2, 700), None, None),
-            ImageRenderer(self.scene.app.ASSETS["ui"]["vignette"]["black"], pg.Vector2(0, 0), anchor=pg.Vector2(0, 0))
-        ]
+            [
+                ImageButton("game_start", pg.Vector2(SCREEN_SIZE.x / 2, 400), None, None),
+                ImageButton("app_settings", pg.Vector2(SCREEN_SIZE.x / 2, 500), None, None),
+                ImageButton("app_info", pg.Vector2(SCREEN_SIZE.x / 2, 600), None, None),
+                ImageButton("app_quit", pg.Vector2(SCREEN_SIZE.x / 2, 700), None, None),
+                # 화면 전체 덮는 검은 비네팅 이미지 (앵커 좌상단 고정)
+                ImageRenderer(self.scene.app.ASSETS["ui"]["vignette"]["black"], pg.Vector2(0, 0), anchor=pg.Vector2(0, 0))
+            ]
         )
-        
-        TextRenderer("< Limen >", pg.Vector2(SCREEN_SIZE.x / 2, 150), font_name="gothic", font_size=170, anchor=pg.Vector2(0.5, 0.5))
-        TextRenderer("팀 후라이맨즈", SCREEN_SIZE - pg.Vector2(25, 25), anchor=pg.Vector2(1, 1))
+        # 타이틀 텍스트 & 팀명 텍스트 생성
+        TextRenderer(
+            "< Limen >", pg.Vector2(SCREEN_SIZE.x / 2, 150),
+            font_name="gothic", font_size=170, anchor=pg.Vector2(0.5, 0.5)
+        )
+        TextRenderer(
+            "팀 후라이맨즈",
+            SCREEN_SIZE - pg.Vector2(25, 25),
+            anchor=pg.Vector2(1, 1)
+        )
 
     def _connect_events(self):
-        """UI 요소에 이벤트 핸들러 연결"""
-        # 버튼에 on_click 핸들러를 연결
+        """각 버튼에 클릭 이벤트 함수 연결"""
         for ui_element in self._buttons:
             ui_element.on_click = self.on_click
 
     def on_click(self, button: ImageButton):
-        """버튼 클릭 시 해당 씬으로 이동"""
+        """버튼 클릭 시 동작 분기 처리"""
         name = button.name
         app = self.scene.app
 
@@ -56,24 +72,33 @@ class MainMenuUI:
         elif name == "app_quit":
             app.window_should_be_closed = True
 
-        # 타격감을 위한 화면 흔들림 효과
+        # 버튼 클릭 시 약간의 화면 흔들림 효과로 타격감 추가
         app.scene.camera.shake_amount += 15
 
 class MainMenuScene(Scene):
-    """메인 메뉴 씬 클래스. 게임 시작, 설정 등 주요 메뉴를 관리"""
+    """
+    메인 메뉴 씬 클래스
+
+    씬 시작 시:
+    - 랜덤 메인 메뉴용 타일맵 로드 및 엔티티 생성
+    - 하늘, 구름, 안개 효과 생성
+    - 메인 메뉴 UI 생성
+    """
     def __init__(self):
         super().__init__()
         self.main_menu_ui = None
 
     def on_scene_start(self):
-        """씬 시작 시 타일맵, 배경, UI를 초기화"""
-        super().on_scene_start()        
+        super().on_scene_start()
 
+        # 랜덤으로 메인 메뉴용 타일맵 불러와 씬에 생성
         self.tilemap = Tilemap(random.choice(TILEMAP_DATA["main_menu_maps"]))
         spawn_all_entities(self.tilemap)
 
+        # UI 생성
         self.main_menu_ui = MainMenuUI(self)
 
+        # 배경 이펙트 생성
         Sky()
         Clouds()
         Fog()

@@ -23,7 +23,7 @@
             true
         ],
         "4": [
-            false
+            true
         ]
     },
     "scores": {
@@ -52,6 +52,6 @@
             0
         ]
     },
-    "vfx_volume": 0.8,
-    "bgm_volume": 0.8
+    "vfx_volume": 0.5,
+    "bgm_volume": 1.0
 }
