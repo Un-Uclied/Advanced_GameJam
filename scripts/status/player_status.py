@@ -30,6 +30,9 @@ class PlayerAbilities:
         
         self.hurt_sound = self.app.ASSETS["sounds"]["player"]["hurt"]
         self.hurt_particle_anim = self.app.ASSETS["animations"]["vfxs"]["hurt"]
+        
+        # 영혼 바뀌면 스탯 업뎃
+        self.app.scene.event_bus.connect("on_player_soul_changed", lambda: self._update_stats_by_soul_type())
 
     def on_damage(self, damage: int):
         """플레이어가 대미지를 입었을 때 처리"""
@@ -58,8 +61,6 @@ class PlayerAbilities:
         
         self.status.soul_queue.append(soul_type)
         self.app.scene.event_bus.emit("on_player_soul_changed")
-        
-        self._update_stats_by_soul_type()
 
     def _update_stats_by_soul_type(self):
         """영혼 타입에 따라 플레이어 능력치 업데이트"""

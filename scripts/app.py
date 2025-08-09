@@ -104,7 +104,9 @@ class App:
 
             "opening_cut_scene" : OpeningScene(),
             "tutorial_one_scene" : Tutorial1Scene(),
-            "tutorial_two_scene" : Tutorial2Scene()
+            "tutorial_two_scene" : Tutorial2Scene(),
+            "no_lights_cut_scene" : NoLightCutScene(),
+            "no_souls_cut_scene" : NoSoulsCutScene(),
         }
         # 메인메뉴를 가려는데 처음 게임을 튼다면 오프닝 컷씬으로
         if self.player_data["is_first_start"] and start_scene_name == "main_menu_scene":

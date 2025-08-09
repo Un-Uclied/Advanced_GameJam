@@ -230,6 +230,8 @@ def load_cut_scene_assets():
         "opening" : load_images("cut_scene/opening", scale=2),
         "tutorial_1" : load_images("cut_scene/tutorial_1", scale=2),
         "tutorial_2" : load_images("cut_scene/tutorial_2", scale=2),
+        "no_lights" : load_images("cut_scene/no_lights", scale=2),
+        "no_souls" : load_images("cut_scene/no_souls", scale=2),
     }
 
 def load_all_assets():

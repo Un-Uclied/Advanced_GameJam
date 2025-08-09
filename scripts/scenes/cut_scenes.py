@@ -52,3 +52,36 @@ class Tutorial2Scene(Scene):
         surface = self.app.surfaces[LAYER_INTERFACE]
         pg.draw.rect(surface, "black", surface.get_rect())
         super().draw()
+
+class NoLightCutScene(Scene):
+    def on_scene_start(self):
+        CutScene("no_lights", self.cut_scene_end)
+        super().on_scene_start()
+
+    def cut_scene_end(self):
+        self.app.registered_scenes["main_game_scene"].current_chapter = 3
+        self.app.registered_scenes["main_game_scene"].current_level = 4
+        self.app.change_scene("main_game_scene")
+
+    def draw(self):
+        # 배경을 검정색으로 칠하기
+        surface = self.app.surfaces[LAYER_INTERFACE]
+        pg.draw.rect(surface, "black", surface.get_rect())
+        super().draw()
+
+
+class NoSoulsCutScene(Scene):
+    def on_scene_start(self):
+        CutScene("no_souls", self.cut_scene_end)
+        super().on_scene_start()
+
+    def cut_scene_end(self):
+        self.app.registered_scenes["main_game_scene"].current_chapter = 2
+        self.app.registered_scenes["main_game_scene"].current_level = 2
+        self.app.change_scene("main_game_scene")
+
+    def draw(self):
+        # 배경을 검정색으로 칠하기
+        surface = self.app.surfaces[LAYER_INTERFACE]
+        pg.draw.rect(surface, "black", surface.get_rect())
+        super().draw()

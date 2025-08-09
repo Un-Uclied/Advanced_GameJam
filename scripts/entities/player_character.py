@@ -3,14 +3,18 @@ import pygame as pg
 from scripts.constants import *
 from scripts.camera import *
 from scripts.projectiles import *
+from scripts.core import *
+from scripts.ui import *
 from scripts.volume import *
-from .base import PhysicsEntity, VELOCITY_DRAG
+from .base import PhysicsEntity, VELOCITY_DRAG, MAX_GRAVITY
 
 HIT_BOX_SIZE = (48, 100)
 FLIP_OFFSET = {
     False : pg.Vector2(-70, -39),
     True : pg.Vector2(-70, -39)
 }
+
+FALL_WARNING_TIME = 3
 
 MOVE_SPEED = 3.8
 JUMP_POWER = -7.5
@@ -41,6 +45,9 @@ class PlayerCharacter(PhysicsEntity):
         self.lerped_movement = pg.Vector2()
 
         self.flip_offset = FLIP_OFFSET
+
+        self.fall_timer = Timer(FALL_WARNING_TIME, lambda: PopupText("일시정지 메뉴에서 재시작", pg.Vector2(SCREEN_SIZE.x / 2, 670), .5))
+        self.fall_timer.active = False
 
         # 이벤트 등록
         self.app.scene.event_bus.connect("on_player_soul_changed", lambda: self.set_action("change_soul"))
@@ -211,8 +218,16 @@ class PlayerCharacter(PhysicsEntity):
         else:
             self.anim.flip_x = self.invert_x
 
+    def update_fall_timer(self):
+        if self.collisions["down"]:
+            self.fall_timer.reset()
+            self.fall_timer.active = False
+        else:
+            self.fall_timer.active = True
+
     def update(self):
         self.handle_input()
         self.control_animation()
         super().update()
         self.follow_light_and_camera()
+        self.update_fall_timer()

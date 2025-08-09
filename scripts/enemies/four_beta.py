@@ -10,7 +10,7 @@ FLIP_OFFSET = {
     True  : [-8, -8]
 }
 
-MAX_HEALTH = 100
+MAX_HEALTH = 125
 
 MOVE_SPEED = 7
 MIN_CHANGE_TIMER = 0.1
@@ -36,14 +36,21 @@ class FourBeta(PhysicsEnemy):
         else:
             self.set_action("run")
 
-    def do_attack(self, damage, pos, shake = 0):
+    def do_attack(self, damage, pos, shake=0):
         super().do_attack(damage, pos, shake)
         ps = self.app.scene.player_status
-        # 이미 모든 SOUL이 DEFAULT면 안함
+
+        # 큐가 비어있지 않고, 전부 DEFAULT가 아닐 때만 실행
         if ps.soul_queue and not all(soul == SOUL_DEFAULT for soul in ps.soul_queue):
-            ps.soul_queue.append(SOUL_DEFAULT)
+            for i in range(len(ps.soul_queue)):
+                ps.soul_queue[i] = SOUL_DEFAULT  # 값 교체
             self.app.scene.event_bus.emit("on_player_soul_changed")
-            PopupText("혼이 감염되어 소멸해버렸다...", pg.Vector2(SCREEN_SIZE.x / 2, 680), fade_delay=.25, fade_duration=1.5)
+            PopupText(
+                "혼이 감염되어 소멸해버렸다...",
+                pg.Vector2(SCREEN_SIZE.x / 2, 680),
+                fade_delay=.25,
+                fade_duration=1.5
+            )
 
     def update(self):
         super().update()

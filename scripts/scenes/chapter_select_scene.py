@@ -77,7 +77,8 @@ class ChapterSelectScene(Scene):
             btn = TextButton(
                 f"< {name} > : [ {score} ]",
                 pg.Vector2(200, 400 + i * 60),
-                self.on_world_start_click if can_play else self.on_world_blocked_click, # 플레이 가능한것과 아닌건 버튼을 눌렀을때 불리는 메소드가 다름.
+                # 플레이 가능하면 self.on_world_start_click에서 관리, 불가능하면 클릭했을때 팝업
+                self.on_world_start_click if can_play else lambda _: PopupText("플레이 불가", pg.Vector2(SCREEN_SIZE.x / 2, 750), 0, .5),
                 None,
                 font_name="bold",
                 font_size=32,
@@ -93,24 +94,28 @@ class ChapterSelectScene(Scene):
 
     def on_world_start_click(self, button: TextButton):
         '''플레이 가능한 원드 버튼을 눌렀을때 change_scene하기 전에 먼저 플레이할 챕터와 월드 인덱스 설정후, change_scene'''
-        self.app.registered_scenes["main_game_scene"].current_chapter = self.selected_chapter
-        self.app.registered_scenes["main_game_scene"].current_level = button.data["index"]
-        # 특정 레벨을 선택했다면 메인게임 씬으로 가지않고, 튜토리얼씬으로 가게 만든후, 튜토리얼씬에서 끝나면 메인게임으로 감
+        # 특정 레벨을 선택했다면 메인게임 씬으로 가지않고, 컷씬으로 가게 만든후, 컷씬이 끝나면 컷씬에서 다음씬으로 가게 함
+        # 1-1
         if self.selected_chapter == 1 and button.data["index"] == 0:
             self.app.change_scene("tutorial_one_scene")
             return
+        # 1-2
         if self.selected_chapter == 1 and button.data["index"] == 1:
             self.app.change_scene("tutorial_two_scene")
             return
+        # 2-3
+        if self.selected_chapter == 2 and button.data["index"] == 2:
+            self.app.change_scene("no_souls_cut_scene")
+            return
+        # 3-5
+        if self.selected_chapter == 3 and button.data["index"] == 4:
+            self.app.change_scene("no_lights_cut_scene")
+            return
         
+        # 컷씬이 없을때엔 그냥 가기
+        self.app.registered_scenes["main_game_scene"].current_chapter = self.selected_chapter
+        self.app.registered_scenes["main_game_scene"].current_level = button.data["index"]
         self.app.change_scene("main_game_scene")
-
-    def on_world_blocked_click(self, button: TextButton):
-        '''플레이 불가한 월드 버튼을 눌렀을때 플레이 불가 텍스트를 생성후 Tween해서 서서히 없어짐.'''
-        txt_renderer = TextRenderer("플레이 불가", pg.Vector2(SCREEN_SIZE.x / 2, 750), anchor=pg.Vector2(.5, .5))
-        Tween(txt_renderer, "alpha", 255, 0, .5).on_complete.append(
-            lambda: txt_renderer.destroy()
-        )
 
     def handle_input(self):
         for event in self.app.events:
