@@ -4,4 +4,4 @@ from .settings_scene import SettingsScene
 from .info_scene import InfoScene
 from .tile_map_editor_scene import TileMapEditScene
 from .chapter_select_scene import ChapterSelectScene
-from .cut_scenes import OpeningScene, Tutorial1Scene
+from .cut_scenes import OpeningScene, Tutorial1Scene, Tutorial2Scene

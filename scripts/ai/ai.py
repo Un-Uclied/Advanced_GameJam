@@ -102,6 +102,10 @@ class ChaseAI:
     def update(self):
         entity = self.entity
         
+        # 메인메뉴 같은데엔 player_status가 없으니 리턴
+        if not hasattr(self.entity.app.scene, "player_status"):
+            return
+
         ps = entity.app.scene.player_status
         pc = ps.player_character
 

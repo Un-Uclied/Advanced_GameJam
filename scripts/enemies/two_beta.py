@@ -17,7 +17,7 @@ MAX_CHANGE_TIMER = 0.4
 
 COLLIDE_ATTACK_DAMAGE = 15
 
-FIRE_RANGE = 550
+FIRE_RANGE = 500
 FIRE_COOLTIME = 1
 from scripts.projectiles import ProjectileBeta
 PROJECTILE_CLASS = ProjectileBeta

@@ -11,5 +11,9 @@
         "2" : ["chap_2/a", "chap_2/b", "chap_2/c", "chap_2/d", "chap_2/e"],
         "3" : ["chap_3/a", "chap_3/b", "chap_3/c", "chap_3/d", "chap_3/e"],
         "4" : ["boss/a"]
-    }
+    },
+
+    "main_menu_maps" : [
+        "main_menu/bright.json", "main_menu/dark.json", "main_menu/grave.json"
+    ]
 }

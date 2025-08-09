@@ -1,6 +1,7 @@
 from scripts.constants import *
 from scripts.status import *
 from scripts.ai import *
+from scripts.ui import *
 from .base import PhysicsEnemy
 
 HIT_BOX_SIZE = (80, 170)
@@ -34,6 +35,15 @@ class FourBeta(PhysicsEnemy):
             self.set_action("idle")
         else:
             self.set_action("run")
+
+    def do_attack(self, damage, pos, shake = 0):
+        super().do_attack(damage, pos, shake)
+        ps = self.app.scene.player_status
+        # 이미 모든 SOUL이 DEFAULT면 안함
+        if ps.soul_queue and not all(soul == SOUL_DEFAULT for soul in ps.soul_queue):
+            ps.soul_queue.append(SOUL_DEFAULT)
+            self.app.scene.event_bus.emit("on_player_soul_changed")
+            PopupText("혼이 감염되어 소멸해버렸다...", pg.Vector2(SCREEN_SIZE.x / 2, 680), fade_delay=.25, fade_duration=1.5)
 
     def update(self):
         super().update()

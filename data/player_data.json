@@ -5,19 +5,19 @@
             true,
             true,
             true,
-            false,
-            false
+            true,
+            true
         ],
         "2": [
-            false,
+            true,
             false,
             false,
             false,
             false
         ],
         "3": [
-            false,
-            false,
+            true,
+            true,
             false,
             false,
             false
@@ -28,10 +28,10 @@
     },
     "scores": {
         "1": [
-            910,
-            1945,
             0,
-            0,
+            15000,
+            19360,
+            26930,
             0
         ],
         "2": [
@@ -42,7 +42,7 @@
             0
         ],
         "3": [
-            0,
+            43880,
             0,
             0,
             0,

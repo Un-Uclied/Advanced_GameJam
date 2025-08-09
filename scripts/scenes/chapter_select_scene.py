@@ -1,5 +1,6 @@
 import pygame as pg
 import json
+import random
 
 from scripts.constants import *
 from scripts.backgrounds import *
@@ -17,7 +18,7 @@ class ChapterSelectScene(Scene):
         super().on_scene_start()
         
         # 타일맵 만들고
-        self.tilemap = Tilemap("main_menu.json")
+        self.tilemap = Tilemap(random.choice(TILEMAP_DATA["main_menu_maps"]))
         spawn_all_entities(self.tilemap)
         ImageRenderer(self.app.ASSETS["ui"]["vignette"]["black"], pg.Vector2(0, 0), anchor=pg.Vector2(0, 0))
 
@@ -34,9 +35,6 @@ class ChapterSelectScene(Scene):
         self.selected_chapter = 0
         # 생성된 월드 플레이 버튼
         self.buttons = []
-
-        # 엔티티들이 움직이는 속도가 너무 빨라서 느리게 하기
-        self.app.time_scale = .5
 
         Sky()
         Clouds()
@@ -97,9 +95,12 @@ class ChapterSelectScene(Scene):
         '''플레이 가능한 원드 버튼을 눌렀을때 change_scene하기 전에 먼저 플레이할 챕터와 월드 인덱스 설정후, change_scene'''
         self.app.registered_scenes["main_game_scene"].current_chapter = self.selected_chapter
         self.app.registered_scenes["main_game_scene"].current_level = button.data["index"]
+        # 특정 레벨을 선택했다면 메인게임 씬으로 가지않고, 튜토리얼씬으로 가게 만든후, 튜토리얼씬에서 끝나면 메인게임으로 감
         if self.selected_chapter == 1 and button.data["index"] == 0:
-            print("WWWWWWWWWWWWWWWWWWW")
             self.app.change_scene("tutorial_one_scene")
+            return
+        if self.selected_chapter == 1 and button.data["index"] == 1:
+            self.app.change_scene("tutorial_two_scene")
             return
         
         self.app.change_scene("main_game_scene")
@@ -120,8 +121,3 @@ class ChapterSelectScene(Scene):
         super().update()
 
         self.handle_input()
-
-    def on_scene_end(self):
-        # 끝날때 원상복구
-        self.app.time_scale = 1.0
-        super().on_scene_end()

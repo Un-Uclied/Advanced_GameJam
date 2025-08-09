@@ -31,7 +31,11 @@ class ProjectileBeta(Projectile):
         self.timer.destroy()
         AnimatedParticle(self.destroy_particle_anim, self.position)
         super().destroy()
-        
+    
+    def update_tilemap_collision(self):
+        # 이 탄환은 벽에 닿아도 부서지지 않음 ㅇㅇ
+        return None
+
     def update(self):
         super().update()
 

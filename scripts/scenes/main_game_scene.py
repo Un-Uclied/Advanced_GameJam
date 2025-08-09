@@ -21,8 +21,8 @@ with open("data/tilemap_data.json", 'r', encoding="utf-8") as f:
 
 class GameUI:
     """
-    플레이어 상태를 표시하는 UI를 관리하는 클래스.
-    MainGameScene에서 생성되어 플레이어 상태 변화에 반응합니다.
+    플레이어 상태를 표시하는 UI를 관리하는 클래SUIIII
+    MainGameScene에서 생성되어 플레이어 상태 변화에 반응
     """
     def __init__(self, scene, player_status, vignette):
         self.scene = scene
@@ -152,10 +152,10 @@ class PauseUI:
 
     def on_reset_button_clicked(self):
         """무적 슬롯 초기화 버튼 클릭 시 처리"""
-        self.scene_paused = False
+        self.scene.scene_paused = False
         for i in range(len(self.player_status.soul_queue)):
-            self.player_status.on_soul_interact(SOUL_DEFAULT)
-        self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["ui"]["reset"])
+            self.player_status.soul_queue.append(SOUL_DEFAULT)
+        self.scene.app.sound_manager.play_sfx(self.scene.app.ASSETS["sounds"]["ui"]["reset"])
 
 class MainGameScene(Scene):
     """
@@ -286,7 +286,12 @@ class MainGameScene(Scene):
 
     def on_level_end(self):
         """레벨 종료 시 다음 맵으로 이동"""
-        self.app.player_data["scores"][str(self.current_chapter)][self.current_level] = self._score
+        # 일단 트랜지션중에 죽지 않게
+        self.player_status.is_invincible = True
+        # 하이스코어 저장
+        if self._score > self.app.player_data["scores"][str(self.current_chapter)][self.current_level]:
+            self.app.player_data["scores"][str(self.current_chapter)][self.current_level] = self._score
+        # 다음 레벨로갈 초기화
         self._score = 0
         self.current_level += 1
         self.app.change_scene("main_game_scene")

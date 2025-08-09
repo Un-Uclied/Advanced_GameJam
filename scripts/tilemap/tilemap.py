@@ -21,8 +21,8 @@ AUTOTILE_MAP = {
 
 NEIGHBOR_OFFSETS = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (0, 0), (-1, 1), (0, 1), (1, 1)]
 
-AUTO_TILE_TILES = ["dirt"]
-IN_GRID_TILES = ["dirt"]
+AUTO_TILE_TILES = ["dirt", "stone", "dead_grass"]
+IN_GRID_TILES = ["dirt", "stone", "dead_grass", "wood_struct"]
 DO_NOT_RENDER_TILES = ["spawners_entities", "spawners_enemies"]
 
 # big ass number

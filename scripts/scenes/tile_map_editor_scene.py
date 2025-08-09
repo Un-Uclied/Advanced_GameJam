@@ -100,8 +100,10 @@ class TileMapEditor:
                     self.tilemap.save_file()
                 elif event.key == pg.K_u:
                     self.erase_all()
+                    self.tilemap.rerender()
                 elif event.key == pg.K_z and keys[pg.K_LCTRL]:
                     self.undo()
+                    self.tilemap.rerender()
 
     def handle_mouse_input(self):
         '''마우스 인풋 핸들'''

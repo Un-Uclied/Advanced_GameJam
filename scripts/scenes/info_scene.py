@@ -11,7 +11,10 @@ ASSET_LINKS = [
     "https://xyezawr.itch.io/free",
     "https://bdragon1727.itch.io/1050-rpg-effects-64x64",
     "https://xyezawr.itch.io/gif-free-pixel-effects-pack-5-blood-effects",
-    "https://xyezawr.itch.io/free-pixel-effects-pack-4-explosions"
+    "https://xyezawr.itch.io/free-pixel-effects-pack-4-explosions",
+    "https://szadiart.itch.io/pixel-fantasy-caves",
+    "https://corwin-zx.itch.io/the-pale-moonlight",
+    "https://free-game-assets.itch.io/free-moon-pixel-game-backgrounds"
 ]
 
 class InfoUI:
@@ -32,7 +35,7 @@ class InfoUI:
         self.github_button = TextButton("[github 페이지 바로 가기]", pg.Vector2(SCREEN_SIZE.x / 2, 470), None, None, font_size=48)
         TextRenderer("[사용된 무료 에셋 (itch.io)]", pg.Vector2(SCREEN_SIZE.x / 2, 540), font_name="bold", font_size=60, anchor=pg.Vector2(0.5, 0.5))
         for i, link in enumerate(ASSET_LINKS):
-            TextRenderer(link, pg.Vector2(SCREEN_SIZE.x / 2, 600 + i * 40), anchor=pg.Vector2(0.5, 0.5))
+            TextRenderer(link, pg.Vector2(SCREEN_SIZE.x / 2, 600 + i * 30), font_size=15, anchor=pg.Vector2(0.5, 0.5))
 
     def _connect_events(self):
         """UI 요소에 이벤트 핸들러 연결"""

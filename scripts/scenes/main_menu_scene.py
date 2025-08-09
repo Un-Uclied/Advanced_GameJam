@@ -1,4 +1,6 @@
 import pygame as pg
+import json
+import random
 
 from scripts.constants import *
 from scripts.backgrounds import *
@@ -7,6 +9,9 @@ from scripts.core import *
 from scripts.volume import *
 from scripts.tilemap import *
 from .base import Scene
+
+with open("data/tilemap_data.json", encoding="utf-8") as f:
+    TILEMAP_DATA = json.load(f)
 
 class MainMenuUI:
     """메인 메뉴 화면의 모든 UI 요소를 관리하는 클래스"""
@@ -62,21 +67,13 @@ class MainMenuScene(Scene):
 
     def on_scene_start(self):
         """씬 시작 시 타일맵, 배경, UI를 초기화"""
-        super().on_scene_start()
-        
-        self.tilemap = Tilemap("main_menu.json")
+        super().on_scene_start()        
+
+        self.tilemap = Tilemap(random.choice(TILEMAP_DATA["main_menu_maps"]))
         spawn_all_entities(self.tilemap)
 
         self.main_menu_ui = MainMenuUI(self)
-        
-        # 엔티티들의 속도를 느리게 설정
-        self.app.time_scale = .5
 
         Sky()
         Clouds()
         Fog()
-
-    def on_scene_end(self):
-        """씬 종료 시 속도를 원래대로 복구"""
-        self.app.time_scale = 1.0
-        super().on_scene_end()

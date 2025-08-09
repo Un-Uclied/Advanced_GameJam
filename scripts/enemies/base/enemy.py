@@ -75,18 +75,24 @@ class ProjectileEnemy(PhysicsEnemy):
         
         my_dir = pg.Vector2(1 if not self.anim.flip_x else -1, 0)
 
-        if plr_dir.dot(my_dir) > 0:
+        # 왜 Dot product가 음수일때 같은 방향이 되는거냐 어이가 없넹;
+        if plr_dir.dot(my_dir) < 0:
             self.projectile_class(pg.Vector2(self.rect.center), plr_dir)
 
-    def update(self):
-        super().update()
-
+    def fire_attack_update(self):
         pc = self.app.scene.player_status.player_character
         dist = pg.Vector2(self.rect.center).distance_to(pg.Vector2(pc.rect.center))
 
         if dist <= self.fire_range and self.cooldown.current_time <= 0:
             self.fire()
             self.cooldown.reset()
+
+    def update(self):
+        super().update()
+        # 메인 메뉴 같은데엔 player_status가 없으니 리턴
+        if not hasattr(self.app.scene, "player_status"):
+            return
+        self.fire_attack_update()
 
 class GhostEnemy(Entity, EnemyBase):
     def __init__(self, name: str, rect: pg.Rect, collide_attack_damage: int, attack_cool: float):
@@ -109,6 +115,11 @@ class GhostEnemy(Entity, EnemyBase):
         self.attack_timer = Timer(self.attack_cool, lambda: setattr(self, "is_attacking", False))
 
     def update(self):
+        # 메인 메뉴 같은데엔 player_status가 없으니 리턴
+        if not hasattr(self.app.scene, "player_status"):
+            # 그래도 애니메이션 업데이트는 해야하니깐 ㅇㅇ;
+            return super().update()
+        
         ps = self.enemy.app.scene.player_status
         pc = ps.player_character
 

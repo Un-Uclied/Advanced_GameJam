@@ -36,3 +36,19 @@ class Tutorial1Scene(Scene):
         surface = self.app.surfaces[LAYER_INTERFACE]
         pg.draw.rect(surface, "black", surface.get_rect())
         super().draw()
+
+class Tutorial2Scene(Scene):
+    def on_scene_start(self):
+        CutScene("tutorial_2", self.cut_scene_end)
+        super().on_scene_start()
+
+    def cut_scene_end(self):
+        self.app.registered_scenes["main_game_scene"].current_chapter = 1
+        self.app.registered_scenes["main_game_scene"].current_level = 1
+        self.app.change_scene("main_game_scene")
+
+    def draw(self):
+        # 배경을 검정색으로 칠하기
+        surface = self.app.surfaces[LAYER_INTERFACE]
+        pg.draw.rect(surface, "black", surface.get_rect())
+        super().draw()

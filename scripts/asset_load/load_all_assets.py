@@ -7,6 +7,13 @@ from .load_image import *
 def load_tilemap_assets():
     return {
         "dirt": load_images("tiles/tiles/dirt", scale=2, tint_color="grey"),
+        "stone": load_images("tiles/tiles/stone", scale=2, tint_color="grey"),
+        "dead_grass": load_images("tiles/tiles/dead_grass", scale=2, tint_color="grey"),
+        "dark_folliage": load_images("tiles/objects/dark_folliage", scale=2, tint_color="grey"),
+        "wood_struct": load_images("tiles/tiles/wood_struct", scale=2, tint_color="grey"),
+        "dark_rocks": load_images("tiles/objects/dark_rocks", scale=3, tint_color="grey"),
+        "grave_woods": load_images("tiles/objects/grave_woods", scale=3, tint_color="grey"),
+        "dark_stones": load_images("tiles/objects/dark_stones", scale=2, tint_color="grey"),
         "folliage": load_images("tiles/objects/folliage", scale=2, tint_color="grey"),
         "props": load_images("tiles/objects/props", scale=2, tint_color="grey"),
         "statues": load_images("tiles/objects/statues", scale=2, tint_color="grey"),
@@ -212,7 +219,8 @@ def load_ui_assets():
 def load_background_assets():
     return {
         "sky": {
-            "default": load_images("skys/default", scale=2.5, tint_color=pg.Color(100, 100, 100))
+            "default": load_images("skys/default", scale=2.5, tint_color=pg.Color(100, 100, 100)),
+            "dark": load_images("skys/dark", scale=2.5, tint_color=pg.Color(100, 100, 100))
         },
         "clouds": load_images("clouds", scale=1.5, tint_color="grey")
     }
@@ -221,6 +229,7 @@ def load_cut_scene_assets():
     return {
         "opening" : load_images("cut_scene/opening", scale=2),
         "tutorial_1" : load_images("cut_scene/tutorial_1", scale=2),
+        "tutorial_2" : load_images("cut_scene/tutorial_2", scale=2),
     }
 
 def load_all_assets():
