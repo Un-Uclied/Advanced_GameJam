@@ -36,6 +36,10 @@ class EnemyBase:
         :param pos: 공격 위치 (파티클/넉백 기준)
         :param shake: 카메라 흔들림 세기 (기본값 0)
         '''
+        # 대미지 0 이하면 return
+        if damage <= 0:
+            return
+        
         if self.enemy.status.soul_type == SOUL_EVIL_B:
             damage += ENEMY_EVIL_B_DAMAGE_UP
 
@@ -126,12 +130,7 @@ class ProjectileEnemy(PhysicsEnemy):
         방향 맞지 않으면 발사 안 함
         '''
         pc = self.app.scene.player_status.player_character
-        plr_dir = pg.Vector2(pc.rect.center) - pg.Vector2(self.rect.center)
-
-        if plr_dir.length() == 0:
-            return
-        else:
-            plr_dir = plr_dir.normalize()
+        plr_dir = pc.get_direction_from(pg.Vector2(self.rect.center))
         
         my_dir = pg.Vector2(1 if not self.anim.flip_x else -1, 0)
 

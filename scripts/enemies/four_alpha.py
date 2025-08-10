@@ -38,7 +38,7 @@ class FourAlpha(PhysicsEnemy):
 
         self.current_move_speed = MOVE_SPEED_NORMAL
 
-    def control_animation(self):
+    def _control_animation(self):
         if self.ai.direction.x == 0:
             self.set_action("idle")
         else:
@@ -48,8 +48,8 @@ class FourAlpha(PhysicsEnemy):
         super().do_attack(damage, pos, shake)
         ps = self.app.scene.player_status
 
-        # 큐가 비어있지 않고, 전부 DEFAULT가 아닐 때만 실행
-        if ps.soul_queue and not all(soul == SOUL_DEFAULT for soul in ps.soul_queue):
+        # # 무적이 아니고, 큐가 비어있지 않고, 전부 DEFAULT가 아닐 때만 실행
+        if ps.current_invincible_time <= 0 and ps.soul_queue and not all(soul == SOUL_DEFAULT for soul in ps.soul_queue):
             for i in range(len(ps.soul_queue)):
                 ps.soul_queue[i] = SOUL_DEFAULT  # 값 교체
             self.app.scene.event_bus.emit("on_player_soul_changed")
@@ -75,7 +75,7 @@ class FourAlpha(PhysicsEnemy):
         super().update()
         
         self.ai.update()
-        self.control_animation()
+        self._control_animation()
 
         if self.is_player_nearby:
             self.current_move_speed = MOVE_SPEED_CRAZY

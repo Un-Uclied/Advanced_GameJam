@@ -37,7 +37,7 @@ class TwoBeta(ProjectileEnemy):
         self.status = EnemyStatus(self, MAX_HEALTH)
         self.ai = WanderAI(self, MIN_CHANGE_TIMER, MAX_CHANGE_TIMER)
 
-    def control_animation(self):
+    def _control_animation(self):
         if self.ai.direction.x == 0:
             self.set_action("idle")
         else:
@@ -47,6 +47,6 @@ class TwoBeta(ProjectileEnemy):
         super().update()
         
         self.ai.update()
-        self.control_animation()
+        self._control_animation()
         
         self.velocity.x = self.ai.direction.x * ((MOVE_SPEED + ENEMY_EVIL_A_SPEED_UP) if self.status.soul_type == SOUL_EVIL_A else MOVE_SPEED) * 100

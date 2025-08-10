@@ -25,7 +25,7 @@ class ProjectileBeta(Projectile):
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["enemy"]["projectile"])
 
         # 파괴 시 재생할 파티클 애니메이션 지정
-        self.destroy_particle_anim = self.app.ASSETS["animations"]["vfxs"]["projectile_destroy"]["player"]
+        self.destroy_particle_anim = self.app.ASSETS["animations"]["vfxs"]["projectile_destroy"]["enemy_beta"]
 
     def destroy(self):
         """

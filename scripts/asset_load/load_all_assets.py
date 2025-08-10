@@ -21,6 +21,7 @@ def load_tilemap_assets():
         "statues": load_images("tiles/objects/statues", **base_args),
         "spawners_entities": load_images("tiles/spawners_entities", scale=2),
         "spawners_enemies": load_images("tiles/spawners_enemies", scale=2),
+        "custom_point": load_images("tiles/custom_point", scale=2),
     }
 
 def load_entity_animations():
@@ -81,7 +82,7 @@ def load_entity_animations():
         "idle": Animation(load_images("entities/enemies/five_omega/idle", 1.5), 0.05),
         "run": Animation(load_images("entities/enemies/five_omega/run", 1.5), 0.08),
         "scythe_attack": Animation(load_images("entities/enemies/five_omega/scythe_attack", 1.5), 0.02, False),
-        "turn_eye": Animation(load_images("entities/enemies/five_omega/turn_eye", 1.5), 0.05, False),
+        "turn_eye": Animation(load_images("entities/enemies/five_omega/turn_eye", 1.5), 0.04, False),
     }
 
     return anims
@@ -103,7 +104,7 @@ def load_vfx_animations():
         },
         "projectile_destroy": {
             "enemy_alpha": Animation(load_images("particles/destroy", scale=2, tint_color="purple"), 0.03, False),
-            "enemy_beta": Animation(load_images("particles/destroy", scale=2, tint_color="red"), 0.03, False),
+            "enemy_beta": Animation(load_images("particles/destroy", scale=2, tint_color="orange"), 0.03, False),
             "player": Animation(load_images("particles/destroy", scale=2), 0.03, False),
         },
     }
@@ -115,6 +116,8 @@ def load_projectile_animations():
         "two_alpha_projectile": Animation(load_images("projectiles/projectile", tint_color="purple", **base_args), 0.03, True),
         "two_beta_projectile": Animation(load_images("projectiles/projectile", tint_color="red", **base_args), 0.03, True),
         "player_projectile": Animation(load_images("projectiles/projectile", **base_args), 0.03, True),
+        "boss_projectile": Animation(load_images("projectiles/boss_projectile", **base_args), 0.03, True),
+        "boss_lazer": Animation(load_images("projectiles/boss_lazer", **base_args), 0.03, True),
     }
 
 def load_sound_assets():
@@ -136,6 +139,7 @@ def load_sound_assets():
             "projectile": snd("enemy/projectile"),
             "boss": {
                 "scythe": snd("enemy/boss/scythe"),
+                "lazer" : snd("enemy/boss/lazer"),
             },
         },
         "soul": {

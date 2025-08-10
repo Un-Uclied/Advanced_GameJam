@@ -1,11 +1,19 @@
 {
     "two_alpha_projectile" : {
-        "damage" : 20,
+        "damage" : 15,
         "speed" : 400
     },
     "two_beta_projectile" : {
         "damage" : 20,
         "speed" : 450
+    },
+    "boss_projectile" : {
+        "damage" : 20,
+        "speed" : 800
+    },
+    "boss_lazer" : {
+        "damage" : 20,
+        "speed" : 1200
     },
 
     "player_projectile" : {

@@ -70,7 +70,7 @@ class PhysicsEntity(Entity):
                         # 중력 처리 따로 하기 때문에 movement.y = 0 은 하지 않음
                         self.rect.top = rect.bottom
 
-    def physics_gravity(self):
+    def _physics_gravity(self):
         """
         중력 처리
         
@@ -89,7 +89,7 @@ class PhysicsEntity(Entity):
         if self.collisions["up"]:
             self.current_gravity = 0
 
-    def physics_movement(self):
+    def _physics_movement(self):
         """
         movement 계산
         
@@ -110,7 +110,7 @@ class PhysicsEntity(Entity):
         - 중력 업데이트
         - 부모 업데이트 호출 (애니메이션 등)
         """
-        self.physics_movement()
+        self._physics_movement()
         self.physics_collision()
-        self.physics_gravity()
+        self._physics_gravity()
         super().update()

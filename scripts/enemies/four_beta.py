@@ -30,7 +30,7 @@ class FourBeta(PhysicsEnemy):
         self.status = EnemyStatus(self, MAX_HEALTH)
         self.ai = WanderAI(self, MIN_CHANGE_TIMER, MAX_CHANGE_TIMER)
 
-    def control_animation(self):
+    def _control_animation(self):
         if self.ai.direction.x == 0:
             self.set_action("idle")
         else:
@@ -40,8 +40,8 @@ class FourBeta(PhysicsEnemy):
         super().do_attack(damage, pos, shake)
         ps = self.app.scene.player_status
 
-        # 큐가 비어있지 않고, 전부 DEFAULT가 아닐 때만 실행
-        if ps.soul_queue and not all(soul == SOUL_DEFAULT for soul in ps.soul_queue):
+        # # 무적이 아니고, 큐가 비어있지 않고, 전부 DEFAULT가 아닐 때만 실행
+        if ps.current_invincible_time <= 0 and ps.soul_queue and not all(soul == SOUL_DEFAULT for soul in ps.soul_queue):
             for i in range(len(ps.soul_queue)):
                 ps.soul_queue[i] = SOUL_DEFAULT  # 값 교체
             self.app.scene.event_bus.emit("on_player_soul_changed")
@@ -56,6 +56,6 @@ class FourBeta(PhysicsEnemy):
         super().update()
         
         self.ai.update()
-        self.control_animation()
+        self._control_animation()
         
         self.velocity.x = self.ai.direction.x * ((MOVE_SPEED + ENEMY_EVIL_A_SPEED_UP) if self.status.soul_type == SOUL_EVIL_A else MOVE_SPEED) * 100

@@ -2,7 +2,7 @@ import time
 
 class GameObject:
     # 디버그 모드 플래그 (True면 업데이트/드로우 걸린 시간 출력함)
-    is_debug = False
+    is_debug = True
     # 모든 GameObject 인스턴스 전역 리스트 (씬 전체 오브젝트 관리)
     all_objects: list["GameObject"] = []
 

@@ -64,7 +64,7 @@ class Entity(GameObject):
             pg.Vector2(self.rect.bottomright)
         ]
 
-    def flip_anim(self):
+    def _flip_anim(self):
         """
         이동 방향(x축 속도)에 따라 애니메이션 좌우 반전 설정
         invert_x 플래그와 조합하여 뒤집힘 결정
@@ -83,7 +83,7 @@ class Entity(GameObject):
         - 애니메이션 프레임 업데이트
         """
         super().update()
-        self.flip_anim()
+        self._flip_anim()
         self.anim.update(self.app.dt)
 
     def draw_debug(self):

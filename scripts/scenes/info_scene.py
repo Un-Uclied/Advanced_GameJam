@@ -15,7 +15,9 @@ ASSET_LINKS = [
     "https://szadiart.itch.io/pixel-fantasy-caves",
     "https://corwin-zx.itch.io/the-pale-moonlight",
     "https://free-game-assets.itch.io/free-moon-pixel-game-backgrounds",
-    "https://ragnapixel.itch.io/particle-fx"
+    "https://ragnapixel.itch.io/particle-fx",
+    "https://www.youtube.com/watch?v=whLbGbpt-E4&t=1s",
+    "https://codemanu.itch.io/pixelart-effect-pack"
 ]
 
 class InfoUI:
@@ -34,7 +36,7 @@ class InfoUI:
         TextRenderer("심규원", pg.Vector2(SCREEN_SIZE.x / 2, 280), anchor=pg.Vector2(0.5, 0.5))
         TextRenderer("이준영", pg.Vector2(SCREEN_SIZE.x / 2, 310), anchor=pg.Vector2(0.5, 0.5))
         self.github_button = TextButton("[github 페이지 바로 가기]", pg.Vector2(SCREEN_SIZE.x / 2, 370), None, None, font_size=48)
-        TextRenderer("[사용된 무료 에셋 (itch.io)]", pg.Vector2(SCREEN_SIZE.x / 2, 450), font_name="bold", font_size=60, anchor=pg.Vector2(0.5, 0.5))
+        TextRenderer("사용된 무료 에셋", pg.Vector2(SCREEN_SIZE.x / 2, 450), font_name="bold", font_size=60, anchor=pg.Vector2(0.5, 0.5))
         for i, link in enumerate(ASSET_LINKS):
             TextRenderer(link, pg.Vector2(SCREEN_SIZE.x / 2, 500 + i * 30), font_size=15, anchor=pg.Vector2(0.5, 0.5))
 

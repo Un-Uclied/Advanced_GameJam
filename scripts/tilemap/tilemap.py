@@ -31,7 +31,7 @@ AUTO_TILE_TILES = ["dirt", "stone", "dead_grass"]
 IN_GRID_TILES = ["dirt", "stone", "dead_grass", "wood_struct"]
 
 # 렌더링하지 않을 타일 타입 (스폰 지점 같은 것들)
-DO_NOT_RENDER_TILES = ["spawners_entities", "spawners_enemies"]
+DO_NOT_RENDER_TILES = ["spawners_entities", "spawners_enemies", "custom_point"]
 
 # 엄청 큰 크기의 캐시용 서피스 크기 (월드 좌표를 모두 커버)
 CACHE_SURFACE_SIZE = pg.Vector2(15000, 15000)

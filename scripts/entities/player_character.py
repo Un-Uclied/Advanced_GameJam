@@ -73,7 +73,21 @@ class PlayerCharacter(PhysicsEntity):
         self.app.scene.event_bus.connect("on_player_died", lambda: self.set_action("die"))
         self.app.scene.event_bus.connect("on_player_hurt", self._on_player_hurt)
 
-    def _on_player_hurt(self, damage):
+    def get_direction_from(self, point : pg.Vector2):
+        '''적이 부르는 헬퍼 function (적과 플레이어의 방향을 줌)'''
+        to_plr_dir = pg.Vector2(self.rect.center) - pg.Vector2(point)
+
+        if to_plr_dir.length_squared() == 0:
+            return pg.Vector2(0, 0)
+        else:
+            return to_plr_dir.normalize()
+        
+    def get_distance_from(self, point : pg.Vector2):
+        '''적이 부르는 헬퍼 function (적과 플레이어의 거리를 줌)'''
+        to_plr_dir = pg.Vector2(self.rect.center) - pg.Vector2(point)
+        return to_plr_dir.length()
+
+    def _on_player_hurt(self, _damage):
         ps = self.app.scene.player_status
         if ps.health <= 0:
             return
@@ -81,7 +95,7 @@ class PlayerCharacter(PhysicsEntity):
             return
         self.set_action("hurt")
 
-    def handle_input(self):
+    def _handle_input(self):
         """플레이어 키보드 & 마우스 입력 처리"""
 
         ps = self.app.scene.player_status
@@ -112,13 +126,13 @@ class PlayerCharacter(PhysicsEntity):
         for event in self.app.events:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE:
-                    self.jump()
+                    self._jump()
                 if event.key == pg.K_LSHIFT:
-                    self.dash()
+                    self._dash()
             elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-                self.projectile_attack()
+                self._projectile_attack()
 
-    def control_animation(self):
+    def _control_animation(self):
         """
         애니메이션 상태 관리
         
@@ -147,7 +161,7 @@ class PlayerCharacter(PhysicsEntity):
             elif self.current_gravity < 0:
                 self.set_action("fall")
 
-    def projectile_attack(self):
+    def _projectile_attack(self):
         """탄환 발사 처리"""
 
         ps = self.app.scene.player_status
@@ -174,7 +188,7 @@ class PlayerCharacter(PhysicsEntity):
         self.set_action("attack")
         self.view_direction = "left" if direction.x < 0 else "right"
 
-    def dash(self):
+    def _dash(self):
         '''대쉬 시도, 실행'''
         # 가만히 있다면 대쉬 안함
         if self.input_direction.x == 0:
@@ -198,7 +212,7 @@ class PlayerCharacter(PhysicsEntity):
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["player"]["dash"])
         Timer(DASH_GRAVITY_TIME, lambda: setattr(self, "is_dashing", False))
 
-    def jump(self):
+    def _jump(self):
         """점프 시도"""
 
         ps = self.app.scene.player_status
@@ -212,17 +226,17 @@ class PlayerCharacter(PhysicsEntity):
 
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["player"]["jump"])
 
-    def physics_gravity(self):
+    def _physics_gravity(self):
         """중력 처리 및 점프 횟수 초기화"""
 
         # 대쉬 중이면 중력 안함
         if not self.is_dashing:
-            super().physics_gravity()
+            super()._physics_gravity()
 
         if self.collisions["down"]:
             self.current_jump_count = 0
 
-    def physics_movement(self):
+    def _physics_movement(self):
         """
         움직임 계산
         
@@ -250,7 +264,7 @@ class PlayerCharacter(PhysicsEntity):
 
         self.velocity = self.velocity.lerp(pg.Vector2(0, 0), max(min(dt * VELOCITY_DRAG, 1), 0))
 
-    def follow_light_and_camera(self):
+    def _follow_light_and_camera(self):
         """카메라 및 빛 위치 부드럽게 따라가기"""
 
         camera = self.app.scene.camera
@@ -259,16 +273,16 @@ class PlayerCharacter(PhysicsEntity):
 
         camera.position = camera.position.lerp(target_pos, max(min(dt * CAMERA_FOLLOW_SPEED, 1), 0))
 
-    def flip_anim(self):
+    def _flip_anim(self):
         """
         애니메이션 좌우 반전 처리
         
         - 기본 flip 처리 후, 인풋 방향에 맞게 강제 설정
         """
-        super().flip_anim()
+        super()._flip_anim()
         self.anim.flip_x = not self.invert_x if self.view_direction == "left" else self.invert_x
 
-    def update_fall_timer(self):
+    def _update_fall_timer(self):
         """낙하 타이머 업데이트 (땅에 없으면 타이머 활성화)"""
 
         if self.collisions["down"]:
@@ -280,8 +294,8 @@ class PlayerCharacter(PhysicsEntity):
     def update(self):
         """매 프레임 실행"""
 
-        self.handle_input()
-        self.control_animation()
+        self._handle_input()
+        self._control_animation()
         super().update()
-        self.follow_light_and_camera()
-        self.update_fall_timer()
+        self._follow_light_and_camera()
+        self._update_fall_timer()
