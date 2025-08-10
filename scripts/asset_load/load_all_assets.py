@@ -92,6 +92,7 @@ def load_vfx_animations():
     return {
         "hurt": Animation(load_images("particles/hurt", scale=2), 0.03, False),
         "explosion": Animation(load_images("particles/explosion", scale=4), 0.03, False),
+        "darkness" :  Animation(load_images("particles/darkness", scale=3), 0.03, False),
         "enemy": {
             "attack": Animation(load_images("particles/enemy/attack", scale=2, tint_color="grey"), 0.03, False),
             "die": Animation(load_images("particles/enemy/die", scale=2, tint_color="black"), 0.03, False),

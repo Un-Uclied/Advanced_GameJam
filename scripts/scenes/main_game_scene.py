@@ -5,7 +5,7 @@ import json
 from scripts.core import *
 from scripts.constants import *
 from scripts.status import PlayerStatus
-from scripts.enemies import SCORE_UP_MAP
+from scripts.enemies import SCORE_UP_MAP, FiveOmega
 from scripts.entities import PlayerCharacter
 from scripts.backgrounds import *
 from scripts.volume import *
@@ -162,6 +162,22 @@ class PauseUI:
         self.scene.event_bus.emit("on_player_soul_changed")
         self.scene.app.sound_manager.play_sfx(self.scene.app.ASSETS["sounds"]["ui"]["reset"])
 
+class BossUI:
+    def __init__(self, scene):
+        self.scene = scene
+        self.boss : FiveOmega = GameObject.get_objects_by_types(FiveOmega)[0]
+
+        self._create_boss_healthbar()
+
+    def _create_boss_healthbar(self):
+        self.health_bar = ProgressBar(pg.Vector2(SCREEN_SIZE.x / 2, 50), pg.Vector2(800, 25), self.boss.status.health, 0, self.boss.status.max_health)
+        
+        def on_enemy_hit(enemy):
+            if not enemy is self.boss:
+                return
+            self.health_bar.value = self.boss.status.health
+        self.scene.event_bus.connect("on_enemy_hit", on_enemy_hit)
+
 class MainGameScene(Scene):
     """
     인게임 씬 전담 클래스
@@ -212,6 +228,8 @@ class MainGameScene(Scene):
         self.event_bus.connect("on_player_died", lambda: self.app.change_scene("main_game_scene"))
 
         # UI 인스턴스 생성
+        if self.current_chapter == 4 and self.current_level == 0:
+            BossUI(self)
         self.game_ui = GameUI(self, self.player_status, self.vignette)
         self.pause_ui = PauseUI(self, self.player_status)
 

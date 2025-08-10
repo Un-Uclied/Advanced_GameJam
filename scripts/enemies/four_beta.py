@@ -2,6 +2,7 @@ from scripts.constants import *
 from scripts.status import *
 from scripts.ai import *
 from scripts.ui import *
+from scripts.vfx import *
 from .base import PhysicsEnemy
 
 HIT_BOX_SIZE = (80, 170)
@@ -45,6 +46,7 @@ class FourBeta(PhysicsEnemy):
             for i in range(len(ps.soul_queue)):
                 ps.soul_queue[i] = SOUL_DEFAULT  # 값 교체
             self.app.scene.event_bus.emit("on_player_soul_changed")
+            AnimatedParticle(self.app.ASSETS["animations"]["vfxs"]["darkness"], pg.Vector2(ps.player_character.rect.center))
             PopupText(
                 "혼이 감염되어 소멸해버렸다...",
                 pg.Vector2(SCREEN_SIZE.x / 2, 680),
