@@ -87,7 +87,7 @@ class PhysicsEnemy(PhysicsEntity, EnemyBase):
         ps = self.enemy.app.scene.player_status
         pc = ps.player_character
 
-        if self.rect.colliderect(pc.rect) and not ps.is_invincible:
+        if self.rect.colliderect(pc.rect) and not ps.current_invincible_time > 0:
             self.do_attack(self.collide_attack_damage, pg.Vector2(self.rect.center), shake=10)
 
 class ProjectileEnemy(PhysicsEnemy):
@@ -207,7 +207,7 @@ class GhostEnemy(Entity, EnemyBase):
         pc = ps.player_character
 
         if not self.is_attacking:
-            if self.rect.colliderect(pc.rect) and not ps.is_invincible:
+            if self.rect.colliderect(pc.rect) and not ps.current_invincible_time > 0:
                 self.trigger_attack()
             else:
                 self.set_action("idle")

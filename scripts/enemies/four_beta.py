@@ -10,7 +10,7 @@ FLIP_OFFSET = {
     True  : [-8, -8]
 }
 
-MAX_HEALTH = 125
+MAX_HEALTH = 100
 
 MOVE_SPEED = 7
 MIN_CHANGE_TIMER = 0.1

@@ -127,6 +127,7 @@ def load_sound_assets():
             "jump": snd("player/jump"),
             "hurt": snd("player/hurt"),
             "projectile": snd("player/projectile"),
+            "dash": snd("player/dash"),  
         },
         "enemy": {
             "attack": snd("enemy/attack"),

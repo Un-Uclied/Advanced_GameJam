@@ -73,6 +73,7 @@ class Scene:
         모든 게임 오브젝트 정리 (삭제)
         """
         GameObject.all_objects.clear()
+        self.scene_paused = False
 
     def update(self):
         """

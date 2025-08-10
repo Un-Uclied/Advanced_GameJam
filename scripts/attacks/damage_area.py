@@ -42,7 +42,7 @@ class DamageArea(GameObject):
         ps = self.app.scene.player_status
         pc = ps.player_character
 
-        if self.rect.colliderect(pc.rect) and not ps.is_invincible:
+        if self.rect.colliderect(pc.rect) and not ps.current_invincible_time > 0:
             if self.once and self._has_damaged:
                 return
 

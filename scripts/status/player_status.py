@@ -8,7 +8,7 @@ from scripts.ui import *
 from scripts.volume import *
 
 MAX_HEALTH = 100
-INVINCIBLE_DURATION = 1.5
+HURT_INVINCIBLE_TIME = 1
 HEALTH_RESTORE_INTERVAL = 1.0
 HEALTH_RESTORE_AMOUNT = 1
 ATTACK_COOLTIME = 0.65
@@ -35,14 +35,10 @@ class PlayerAbilities:
 
     def on_damage(self, damage: int):
         """피격 시 호출 - 무적 시작, 카메라 흔들림, 효과음 재생, 파티클 생성"""
-        if self.status.is_invincible:
+        if self.status.current_invincible_time > 0:
             return  # 무적이면 무시
         
-        self.status.is_invincible = True
-        self.status.invincible_timer.reset()
-        self.status.invincible_timer.active = True
-
-        self.app.scene.event_bus.emit("on_player_invincible", True)
+        self.status.current_invincible_time += HURT_INVINCIBLE_TIME
 
         self.app.scene.camera.shake_amount += damage * 2
         self.app.sound_manager.play_sfx(self.hurt_sound)
@@ -105,7 +101,6 @@ class PlayerStatus(GameObject):
 
         self._health = start_health
         self.max_health = MAX_HEALTH
-        self.is_invincible = False
 
         self.soul_queue = deque([SOUL_DEFAULT, SOUL_DEFAULT], maxlen=2)
 
@@ -120,13 +115,8 @@ class PlayerStatus(GameObject):
         )
         self.heal_timer.active = True
 
-        # 무적 타이머
-        self.invincible_timer = Timer(
-            time=INVINCIBLE_DURATION,
-            on_time_out=self.end_invincibility,
-            auto_destroy=False,
-        )
-        self.invincible_timer.active = False
+        # 무적 시간
+        self._current_invincible_time = 0
 
         # 공격 쿨타임 타이머
         self.attack_cooltime = Timer(
@@ -137,11 +127,6 @@ class PlayerStatus(GameObject):
         self.attack_cooltime.current_time = 0
 
         self.player_character = None  # 외부에서 연결 필수
-
-    def end_invincibility(self):
-        """무적 상태 종료"""
-        self.is_invincible = False
-        self.app.scene.event_bus.emit("on_player_invincible", False)
 
     @property
     def health(self):
@@ -156,7 +141,7 @@ class PlayerStatus(GameObject):
         self._health = max(0, min(value, self.max_health))
 
         if self._health < prev_health:
-            if self.is_invincible:
+            if self.current_invincible_time > 0:
                 self._health = prev_health  # 무적 상태면 대미지 무시
                 return
 
@@ -168,3 +153,20 @@ class PlayerStatus(GameObject):
 
         if self._health <= 0:
             scene.event_bus.emit("on_player_died")
+
+    @property
+    def current_invincible_time(self):
+        return self._current_invincible_time
+    
+    @current_invincible_time.setter
+    def current_invincible_time(self, value):
+        prev = self._current_invincible_time
+        self._current_invincible_time = max(value, 0)
+
+        if self._current_invincible_time > 0 and prev <= 0:
+            self.app.scene.event_bus.emit("on_player_invincible", True)
+        elif self._current_invincible_time <= 0 and prev > 0:
+            self.app.scene.event_bus.emit("on_player_invincible", False)
+
+    def update(self):
+        self.current_invincible_time -= self.app.dt

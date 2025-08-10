@@ -14,7 +14,8 @@ ASSET_LINKS = [
     "https://xyezawr.itch.io/free-pixel-effects-pack-4-explosions",
     "https://szadiart.itch.io/pixel-fantasy-caves",
     "https://corwin-zx.itch.io/the-pale-moonlight",
-    "https://free-game-assets.itch.io/free-moon-pixel-game-backgrounds"
+    "https://free-game-assets.itch.io/free-moon-pixel-game-backgrounds",
+    "https://ragnapixel.itch.io/particle-fx"
 ]
 
 class InfoUI:

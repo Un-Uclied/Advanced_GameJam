@@ -9,7 +9,7 @@ FLIP_OFFSET = {
     True  : [-4, -12]
 }
 
-MAX_HEALTH = 100
+MAX_HEALTH = 75
 
 MOVE_SPEED = 2.2
 MAX_FOLLOW_RANGE = 500

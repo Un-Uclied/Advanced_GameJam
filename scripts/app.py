@@ -195,6 +195,7 @@ class App:
         Args:
             name (str): 전환할 씬의 이름
         """
+                
         def on_fade_out_end():
             self.transition = False
 

@@ -12,6 +12,7 @@ from scripts.volume import *
 from scripts.tilemap import *
 from scripts.ui import *
 from .base import Scene
+from .chapter_select_scene import CUTSCENE_MAP
 
 # 타일맵 데이터 미리 로드 (레벨별 파일, 이름 매핑)
 with open("data/tilemap_data.json", 'r', encoding="utf-8") as f:
@@ -64,8 +65,8 @@ class GameUI:
         self.player_invincible_text = TextRenderer("무적 상태", pg.Vector2(25, 675), font_size=30, anchor=pg.Vector2(0, 1))
         self.player_invincible_text.alpha = 0
 
-        def on_player_invincible(start):
-            self.player_invincible_text.alpha = 255 if start else 0
+        def on_player_invincible(is_start):
+            self.player_invincible_text.alpha = 255 if is_start else 0
 
         self.scene.event_bus.connect("on_player_invincible", on_player_invincible)
 
@@ -301,11 +302,17 @@ class MainGameScene(Scene):
         - 다음 레벨로 넘어감
         - 플레이어 데이터 저장
         """
-        self.player_status.is_invincible = True
+        self.player_status.current_invincible_time += 99
         if self._score > self.app.player_data["scores"][str(self.current_chapter)][self.current_level]:
             self.app.player_data["scores"][str(self.current_chapter)][self.current_level] = self._score
         
         self._score = 0
         self.current_level += 1
-        self.app.change_scene("main_game_scene")
+
+        # 레벨이 ~~라면 컷씬으로 빼돌리기
+        target_scene_name = "main_game_scene"
+        if (self.current_chapter, self.current_level) in CUTSCENE_MAP:
+            target_scene_name = CUTSCENE_MAP[(self.current_chapter, self.current_level)]
+            
+        self.app.change_scene(target_scene_name)
         self.app.save_player_data()

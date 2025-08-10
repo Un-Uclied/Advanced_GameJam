@@ -24,6 +24,12 @@ ACCEL_POWER = 7
 DECCEL_POWER = 5
 PLAYER_PROJECTILE_KNOCKBACK = 400
 
+DASH_COOLTIME = 1
+DASH_POWER = 1000
+DASH_INVINCIBLE_TIME = .45
+DASH_GRAVITY_TIME = .15
+DASH_COST = 150
+
 CAMERA_FOLLOW_SPEED = 5
 LIGHT_SIZE = 500
 
@@ -56,14 +62,24 @@ class PlayerCharacter(PhysicsEntity):
         )
         self.fall_timer.active = False
 
+        # 대쉬 쿨타임용 타이머
+        self.dash_timer = Timer(
+            DASH_COOLTIME, None, auto_destroy=False
+        )
+        self.is_dashing = False
+
         # 이벤트 등록
         self.app.scene.event_bus.connect("on_player_soul_changed", lambda: self.set_action("change_soul"))
         self.app.scene.event_bus.connect("on_player_died", lambda: self.set_action("die"))
-        self.app.scene.event_bus.connect("on_player_invincible", self._on_player_invincible)
+        self.app.scene.event_bus.connect("on_player_hurt", self._on_player_hurt)
 
-    def _on_player_invincible(self, started: bool):
-        if started:
-            self.set_action("hurt")
+    def _on_player_hurt(self, damage):
+        ps = self.app.scene.player_status
+        if ps.health <= 0:
+            return
+        if ps.current_invincible_time > 0:
+            return
+        self.set_action("hurt")
 
     def handle_input(self):
         """플레이어 키보드 & 마우스 입력 처리"""
@@ -94,8 +110,11 @@ class PlayerCharacter(PhysicsEntity):
 
         # 이벤트 루프에서 점프 및 공격 처리
         for event in self.app.events:
-            if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
-                self.jump()
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_SPACE:
+                    self.jump()
+                if event.key == pg.K_LSHIFT:
+                    self.dash()
             elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
                 self.projectile_attack()
 
@@ -155,6 +174,30 @@ class PlayerCharacter(PhysicsEntity):
         self.set_action("attack")
         self.view_direction = "left" if direction.x < 0 else "right"
 
+    def dash(self):
+        '''대쉬 시도, 실행'''
+        # 가만히 있다면 대쉬 안함
+        if self.input_direction.x == 0:
+            return
+        # 대쉬 쿨타임이 아직 안됐다면 대쉬 안함
+        if self.dash_timer.current_time > 0:
+            return
+        # 쿨타임 초기화
+        self.dash_timer.reset()
+        # 상태 설정
+        self.is_dashing = True
+        # 힘 주기
+        self.velocity.x += self.input_direction.x * DASH_POWER
+        # 중력 0으로 초기화
+        self.current_gravity = 0
+
+        ps = self.app.scene.player_status
+        ps.current_invincible_time += DASH_INVINCIBLE_TIME
+        self.app.scene.score -= DASH_COST
+        
+        self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["player"]["dash"])
+        Timer(DASH_GRAVITY_TIME, lambda: setattr(self, "is_dashing", False))
+
     def jump(self):
         """점프 시도"""
 
@@ -172,7 +215,9 @@ class PlayerCharacter(PhysicsEntity):
     def physics_gravity(self):
         """중력 처리 및 점프 횟수 초기화"""
 
-        super().physics_gravity()
+        # 대쉬 중이면 중력 안함
+        if not self.is_dashing:
+            super().physics_gravity()
 
         if self.collisions["down"]:
             self.current_jump_count = 0

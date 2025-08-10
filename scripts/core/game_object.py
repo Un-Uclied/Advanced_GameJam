@@ -35,9 +35,10 @@ class GameObject:
     @classmethod
     def update_all(cls):
         # 전체 GameObject를 매 프레임 업데이트함
-        # 다만 게임 씬이 일시정지 상태일 땐 Entity(캐릭터 등)만 업데이트 안 함
+        # 다만 게임 씬이 일시정지 상태일 땐 Entity(캐릭터 등), PlayerStatus만 업데이트 안 함
         from scripts.entities.base import Entity
-        do_not_update_when_paused = (Entity)
+        from scripts.status import PlayerStatus
+        do_not_update_when_paused = (Entity, PlayerStatus)
 
         if GameObject.is_debug:
             start = time.perf_counter()
