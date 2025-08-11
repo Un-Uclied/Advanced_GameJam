@@ -40,6 +40,8 @@ class ChapterSelectScene(Scene):
         self.selected_chapter = 0
         self.buttons = []
 
+        self.app.sound_manager.play_bgm("main_menu")
+
         Sky()
         Clouds()
         Fog()

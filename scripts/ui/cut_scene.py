@@ -38,11 +38,12 @@ class CutScene(GameObject):
         next_step_sound (Sound): 스텝 전환 효과음
     """
 
-    def __init__(self, cut_scene_data_name: str = "opening", on_cut_scene_end=None):
+    def __init__(self, cut_scene_data_name: str = "opening", on_cut_scene_end=None, text_color=pg.Color("black")):
         super().__init__()
 
         self.cut_scene_name = cut_scene_data_name
         self.on_cut_scene_end = on_cut_scene_end
+        self.text_color = text_color
 
         # 컷씬 데이터 로드 및 초기화
         self.cut_scene_data = self._load_cut_scene_data()
@@ -53,7 +54,7 @@ class CutScene(GameObject):
 
         # 이미지 및 텍스트 렌더러 초기화
         self.image_renderer = ImageRenderer(self.current_image, pg.Vector2(SCREEN_SIZE.x / 2, 250))
-        self.text_renderer = TextRenderer("", pg.Vector2(SCREEN_SIZE.x / 2, 600), anchor=pg.Vector2(0.5, 0.5))
+        self.text_renderer = TextRenderer("", pg.Vector2(SCREEN_SIZE.x / 2, 600), anchor=pg.Vector2(0.5, 0.5), color=self.text_color)
 
         # 타자기 효과 관련 변수 및 타이머
         self.text_index = 0
@@ -68,7 +69,7 @@ class CutScene(GameObject):
         # ESC 스킵 관련 타이머 및 텍스트
         self.skip_timer = Timer(0.5, on_time_out=self._skip_cut_scene, auto_destroy=False, use_unscaled=True)
         self.skip_timer.active = False
-        self.skip_text_renderer = TextRenderer("[ESC] 스킵", pg.Vector2(10, 10), font_name="bold", font_size=20, anchor=pg.Vector2(0, 0))
+        self.skip_text_renderer = TextRenderer("[ESC] 스킵", pg.Vector2(10, 10), font_name="bold", font_size=20, anchor=pg.Vector2(0, 0), color=self.text_color)
 
         # 다음 컷 진행 안내 텍스트 (페이드 아웃 효과)
         Tween(

@@ -120,6 +120,6 @@ class ChaseAI:
         # 방향 벡터 계산 및 정규화 (길이 0인 경우 예외처리)
         self.direction = self.target_position - entity_center
         if self.direction.length_squared() > 0:
-            self.direction = self.direction.normalize()
+            self.direction.normalize_ip()
         else:
             self.direction = pg.Vector2(0, 0)

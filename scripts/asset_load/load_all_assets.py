@@ -93,6 +93,7 @@ def load_vfx_animations():
         "hurt": Animation(load_images("particles/hurt", scale=2), 0.03, False),
         "explosion": Animation(load_images("particles/explosion", scale=4), 0.03, False),
         "darkness" :  Animation(load_images("particles/darkness", scale=3), 0.03, False),
+        "darkness_big" :  Animation(load_images("particles/darkness", scale=5), 0.1, False),
         "enemy": {
             "attack": Animation(load_images("particles/enemy/attack", scale=2, tint_color="grey"), 0.03, False),
             "die": Animation(load_images("particles/enemy/die", scale=2, tint_color="black"), 0.03, False),
@@ -117,8 +118,9 @@ def load_projectile_animations():
         "two_alpha_projectile": Animation(load_images("projectiles/projectile", tint_color="purple", **base_args), 0.03, True),
         "two_beta_projectile": Animation(load_images("projectiles/projectile", tint_color="red", **base_args), 0.03, True),
         "player_projectile": Animation(load_images("projectiles/projectile", **base_args), 0.03, True),
-        "boss_projectile": Animation(load_images("projectiles/boss_projectile", **base_args), 0.03, True),
+        "boss_fire": Animation(load_images("projectiles/boss_fire", **base_args), 0.03, True),
         "boss_lazer": Animation(load_images("projectiles/boss_lazer", **base_args), 0.03, True),
+        "boss_knife": Animation(load_images("projectiles/boss_knife", **base_args), 0.03, True),
     }
 
 def load_sound_assets():
@@ -131,7 +133,7 @@ def load_sound_assets():
             "jump": snd("player/jump"),
             "hurt": snd("player/hurt"),
             "projectile": snd("player/projectile"),
-            "dash": snd("player/dash"),  
+            "dash": snd("player/dash"),
         },
         "enemy": {
             "attack": snd("enemy/attack"),
@@ -141,6 +143,10 @@ def load_sound_assets():
             "boss": {
                 "scythe": snd("enemy/boss/scythe"),
                 "lazer" : snd("enemy/boss/lazer"),
+                "knife_warn" : snd("enemy/boss/knife_warn"),
+                "knife_throw" : snd("enemy/boss/knife_throw"),
+                "scream" : snd("enemy/boss/scream"),
+                "spawn": snd("enemy/boss/spawn"),
             },
         },
         "soul": {
@@ -217,6 +223,8 @@ def load_cut_scene_assets():
         "tutorial_2": load_images("cut_scene/tutorial_2", scale=2),
         "no_lights": load_images("cut_scene/no_lights", scale=2),
         "no_souls": load_images("cut_scene/no_souls", scale=2),
+        "bad_ending": load_images("cut_scene/bad_ending", scale=2),
+        "good_ending": load_images("cut_scene/good_ending", scale=2),
     }
 
 def load_all_assets():

@@ -58,7 +58,7 @@ class EnemyBase:
 
         direction = pg.Vector2(pc.rect.center) - pos
         if direction.length_squared() > 0:
-            direction = direction.normalize()
+            direction.normalize_ip()
         pc.velocity += direction * PLAYER_HIT_KNOCKBACK
 
 class PhysicsEnemy(PhysicsEntity, EnemyBase):

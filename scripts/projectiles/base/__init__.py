@@ -1,1 +1,1 @@
-from .projectile import Projectile
+from .projectile import Projectile, EnemyProjectile

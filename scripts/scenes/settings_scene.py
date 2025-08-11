@@ -19,90 +19,92 @@ RESET_MSGS = [
 class SettingsUI:
     """
     설정 화면의 모든 UI 요소를 관리하는 클래스.
-    - 볼륨 슬라이더(SFX, BGM)
-    - 모든 데이터 초기화 버튼
-    - 모든 레벨 잠금 해제 버튼
     """
     def __init__(self, scene):
-        """
-        Args:
-            scene (Scene): 이 UI가 속한 씬 객체
-        """
         self.scene = scene
         self.button_click_stack = 0
-        self._init_ui_elements()
+        self.ui_elements = {}  # 만든 UI 저장
+        self._init_ui()
         self._connect_events()
 
-    def _init_ui_elements(self):
-        """UI 요소 생성 및 기본값 초기화"""
-        TextRenderer("[ESC]", pg.Vector2(10, 10), font_name="bold", font_size=20, anchor=pg.Vector2(0, 0))
-        TextRenderer("설정", pg.Vector2(SCREEN_SIZE.x / 2, 150), font_name="bold", font_size=100, anchor=pg.Vector2(0.5, 0.5))
+    def _init_ui(self):
+        """UI 요소 생성 (동적 생성 꼼수)"""
+        # 텍스트 요소
+        for text, pos, kwargs in [
+            ("[ESC]", (10, 10), dict(font_name="bold", font_size=20, anchor=pg.Vector2(0, 0))),
+            ("설정", (SCREEN_SIZE.x / 2, 150), dict(font_name="bold", font_size=100, anchor=pg.Vector2(0.5, 0.5))),
+        ]:
+            TextRenderer(text, pg.Vector2(*pos), **kwargs)
 
-        # SFX 볼륨 UI
-        self.sfx_volume_slider = Slider(pg.Vector2(SCREEN_SIZE.x / 2, 400), pg.Vector2(450, 50),
-                                        self.scene.app.player_data["vfx_volume"], 0, 1)
-        self.sfx_volume_text = TextRenderer(str(self.scene.app.player_data["vfx_volume"]),
-                                            pg.Vector2(SCREEN_SIZE.x / 2 - 250, 400), anchor=pg.Vector2(1, .5))
+        # 슬라이더 데이터 (이름, 초기값 키, y좌표)
+        sliders = [
+            ("sfx_volume", "vfx_volume", 400),
+            ("bgm_volume", "bgm_volume", 480),
+        ]
 
-        # BGM 볼륨 UI
-        self.bgm_volume_slider = Slider(pg.Vector2(SCREEN_SIZE.x / 2, 480), pg.Vector2(450, 50),
-                                        self.scene.app.player_data["bgm_volume"], 0, 1)
-        self.bgm_volume_text = TextRenderer(str(self.scene.app.player_data["bgm_volume"]),
-                                            pg.Vector2(SCREEN_SIZE.x / 2 - 250, 480), anchor=pg.Vector2(1, .5))
+        for name, key, y in sliders:
+            self.ui_elements[f"{name}_slider"] = Slider(
+                pg.Vector2(SCREEN_SIZE.x / 2, y), pg.Vector2(450, 50),
+                self.scene.app.player_data[key], 0, 1
+            )
+            self.ui_elements[f"{name}_text"] = TextRenderer(
+                str(self.scene.app.player_data[key]),
+                pg.Vector2(SCREEN_SIZE.x / 2 - 250, y), anchor=pg.Vector2(1, .5)
+            )
 
-        # 버튼 UI
-        self.reset_button = TextButton("모든 데이터 초기화", pg.Vector2(SCREEN_SIZE.x / 2, 650),
-                                       None, font_size=28, hover_color=pg.Color("yellow"), not_hover_color=pg.Color("red"))
-        self.unlock_button = TextButton("모든 레벨 잠금 해제", pg.Vector2(SCREEN_SIZE.x / 2, 700),
-                                        None, font_size=28, hover_color=pg.Color("blue"), not_hover_color=pg.Color("red"))
+        # 버튼 데이터 (이름, 표시 텍스트, y좌표, hover색, 기본색)
+        buttons = [
+            ("reset_button", "모든 데이터 초기화", 650, pg.Color("yellow"), pg.Color("red")),
+            ("unlock_button", "모든 레벨 잠금 해제", 700, pg.Color("blue"), pg.Color("red")),
+        ]
+
+        for name, text, y, hover, normal in buttons:
+            self.ui_elements[name] = TextButton(
+                text, pg.Vector2(SCREEN_SIZE.x / 2, y), None, font_size=28,
+                hover_color=hover, not_hover_color=normal
+            )
+
+        # ui_elements를 멤버 변수로 꺼내 쓰기
+        globals().update(self.ui_elements)
 
     def _connect_events(self):
-        """UI 이벤트와 핸들러 연결"""
-        self.sfx_volume_slider.on_value_changed = self.change_vfx
-        self.bgm_volume_slider.on_value_changed = self.change_bgm
-        self.reset_button.on_click = self.on_reset_button_click
-        self.unlock_button.on_click = self.on_unlock_button_click
+        """이벤트 연결"""
+        self.ui_elements["sfx_volume_slider"].on_value_changed = self.change_vfx
+        self.ui_elements["bgm_volume_slider"].on_value_changed = self.change_bgm
+        self.ui_elements["reset_button"].on_click = self.on_reset_button_click
+        self.ui_elements["unlock_button"].on_click = self.on_unlock_button_click
 
     def update_texts(self):
-        """슬라이더 값에 따라 볼륨 표시 텍스트 업데이트"""
-        self.sfx_volume_text.text = f"SFX 음량 : {self.scene.app.player_data['vfx_volume']}"
-        self.bgm_volume_text.text = f"BGM 음량 : {self.scene.app.player_data['bgm_volume']}"
+        """볼륨 표시 업데이트"""
+        self.ui_elements["sfx_volume_text"].text = f"SFX 음량 : {self.scene.app.player_data['vfx_volume']}"
+        self.ui_elements["bgm_volume_text"].text = f"BGM 음량 : {self.scene.app.player_data['bgm_volume']}"
 
     def change_vfx(self):
-        """SFX 볼륨 변경 처리"""
-        self.scene.app.player_data["vfx_volume"] = round(self.sfx_volume_slider.value, 2)
+        self.scene.app.player_data["vfx_volume"] = round(self.ui_elements["sfx_volume_slider"].value, 2)
 
     def change_bgm(self):
-        """BGM 볼륨 변경 처리"""
-        self.scene.app.player_data["bgm_volume"] = round(self.bgm_volume_slider.value, 2)
+        self.scene.app.player_data["bgm_volume"] = round(self.ui_elements["bgm_volume_slider"].value, 2)
 
     def on_reset_button_click(self, _):
-        """
-        모든 데이터 초기화 버튼 클릭 시 실행.
-        - 단계적으로 확인 메시지를 표시
-        - 마지막 단계에서 초기화 수행
-        """
         if self.button_click_stack >= len(RESET_MSGS):
             self.scene.app.reset_player_data()
-            self.reset_button.renderer.text = "모든 데이터 초기화 됨."
-            self.sfx_volume_slider.update_rects()
-            self.bgm_volume_slider.update_rects()
+            self.ui_elements["reset_button"].renderer.text = "모든 데이터 초기화 됨."
+            self.ui_elements["sfx_volume_slider"].update_rects()
+            self.ui_elements["bgm_volume_slider"].update_rects()
             self.scene.app.sound_manager.play_sfx(self.scene.app.ASSETS["sounds"]["ui"]["reset"])
             self.scene.app.change_scene("main_menu_scene")
         else:
-            self.reset_button.renderer.text = RESET_MSGS[self.button_click_stack]
-
+            self.ui_elements["reset_button"].renderer.text = RESET_MSGS[self.button_click_stack]
         self.button_click_stack += 1
 
     def on_unlock_button_click(self, _):
-        """모든 레벨 잠금 해제 처리"""
         self.scene.app.player_data["progress"] = {
             "1": [True] * 5,
             "2": [True] * 5,
             "3": [True] * 5,
             "4": [True]
         }
-        self.unlock_button.renderer.text = "모든 레벨 잠금 해제 됨."
+        self.ui_elements["unlock_button"].renderer.text = "모든 레벨 잠금 해제 됨."
         self.scene.app.sound_manager.play_sfx(self.scene.app.ASSETS["sounds"]["ui"]["unlock"])
         self.scene.app.save_player_data()
         self.scene.app.change_scene("main_menu_scene")

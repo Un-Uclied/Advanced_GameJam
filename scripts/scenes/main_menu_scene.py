@@ -98,6 +98,9 @@ class MainMenuScene(Scene):
         # UI 생성
         self.main_menu_ui = MainMenuUI(self)
 
+        # 브금
+        self.app.sound_manager.play_bgm("main_menu")
+
         # 배경 이펙트 생성
         Sky()
         Clouds()

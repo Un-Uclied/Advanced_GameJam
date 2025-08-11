@@ -16,10 +16,7 @@ class ProjectileAlpha(Projectile):
     """
 
     def __init__(self, start_position: pg.Vector2, start_direction: pg.Vector2):
-        super().__init__("two_alpha_projectile", start_position, start_direction)
-
-        # 기본 수명 타이머 설정, 수명 끝나면 자동 파괴
-        self.timer = Timer(DEFAULT_LIFE_TIME, self.destroy)
+        super().__init__("two_alpha_projectile", start_position, start_direction, DEFAULT_LIFE_TIME)
 
         # 적 탄환 발사 시 사운드 재생
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["enemy"]["projectile"])
@@ -30,25 +27,7 @@ class ProjectileAlpha(Projectile):
     def destroy(self):
         """
         탄환 파괴 처리:
-        타이머 종료, 파티클 생성, 부모 클래스 파괴 호출
+        파티클 생성, 부모 클래스 파괴 호출
         """
-        self.timer.destroy()
         AnimatedParticle(self.destroy_particle_anim, self.position)
         super().destroy()
-
-    def update(self):
-        """
-        매 프레임 업데이트:
-        - 기본 이동, 애니메이션 갱신
-        - 플레이어와 충돌 검사, 맞으면 플레이어 체력 감소 및 탄환 파괴
-        """
-        super().update()
-
-        ps = self.app.scene.player_status
-        pc = ps.player_character
-
-        # 플레이어가 탄환 위치에 닿으면 대미지 주고 탄환 파괴
-        if pc.rect.collidepoint(self.position):
-            ps.health -= self.data["damage"]
-            self.app.scene.event_bus.emit("on_player_hurt", self.data["damage"])
-            self.destroy()

@@ -4,6 +4,8 @@ import json
 from scripts.constants import *
 from scripts.core import *
 from scripts.camera import *
+from scripts.vfx import *
+from scripts.ui import *
 
 # 탄환 데이터 파일 경로
 DATA_PATH = "data/projectile_data.json"
@@ -21,15 +23,16 @@ class Projectile(GameObject):
         projectile_name (str): 탄환 종류 키값 (탄환 데이터 불러올 때 사용)
         start_position (pg.Vector2): 탄환 생성 위치 (보통 발사체의 중심 좌표)
         start_direction (pg.Vector2): 탄환 이동 방향 (벡터)
-        life_time (float, optional): 탄환 수명(초), 기본 3초
+        life_time (float, optional): 탄환 수명(초)
     """
     def __init__(self, projectile_name: str,
                  start_position: pg.Vector2, start_direction: pg.Vector2,
-                 life_time: float = 3):
+                 life_time: float, destroy_on_tilemap_collision : bool = True):
         super().__init__()
 
         # 탄환 기본 데이터(속도, 대미지 등) 불러오기
         self.data = ALL_PROJECTILE_DATA[projectile_name]
+        self.destroy_on_tilemap_collision = destroy_on_tilemap_collision
 
         self.position = start_position
         self.direction = start_direction
@@ -37,13 +40,23 @@ class Projectile(GameObject):
         # 탄환 애니메이션 복사본 생성
         self.anim: Animation = self.app.ASSETS["animations"]["projectiles"][projectile_name].copy()
 
-        # 필요하면 life_time 변수 추가 및 처리 가능 (현재 코드에선 미사용)
+        # 탄환 수명 타이머 설정, 끝나면 자동 파괴
+        self.timer = Timer(life_time, lambda: self.destroy())
+
+    def destroy(self):
+        """
+        파괴 처리: 타이머 종료, 파티클 생성, 부모 파괴 호출
+        """
+        self.timer.destroy()
+        super().destroy()
 
     def update_tilemap_collision(self):
         """
         현재 위치 주변 타일맵 타일들과 충돌 검사
         충돌 시 탄환 파괴
         """
+        if not self.destroy_on_tilemap_collision:
+            return
         for rect in self.app.scene.tilemap.physic_tiles_around(self.position):
             if rect.collidepoint(self.position):
                 self.destroy()
@@ -87,3 +100,48 @@ class Projectile(GameObject):
         screen_pos = CameraMath.world_to_screen(camera, draw_pos)
 
         surface.blit(rotated_img, screen_pos)
+
+class EnemyProjectile(Projectile):
+    def __init__(self, projectile_name, start_position, start_direction, life_time,
+                 destroy_on_tilemap_collision : bool = True, destroy_on_player_collision : bool = True, corrupt_on_attack : bool = False):
+        super().__init__(projectile_name, start_position, start_direction, life_time, destroy_on_tilemap_collision)
+        
+        self.destroy_on_player_collision = destroy_on_player_collision
+        self.corrupt_on_attack = corrupt_on_attack
+
+    def attack_corruption(self):
+        if not self.corrupt_on_attack:
+            return
+        
+        ps = self.app.scene.player_status
+
+        # 무적이 아니고, 큐가 비어있지 않고, 전부 DEFAULT가 아닐 때만 실행
+        if ps.current_invincible_time <= 0 and ps.soul_queue and not all(soul == SOUL_DEFAULT for soul in ps.soul_queue):
+            for i in range(len(ps.soul_queue)):
+                ps.soul_queue[i] = SOUL_DEFAULT  # 값 교체
+            self.app.scene.event_bus.emit("on_player_soul_changed")
+            AnimatedParticle(self.app.ASSETS["animations"]["vfxs"]["darkness"], pg.Vector2(ps.player_character.rect.center))
+            PopupText(
+                "혼이 감염되어 소멸해버렸다...",
+                pg.Vector2(SCREEN_SIZE.x / 2, 680),
+                fade_delay=.25,
+                fade_duration=1.5
+            )
+
+    def update_player_collision(self):
+        ps = self.app.scene.player_status
+        pc = ps.player_character
+
+        if pc.rect.collidepoint(self.position):
+            ps.health -= self.data["damage"]
+            self.app.scene.event_bus.emit("on_player_hurt", self.data["damage"])
+            self.attack_corruption()
+
+            if self.destroy_on_player_collision:
+                self.destroy()
+        
+    def update(self):
+        if not hasattr(self.app.scene, "player_status"):
+            return
+        super().update()
+        self.update_player_collision()

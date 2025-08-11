@@ -1,12 +1,12 @@
 import pygame as pg
 
 from scripts.constants import *
-from scripts.camera import CameraView
+from scripts.camera import *
 from scripts.core import *
 
 class DamageArea(GameObject):
     """
-    범위 기반 대미지 오브젝트 (레이저, 용암, 낫 휘두르기 등)
+    범위 기반 대미지 오브젝트 (낫 휘두르기)
 
     :param rect: 공격 범위를 나타내는 pygame.Rect
     :param damage: 이 영역에 닿은 플레이어에게 입힐 대미지

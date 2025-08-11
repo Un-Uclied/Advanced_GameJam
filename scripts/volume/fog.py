@@ -3,91 +3,113 @@ import pygame as pg
 from scripts.constants import *
 from scripts.core import *
 
-from .light import Light
+# .light 모듈에서 LightManager를 직접 임포트함.
+from .light import LightManager
 
 class Fog(GameObject):
     """
     씬 내 오브젝트와 엔티티에 안개 효과를 씌우는 클래스.
-    성능은 좀 잡아먹지만, 쉐이더 없이 빛 효과를 극대화함.
-
-    특징:
-    - 화면 전체를 덮지 않고, 오브젝트와 엔티티 레이어만 안개 처리
-      (전체 화면 덮으면 너무 어두워서 시야 확보 어려움)
-    - 빛 효과(Light 클래스)와 함께 사용해 빛 구멍(투명 영역) 표현 가능
-    - 플레이어 상태에 따라 안개의 투명도 조절 가능 (예: SOUL_KIND_B 효과)
-    - SOUL_EVIL_C가 있으면 단순 채우기 방식(draw_fill)으로 시야 감소 효과 적용
-
-    주의점:
-    - 타일맵 생성 후 Fog 생성 해야함 (Fog 생성 전에 타일맵 있으면 렌더 순서 꼬임)
-
-    :param fog_color: 안개 덮을 색상 (알파 포함). 기본은 거의 검정에 가까운 투명도 250
+    
+    플레이어 상태에 따라 안개의 투명도를 동적으로 조절할 수 있으며,
+    빛 효과와 함께 사용해 시야 확보 효과를 연출함.
+    
+    Attributes:
+        fog_color (pg.Color): 안개 효과의 기본 색상.
+        fog_surface (pg.Surface): 안개 효과를 미리 렌더링할 임시 Surface.
     """
-
+    
     def __init__(self, fog_color: pg.Color = pg.Color(0, 0, 0, 250)):
-        # 생성시 투명 Surface 생성해둠
+        """
+        Fog 객체를 초기화함.
+        
+        Args:
+            fog_color (pg.Color): 안개의 기본 색상 (알파값 포함).
+        """
+        # 부모 클래스의 생성자를 호출해서 씬에 등록함.
         super().__init__()
-        self._fog_color = fog_color
+        
+        # 안개 기본 색상을 저장함.
+        self.base_fog_color = pg.Color(fog_color)
+        
+        # 안개 효과를 그릴 임시 Surface를 생성함.
+        # 최적화를 위해 오브젝트와 엔티티 레이어의 크기로 만듦.
         self.fog_surface = pg.Surface(SCREEN_SIZE, flags=pg.SRCALPHA)
-
+    
     @property
     def fog_color(self) -> pg.Color:
-        # 씬에 player_status 없으면 메인 게임 씬 아님 → 기본 안개 색 반환
-        if not hasattr(self.app.scene, "player_status"):
-            return self._fog_color
-
-        ps = self.app.scene.player_status
-        color = pg.Color(self._fog_color)
-
-        # SOUL_KIND_B가 있으면 안개 투명도 줄임 (색 알파값 감소)
-        if SOUL_KIND_B in ps.soul_queue:
-            color.a = max(0, color.a - KIND_B_FOG_ALPHA_DOWN)
-
-        return color
+        """
+        플레이어 상태에 따라 조정된 안개 색상을 반환함.
+        
+        Returns:
+            pg.Color: 현재 상태에 맞는 안개 색상.
+        """
+        # 기본 안개 색상으로 시작함.
+        final_color = pg.Color(self.base_fog_color)
+        
+        # 씬에 플레이어 상태 객체가 있을 경우에만 효과를 적용함.
+        # hasattr 체크 대신, 메인 게임 씬에서만 Fog를 생성하도록 디자인을 변경하는 것이 더 좋음.
+        if hasattr(self.app.scene, "player_status"):
+            player_status = self.app.scene.player_status
+            
+            # 특정 소울 효과가 있으면 안개 투명도를 낮춤.
+            if SOUL_KIND_B in player_status.soul_queue:
+                final_color.a = max(0, final_color.a - KIND_B_FOG_ALPHA_DOWN)
+                
+        return final_color
 
     def draw_fill(self):
         """
-        저사양 방식 - LAYER_VOLUME 레이어 전체를 안개 색으로 채움.
-        SOUL_EVIL_C 상태일 때 씀.
+        저사양 방식: 볼륨 레이어 전체를 안개 색으로 채움.
+        
+        주로 시야가 완전히 가려지는 효과를 위해 사용함.
         """
-        self.app.surfaces[LAYER_VOLUME].fill(self.fog_color)
-        Light.draw_lights(self.app.scene.camera, self.app.surfaces[LAYER_VOLUME])
-
-    def draw_mult(self):
+        # 볼륨 레이어 전체를 계산된 안개 색으로 채움.
+        volume_surface = self.app.surfaces[LAYER_VOLUME]
+        volume_surface.fill(self.fog_color)
+        
+        # 라이트매니저를 통해 빛 효과를 적용해서 어두운 배경에 구멍을 뚫음.
+        self.app.scene.light_manager.draw_lights(volume_surface)
+        
+    def draw_multiply(self):
         """
-        고사양 방식 - 오브젝트/엔티티가 그려진 부분만 안개 색 곱하기 (multiply) 처리.
-        오브젝트가 있는 곳만 어둡게 표현, 구멍난 듯한 효과 연출 가능.
+        고사양 방식: 오브젝트/엔티티 레이어에만 안개 효과를 곱하기 모드로 적용함.
+        
+        더욱 정교하고 시각적으로 흥미로운 안개 효과를 연출함.
         """
-        # 알파 0으로 초기화
+        # 임시 안개 Surface를 투명하게 초기화함.
         self.fog_surface.fill((0, 0, 0, 0))
 
-        # 오브젝트, 엔티티 레이어를 안개 Surface에 복사 (최적화를 위해 복사본 X)
+        # 오브젝트와 엔티티 레이어를 임시 Surface에 복사함.
+        # 이렇게 하면 안개 효과를 적용할 영역이 제한됨.
         self.fog_surface.blit(self.app.surfaces[LAYER_OBJ], (0, 0))
         self.fog_surface.blit(self.app.surfaces[LAYER_ENTITY], (0, 0))
 
-        # 곱하기(blend multiply)로 안개 색 덮기
+        # 복사된 영역에 안개 색을 곱하기 블렌딩 모드로 덧씌움.
+        # 이렇게 해서 오브젝트가 있는 부분만 어둡게 만듦.
         self.fog_surface.fill(self.fog_color, special_flags=pg.BLEND_RGBA_MULT)
 
-        # 빛 효과 적용 (구멍 난 영역 표현)
-        Light.draw_lights(self.app.scene.camera, self.fog_surface)
+        # 빛 효과를 임시 안개 Surface에 적용해서 어두워진 부분에 밝은 구멍을 만듦.
+        self.app.scene.light_manager.draw_lights(self.fog_surface)
 
-        # 최종적으로 볼륨 레이어에 안개 그리기
+        # 최종적으로 완성된 안개 Surface를 볼륨 레이어에 그림.
         self.app.surfaces[LAYER_VOLUME].blit(self.fog_surface, (0, 0))
-
+    
     def draw(self):
         """
-        매 프레임 호출됨.
-        플레이어 상태에 따라 적절한 안개 그리기 방식 선택.
+        매 프레임 호출되며, 플레이어 상태에 따라 적절한 그리기 방식을 선택함.
         """
         super().draw()
-
+        
+        # 씬에 플레이어 상태 객체가 있는지 확인해서 모드를 결정함.
         if hasattr(self.app.scene, "player_status"):
-            ps = self.app.scene.player_status
-
-            # SOUL_EVIL_C 상태면 저사양 채우기 방식, 아니면 곱하기 방식
-            if SOUL_EVIL_C in ps.soul_queue:
+            player_status = self.app.scene.player_status
+            
+            # 특정 소울 효과가 있으면 저사양 fill 방식으로 시야를 완전히 가림.
+            if SOUL_EVIL_C in player_status.soul_queue:
                 self.draw_fill()
+            # 아니면 기본 고사양 multiply 방식을 사용함.
             else:
-                self.draw_mult()
+                self.draw_multiply()
         else:
-            # 플레이어 상태 없으면 기본 곱하기 방식
-            self.draw_mult()
+            # 플레이어 상태가 없으면 기본 고사양 multiply 방식을 사용함.
+            self.draw_multiply()

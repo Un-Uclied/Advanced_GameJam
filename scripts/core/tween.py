@@ -6,7 +6,7 @@ from scripts.core import *
 
 def lerp_color(start: pg.Color, end: pg.Color, t: float) -> pg.Color:
     '''
-    색상 보간 함수  
+    색상 보간 함수
     start에서 end로 t(0~1)만큼 선형 보간해서 새로운 색 반환
 
     :param start: 시작 색상 (pg.Color)
@@ -23,73 +23,112 @@ def lerp_color(start: pg.Color, end: pg.Color, t: float) -> pg.Color:
 
 class Tween(GameObject):
     '''
-    특정 객체의 속성을 일정 시간 동안 이징 함수에 따라 보간(변화)시킴  
+    특정 객체의 속성을 일정 시간 동안 이징 함수에 따라 보간(변화)시킴.
 
-    이징 함수(pytweening 사용) 덕분에 자연스럽고 다양한 애니메이션 효과 가능  
+    `pytweening` 라이브러리의 다양한 이징 함수를 사용해 자연스러운 애니메이션 효과를 연출.
+    `GameObject`를 상속받아 자동으로 업데이트되며, 완료 시 콜백을 실행하고 스스로를 파괴함.
 
-    :param target: 속성 변경 대상 객체
-    :param attr_name: 변경할 속성명 (문자열)
-    :param start_value: 시작 값 (숫자, pg.Vector2, pg.Color 가능)
-    :param end_value: 종료 값 (숫자, pg.Vector2, pg.Color 가능)
-    :param duration: 지속 시간(초), 0 이하면 0.0001초 처리
-    :param easing: 이징 함수, 기본은 선형(pt.linear)
-    :param use_unscaled_time: 게임 시간 스케일 무시 여부 (True면 실제 시간으로 계산)
+    Attributes:
+        target: 속성을 변경할 대상 객체.
+        attr_name (str): 변경할 속성명.
+        start_value: 트윈 시작 값.
+        end_value: 트윈 종료 값.
+        duration (float): 트윈 지속 시간(초).
+        easing (callable): 보간에 사용할 이징 함수.
+        use_unscaled_time (bool): 게임 시간 스케일 무시 여부.
+        on_complete (list): 트윈 완료 시 호출될 콜백 함수 목록.
     '''
-
+    
+    # 타입별 보간 함수를 저장하는 딕셔너리
+    _interpolators = {
+        pg.Color: lerp_color,
+        pg.Vector2: lambda start, end, t: start.lerp(end, t),
+        # 숫자 타입 보간은 기본 로직으로 처리
+    }
+    
     def __init__(self, target, attr_name: str,
                  start_value, end_value,
                  duration: float,
-                 easing=pt.linear, use_unscaled_time: bool = False):
+                 easing=pt.linear, use_unscaled_time: bool = False,
+                 on_complete=None):
+        """
+        Tween 객체를 초기화하고 시작합니다.
+        
+        Args:
+            target: 속성을 변경할 대상 객체.
+            attr_name (str): 변경할 속성명.
+            start_value: 시작 값.
+            end_value: 종료 값.
+            duration (float): 지속 시간(초). 0이면 즉시 완료.
+            easing (callable): 이징 함수. 기본값은 `pt.linear`.
+            use_unscaled_time (bool): True면 게임 시간 스케일을 무시하고 실제 시간으로 계산.
+            on_complete (callable or list, optional): 트윈 완료 시 호출할 함수 또는 함수 목록.
+        """
         super().__init__()
 
         self.target = target
         self.attr_name = attr_name
-
         self.start_value = start_value
         self.end_value = end_value
-
-        self.duration = max(0.0001, duration)
+        self.duration = duration
         self.easing = easing
         self.use_unscaled_time = use_unscaled_time
+        self.elapsed = 0.0
 
-        self.elapsed = 0.0  # 경과 시간
-        self.on_complete = []  # 완료 시 호출할 콜백 리스트
+        # 콜백을 리스트로 저장하고, 인자로 전달받은 콜백을 추가함.
+        self.on_complete = []
+        if on_complete:
+            if isinstance(on_complete, (list, tuple)):
+                self.on_complete.extend(on_complete)
+            else:
+                self.on_complete.append(on_complete)
 
-        # 트윈 시작 시점에 대상 속성을 시작 값으로 강제 설정
+        # 트윈 시작 시점에 대상 속성을 시작 값으로 강제 설정.
+        # 이렇게 하면 트윈이 생성될 때부터 정확한 값을 가집니다.
         setattr(self.target, self.attr_name, self.start_value)
+        
+        # duration이 0일 경우, 즉시 완료 처리
+        if self.duration <= 0:
+            self.complete()
+            return
+    
+    def complete(self):
+        """
+        트윈을 즉시 완료 상태로 만들고 콜백을 실행.
+        """
+        # 목표값으로 설정
+        setattr(self.target, self.attr_name, self.end_value)
+        
+        # 콜백 실행
+        for callback in self.on_complete[:]:
+            callback()
+            
+        # 자기 자신을 파괴
+        self.destroy()
 
     def update(self):
         '''
-        매 프레임 호출되어 값을 계산 및 적용함
-
-        게임 내 시간 스케일 적용하거나 무시하는 옵션 포함  
-        경과 시간 누적 후 보간 값을 계산하여 속성에 대입
-
-        완료되면 on_complete 이벤트 호출 후 자기 자신 파괴
+        매 프레임 호출되어 값을 계산하고 적용.
         '''
-        super().update()
+        # 이미 완료된 트윈은 업데이트하지 않음.
+        if self.elapsed >= self.duration:
+            return
 
-        # dt 계산: 언스케일드 시간 쓸지 게임 시간 스케일 적용 시간 쓸지 결정
+        # dt 계산: 언스케일드 시간 또는 스케일드 시간 선택
         dt = self.app.unscaled_dt if self.use_unscaled_time else self.app.dt
         self.elapsed += dt
 
         # 경과 시간 대비 진행률 (0~1)
         t = min(self.elapsed / self.duration, 1.0)
-
-        # 이징 함수로 보간 진행률 변형 (ease in/out 등 자연스러운 움직임)
         eased_t = self.easing(t)
 
-        # 값 타입에 따라 보간 처리 다름
-        if isinstance(self.start_value, pg.Color) and isinstance(self.end_value, pg.Color):
-            # 컬러 보간은 각 채널별로 lerp_color 호출
-            value = lerp_color(self.start_value, self.end_value, eased_t)
-
-        elif isinstance(self.start_value, pg.Vector2) and isinstance(self.end_value, pg.Vector2):
-            # 벡터 보간은 Vector2.lerp 함수 사용
-            value = self.start_value.lerp(self.end_value, eased_t)
-
+        # 보간 함수 딕셔너리를 사용하여 값 타입에 맞는 보간을 처리함.
+        interpolator = self._interpolators.get(type(self.start_value))
+        
+        if interpolator:
+            value = interpolator(self.start_value, self.end_value, eased_t)
         else:
-            # 숫자(int, float) 타입 기본 보간 처리
+            # 기본 숫자 타입 보간
             value = self.start_value + (self.end_value - self.start_value) * eased_t
 
         # 보간된 값을 타겟 속성에 할당
@@ -97,6 +136,4 @@ class Tween(GameObject):
 
         # 완료 시점이면 콜백 실행 및 자기 자신 제거
         if t >= 1.0:
-            for callback in self.on_complete:
-                callback()
-            self.destroy()
+            self.complete()

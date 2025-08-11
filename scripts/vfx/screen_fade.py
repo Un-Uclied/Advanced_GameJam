@@ -8,43 +8,79 @@ class ScreenFader(GameObject):
     """
     화면 전체를 검정으로 페이드 인/아웃하는 UI 효과.
 
-    사용법:
-    - App에서 씬 전환할 때, 화면 전환 효과로 쓰임.
-    - duration 초 동안 alpha를 0~255 또는 255~0으로 부드럽게 변화시킴.
-    - 페이드 완료 후 콜백 함수 실행 가능.
+    `Tween` 객체를 사용해서 지정된 시간 동안 화면의 투명도를 부드럽게 변화시킴.
+    페이드가 완료되면 지정된 콜백 함수를 호출하고 스스로를 파괴함.
 
-    :param duration: 페이드 진행 시간(초)
-    :param fade_in: True면 투명 → 검정 (화면 어두워짐)
-                    False면 검정 → 투명 (화면 밝아짐)
-    :param on_complete: 페이드 완료 시 호출할 함수 (옵션)
+    Attributes:
+        surface (pg.Surface): 페이드 효과를 위해 화면 전체를 덮는 투명한 검정 Surface.
+        alpha (float): 현재 Surface의 투명도 (0.0-255.0). Tween에 의해 변경됨.
+        on_complete (callable): 페이드 완료 시 호출될 콜백 함수.
+        fade_in (bool): True면 페이드 인(투명 -> 검정), False면 페이드 아웃(검정 -> 투명).
     """
 
-    def __init__(self, duration : float, fade_in : bool, on_complete = None):
+    def __init__(self, duration: float, fade_in: bool, on_complete=None):
+        """
+        ScreenFader 객체를 초기화하고 페이드 효과를 시작함.
+
+        Args:
+            duration (float): 페이드 효과가 진행될 시간(초).
+            fade_in (bool): 페이드 인(True) 또는 페이드 아웃(False) 방향을 결정.
+            on_complete (callable, optional): 페이드 완료 시 실행할 함수.
+        """
         super().__init__()
 
-        # 전체 화면 덮을 투명 검정 Surface 생성
+        # 전체 화면 크기의 투명 검정 Surface를 생성함.
         self.surface = pg.Surface(SCREEN_SIZE, pg.SRCALPHA)
         self.surface.fill((0, 0, 0))
-
-        # 초기 알파 값 세팅 (페이드 방향에 따라 0 or 255)
-        self.alpha = 0 if fade_in else 255
-        self.surface.set_alpha(self.alpha)
-
-        self.fade_in = fade_in
-        self.on_complete = on_complete
-
-        # Tween으로 alpha를 목표값까지 자연스럽게 변화시킴
+        
+        # 페이드 방향에 따라 초기 알파값과 목표 알파값을 설정함.
+        initial_alpha = 0 if fade_in else 255
         target_alpha = 255 if fade_in else 0
-        Tween(self, "alpha", self.alpha, target_alpha, duration, pt.easeInCubic, use_unscaled_time=True)\
-            .on_complete.append(self.fade_done)
+        
+        # `alpha`를 인스턴스 변수로 설정해서 Tween이 조작할 수 있게 함.
+        self.alpha = float(initial_alpha)
+        # Surface의 초기 투명도를 설정함.
+        self.surface.set_alpha(int(self.alpha))
+        
+        self.on_complete = on_complete
+        self.fade_in = fade_in
+        
+        # 이전 알파값을 저장해서 변경 여부를 확인하는 데 사용함.
+        self._last_alpha = self.alpha
+
+        # Tween 객체를 생성해서 `alpha` 값을 `duration` 시간 동안 부드럽게 변화시킴.
+        # on_complete 인자를 직접 전달하는 방식으로 콜백을 등록함.
+        Tween(self, "alpha", self.alpha, target_alpha, duration, pt.easeInCubic,
+              on_complete=self.fade_done, use_unscaled_time=True)
 
     def fade_done(self):
-        # 페이드 완료 후 콜백 실행 및 객체 제거
+        """
+        페이드 효과가 완료된 후 호출되는 콜백 메서드.
+
+        지정된 콜백 함수를 실행하고 객체를 파괴해서 메모리를 정리함.
+        """
+        # on_complete 콜백 함수가 있으면 호출함.
         if self.on_complete is not None:
             self.on_complete()
+        
+        # 페이드 효과가 끝났으므로 스스로를 파괴해서 씬 객체 목록에서 제거함.
         self.destroy()
 
     def draw(self):
-        # 매 프레임 alpha 업데이트하고 화면에 덮음
-        self.surface.set_alpha(int(self.alpha))
+        """
+        매 프레임 호출되며, Surface를 화면에 그림.
+        
+        `alpha` 값이 변경되었을 때만 `set_alpha`를 호출해서 성능을 최적화함.
+        """
+        # 부모 클래스의 draw()를 호출함.
+        super().draw()
+        
+        # alpha 값이 이전에 비해 변경되었을 경우에만 set_alpha를 호출함.
+        # 이렇게 하면 불필요한 set_alpha 호출을 줄일 수 있음.
+        if self.alpha != self._last_alpha:
+            # alpha 값은 float이지만 set_alpha는 int를 기대하므로 정수형으로 변환함.
+            self.surface.set_alpha(int(self.alpha))
+            self._last_alpha = self.alpha
+
+        # 페이드 효과 Surface를 인터페이스 레이어에 그림.
         self.app.surfaces[LAYER_INTERFACE].blit(self.surface, (0, 0))

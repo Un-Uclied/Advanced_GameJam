@@ -24,10 +24,10 @@ class InfoUI:
     """정보 화면의 모든 UI 요소를 관리하는 클래스"""
     def __init__(self, scene):
         self.scene = scene
-        self._create_ui_elements()
-        self._connect_events()
+        self.create_ui_elements()
+        self.connect_events()
 
-    def _create_ui_elements(self):
+    def create_ui_elements(self):
         """UI 요소 생성 및 초기 설정"""
         TextRenderer("[ESC]", pg.Vector2(10, 10), font_name="bold", font_size=20, anchor=pg.Vector2(0, 0))
         TextRenderer("팀 [후라이맨즈]", pg.Vector2(SCREEN_SIZE.x / 2, 100), font_name="bold", font_size=100, anchor=pg.Vector2(0.5, 0.5))
@@ -40,13 +40,9 @@ class InfoUI:
         for i, link in enumerate(ASSET_LINKS):
             TextRenderer(link, pg.Vector2(SCREEN_SIZE.x / 2, 500 + i * 30), font_size=15, anchor=pg.Vector2(0.5, 0.5))
 
-    def _connect_events(self):
+    def connect_events(self):
         """UI 요소에 이벤트 핸들러 연결"""
-        self.github_button.on_click = self.on_github_button_click
-
-    def on_github_button_click(self, button: TextButton):
-        """깃허브 버튼 클릭 시 웹 브라우저 열기"""
-        webbrowser.open("https://github.com/Un-Uclied/Advanced_GameJam")
+        self.github_button.on_click = lambda _: webbrowser.open("https://github.com/Un-Uclied/Advanced_GameJam")
 
 class InfoScene(Scene):
     """정보 씬 클래스. 팀 정보와 GitHub 링크를 표시"""

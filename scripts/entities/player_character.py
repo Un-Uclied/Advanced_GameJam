@@ -173,7 +173,9 @@ class PlayerCharacter(PhysicsEntity):
         camera = self.app.scene.camera
         player_pos = pg.Vector2(self.rect.center)
         mouse_pos = pg.Vector2(pg.mouse.get_pos())
-        direction = (CameraMath.screen_to_world(camera, mouse_pos) - player_pos).normalize()
+        direction = (CameraMath.screen_to_world(camera, mouse_pos) - player_pos)
+        if direction.length_squared() != 0:
+            direction.normalize_ip()
 
         PlayerProjectile(player_pos, direction)
 

@@ -96,6 +96,8 @@ class Soul(PhysicsEntity):
         self.light.destroy()
         if self.type_icon_image:
             self.type_icon_image.destroy()
+        if self.hint_ui:
+            self.hint_ui.destroy()
         super().destroy()
 
     def follow_objects(self):

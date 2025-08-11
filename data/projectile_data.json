@@ -7,13 +7,17 @@
         "damage" : 20,
         "speed" : 450
     },
-    "boss_projectile" : {
+    "boss_fire" : {
         "damage" : 20,
         "speed" : 800
     },
     "boss_lazer" : {
         "damage" : 20,
         "speed" : 1200
+    },
+    "boss_knife" : {
+        "damage" : 30,
+        "speed" : 5000
     },
 
     "player_projectile" : {
