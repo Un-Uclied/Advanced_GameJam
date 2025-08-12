@@ -184,7 +184,7 @@ class App:
         
         # 초기화 시작 플래그 설정.
         self.initialized = True
-        self.is_debug = True
+        self.is_debug = False
 
         # Pygame 및 디스플레이 설정 로직을 분리함.
         self.initialize_pygame_and_display()

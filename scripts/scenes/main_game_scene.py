@@ -697,6 +697,8 @@ class MainGameScene(Scene):
             self.app.sound_manager.play_bgm("boss_bgm")
             # 보스 UI 생성함
             self.boss_ui = BossUI(self)
+        else:
+            self.app.sound_manager.play_bgm("main_game")
             
         # 게임 UI 생성함
         self.game_ui = GameUI(self, self.player_status, self.vignette)
@@ -786,15 +788,6 @@ class MainGameScene(Scene):
             anchor=pg.Vector2(0.5, 0.5),
             fade_delay=.1, fade_duration=1.5
         )
-
-    def on_enemy_died(self, enemy_instance):
-        """
-        적 사망 시 점수 처리함 (추가 기능 예정)
-        
-        Args:
-            enemy_instance: 사망한 적 인스턴스
-        """
-        pass  # 현재는 빈 메소드 (나중에 추가 기능 구현 예정)
 
     def on_pause_start(self):
         """

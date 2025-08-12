@@ -21,7 +21,7 @@ FLIP_OFFSET = {
     True  : [-125, -25]
 }
 
-MAX_HEALTH = 2200
+MAX_HEALTH = 3500
 MIN_CHANGE_TIMER = 0.1
 MAX_CHANGE_TIMER = 0.8
 
@@ -201,7 +201,7 @@ class EyePattern(BossPattern):
 # 총알 회전 발사 패턴
 # ---------------------------
 class ProjectilePattern(BossPattern):
-    COOLDOWN = 8
+    COOLDOWN = 6
     ATTACK_DURATION = 2
     FIRE_INTERVAL = 0.15
     ROTATE_SPEED = 200
@@ -264,9 +264,9 @@ class ProjectilePattern(BossPattern):
 # 칼날 발사 패턴
 # ---------------------------
 class KnifePattern(BossPattern):
-    COOLDOWN = 5
-    SHOW_TIME = 1
-    ATTACK_DELAY = .5
+    COOLDOWN = 3.5
+    SHOW_TIME = .4
+    ATTACK_DELAY = .15
     FIRE_OFFSET = pg.Vector2(0, 1000)
     LINE_THICKNESS = 2
     PATTERN_PERCENT = 40
