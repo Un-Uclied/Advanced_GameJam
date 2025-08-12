@@ -39,7 +39,7 @@ class FourAlpha(PhysicsEnemy):
 
         self.current_move_speed = MOVE_SPEED_NORMAL
 
-    def _control_animation(self):
+    def control_animation(self):
         if self.ai.direction.x == 0:
             self.set_action("idle")
         else:
@@ -77,7 +77,7 @@ class FourAlpha(PhysicsEnemy):
         super().update()
         
         self.ai.update()
-        self._control_animation()
+        self.control_animation()
 
         if self.is_player_nearby:
             self.current_move_speed = MOVE_SPEED_CRAZY

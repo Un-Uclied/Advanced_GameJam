@@ -225,11 +225,12 @@ def load_cut_scene_assets():
         "no_souls": load_images("cut_scene/no_souls", scale=2),
         "bad_ending": load_images("cut_scene/bad_ending", scale=2),
         "good_ending": load_images("cut_scene/good_ending", scale=2),
+        "boss_intro": load_images("cut_scene/boss_intro", scale=2),
     }
 
 def load_all_assets():
     '''
-    모든 자원을 한방에 로드
+    모든 애셋을 한방에 로드
 
     - App 클래스에서 딱 1번만 실행 (엄청 무거움)
     - 리턴값 딕셔너리 구조는 엄청 중요하니 절대 바꾸지 말 것

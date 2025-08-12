@@ -6,6 +6,7 @@ class Timer(GameObject):
     
     특정 시간 동안 카운트다운하다가 시간이 다 되면 지정된 콜백 함수들을 호출.
     게임 시간 스케일 적용 여부를 선택할 수 있음.
+    (트랜지션 중엔 timeout안함)
     
     Attributes:
         max_time (float): 타이머의 초기 시간.
@@ -71,7 +72,12 @@ class Timer(GameObject):
         '''
         타이머가 0이 됐을 때 호출되는 메서드.
         콜백을 실행하고 타이머를 비활성화하거나 파괴함.
+        씬간 트랜지션중에 타임아웃되서 동작을 수행하면 에러가 날수 있기에 트랜지션중엔 리턴함.
         '''
+        # 에러 방지
+        if self.app.transition:
+            return
+        
         # 타임아웃 콜백을 모두 호출함.
         for callback in self.on_time_out:
             callback()

@@ -5,7 +5,7 @@ from scripts.vfx import *
 from scripts.core import Tween
 from .base import Entity
 
-HIT_BOX_SIZE = (180, 210)
+HIT_BOX_SIZE = (180, 190)
 LIGHT_SIZE = 500
 
 class Portal(Entity):
@@ -31,7 +31,7 @@ class Portal(Entity):
 
         # 힌트 텍스트 UI (월드 스페이스)
         self.hint_ui = TextRenderer(
-            "F키로 균열 진입",
+            "[F] 키로 균열 진입",
             pg.Vector2(self.rect.centerx, self.rect.top - 30),
             anchor=pg.Vector2(0.5, 1.0),
             use_camera=True

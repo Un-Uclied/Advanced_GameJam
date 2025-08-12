@@ -57,7 +57,7 @@ class SoundManager:
             # 채널이 사용 중이 아닌 경우
             if not channel.get_busy():
                 # 앱의 플레이어 데이터에 있는 전체 효과음 볼륨 설정을 적용함.
-                final_volume = volume * self.app.player_data.get("vfx_volume", 1.0)
+                final_volume = volume * self.app.player_data.get("sfx_volume", 1.0)
                 channel.set_volume(final_volume)
                 channel.play(sound)
                 return
@@ -82,6 +82,16 @@ class SoundManager:
         # loop가 True면 무한 반복(-1)하고 아니면 한 번만 재생함(0).
         num_loops = -1 if loop else 0
         pg.mixer.music.play(num_loops, fade_ms=fade_ms)
+
+    def fade_all_sfx(self, milliseconds : int = 500):
+        """
+        재생되고 있는 모든 효과음들 다 없애기
+        """
+        
+        # 모든 채널을 순회하며 재생 중인 채널을 다 페이드아웃 -> milliseconds후 자동으로 stop()
+        for channel in self.sfx_channels:
+            if channel.get_busy():
+                channel.fadeout(milliseconds)
 
     def pause_all_sfx(self):
         """
@@ -150,7 +160,7 @@ class App:
     
     def __new__(cls, *args, **kwargs):
         """
-        싱글톤 패턴을 위한 __new__ 메서드 재정의.
+        싱글톤 패턴을 위한 __new__ 메서드 정의.
         """
         # 이미 인스턴스가 존재하면 기존 인스턴스를 반환함.
         if cls.singleton is not None:
@@ -251,6 +261,7 @@ class App:
             "no_souls_cut_scene": NoSoulsCutScene(),
             "good_ending_cut_scene": GoodEndingCutScene(),
             "bad_ending_cut_scene": BadEndingCutScene(),
+            "boss_intro_cut_scene": BossIntroCutScene(),
         }
 
         # 첫 실행인 경우 시작 씬을 변경함.
@@ -318,7 +329,7 @@ class App:
             return
         
         # BGM을 서서히 멈춤.
-        pg.mixer.music.fadeout(100)
+        pg.mixer.music.fadeout(500) # 0.5초
         self.transition = True
         
         # 페이드 인이 완료된 후 실행될 콜백 함수를 정의함.

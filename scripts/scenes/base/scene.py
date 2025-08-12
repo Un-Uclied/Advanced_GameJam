@@ -6,6 +6,7 @@ from scripts.ui import *
 from scripts.core import *
 from scripts.volume import *
 from scripts.vfx import *
+from scripts.projectiles.base import Projectile
 from scripts.entities.base import Entity
 
 class Scene:
@@ -60,7 +61,7 @@ class Scene:
         """
         씬이 시작될 때 호출되는 콜백 메서드.
         
-        카메라와 이벤트 버스를 초기화하고 씬의 일시정지 상태를 해제함.
+        카메라와 이벤트 버스를 초기화하고 씬의 일시정지 상태를 해제함. 
         자식 클래스에서 씬에 필요한 초기화 로직을 구현해야 함.
         """
         # 씬 시작 시 카메라와 이벤트 버스를 새로 생성함.
@@ -73,7 +74,7 @@ class Scene:
         """
         씬이 종료될 때 호출되는 콜백 메서드.
         
-        씬에 속한 모든 게임 오브젝트를 파괴하고 일시정지 상태를 해제함.
+        씬에 속한 모든 게임 오브젝트를 파괴하고 일시정지 상태를 해제하고 씬에서 재생중이던것을 모두 정지함.
         """
         # 씬에 속한 모든 객체를 파괴함.
         for obj in self.objects[:]: # 리스트 복사본을 순회해서 삭제 중 오류 방지
@@ -82,6 +83,10 @@ class Scene:
         
         # 씬 종료 후에는 객체 목록이 비어있어야 함.
         self.objects.clear()
+
+        # 모든 효과음을 일시정지가 아닌 꺼버리기
+        self.app.sound_manager.fade_all_sfx()
+        # BGM은 App에서 fadeout하기 때문에 여기선 안함
         
     @property
     def scene_paused(self) -> bool:
@@ -144,7 +149,7 @@ class Scene:
         일시정지 상태에 따라 특정 오브젝트의 업데이트를 건너뛰는 로직을 포함함.
         """
         # 일시정지 상태에서 업데이트 안할 오브젝트의 타입을 정의함.
-        do_not_update_when_paused =  (Entity, ALL_VFX_TYPE, Timer)
+        do_not_update_when_paused =  (Entity, ALL_VFX_TYPE, Timer, Projectile)
         
         # 모든 오브젝트를 순회하며 업데이트를 호출함.
         for obj in self.objects[:]: # 리스트 복사본을 순회해서 업데이트 중 객체 추가/삭제 오류 방지

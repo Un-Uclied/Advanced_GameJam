@@ -19,6 +19,7 @@ CUTSCENE_MAP = {
     (1, 1): "tutorial_two_scene",
     (2, 2): "no_souls_cut_scene",
     (3, 4): "no_lights_cut_scene",
+    (4, 0): "boss_intro_cut_scene",
 }
 
 class ChapterSelectScene(Scene):

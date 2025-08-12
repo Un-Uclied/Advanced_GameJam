@@ -31,7 +31,7 @@ class FourBeta(PhysicsEnemy):
         self.status = EnemyStatus(self, MAX_HEALTH)
         self.ai = WanderAI(self, MIN_CHANGE_TIMER, MAX_CHANGE_TIMER)
 
-    def _control_animation(self):
+    def control_animation(self):
         if self.ai.direction.x == 0:
             self.set_action("idle")
         else:
@@ -58,6 +58,6 @@ class FourBeta(PhysicsEnemy):
         super().update()
         
         self.ai.update()
-        self._control_animation()
+        self.control_animation()
         
         self.velocity.x = self.ai.direction.x * ((MOVE_SPEED + ENEMY_EVIL_A_SPEED_UP) if self.status.soul_type == SOUL_EVIL_A else MOVE_SPEED) * 100

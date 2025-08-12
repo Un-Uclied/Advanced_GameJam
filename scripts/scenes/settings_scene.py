@@ -25,7 +25,7 @@ class SettingsUI:
         self.button_click_stack = 0
         self.ui_elements = {}  # 만든 UI 저장
         self._init_ui()
-        self._connect_events()
+        self.connect_events()
 
     def _init_ui(self):
         """UI 요소 생성 (동적 생성 꼼수)"""
@@ -38,7 +38,7 @@ class SettingsUI:
 
         # 슬라이더 데이터 (이름, 초기값 키, y좌표)
         sliders = [
-            ("sfx_volume", "vfx_volume", 400),
+            ("sfx_volume", "sfx_volume", 400),
             ("bgm_volume", "bgm_volume", 480),
         ]
 
@@ -67,7 +67,7 @@ class SettingsUI:
         # ui_elements를 멤버 변수로 꺼내 쓰기
         globals().update(self.ui_elements)
 
-    def _connect_events(self):
+    def connect_events(self):
         """이벤트 연결"""
         self.ui_elements["sfx_volume_slider"].on_value_changed = self.change_vfx
         self.ui_elements["bgm_volume_slider"].on_value_changed = self.change_bgm
@@ -76,11 +76,11 @@ class SettingsUI:
 
     def update_texts(self):
         """볼륨 표시 업데이트"""
-        self.ui_elements["sfx_volume_text"].text = f"SFX 음량 : {self.scene.app.player_data['vfx_volume']}"
+        self.ui_elements["sfx_volume_text"].text = f"SFX 음량 : {self.scene.app.player_data['sfx_volume']}"
         self.ui_elements["bgm_volume_text"].text = f"BGM 음량 : {self.scene.app.player_data['bgm_volume']}"
 
     def change_vfx(self):
-        self.scene.app.player_data["vfx_volume"] = round(self.ui_elements["sfx_volume_slider"].value, 2)
+        self.scene.app.player_data["sfx_volume"] = round(self.ui_elements["sfx_volume_slider"].value, 2)
 
     def change_bgm(self):
         self.scene.app.player_data["bgm_volume"] = round(self.ui_elements["bgm_volume_slider"].value, 2)
@@ -89,6 +89,8 @@ class SettingsUI:
         if self.button_click_stack >= len(RESET_MSGS):
             self.scene.app.reset_player_data()
             self.ui_elements["reset_button"].renderer.text = "모든 데이터 초기화 됨."
+            self.ui_elements["sfx_volume_slider"].value = self.scene.app.player_data["sfx_volume"]
+            self.ui_elements["bgm_volume_slider"].value = self.scene.app.player_data["bgm_volume"]
             self.ui_elements["sfx_volume_slider"].update_rects()
             self.ui_elements["bgm_volume_slider"].update_rects()
             self.scene.app.sound_manager.play_sfx(self.scene.app.ASSETS["sounds"]["ui"]["reset"])

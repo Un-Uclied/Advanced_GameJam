@@ -683,8 +683,6 @@ class MainGameScene(Scene):
         def on_player_died():
             """플레이어 사망 시 호출되는 콜백 함수"""
             if self.current_chapter == 4 and self.current_level == 0:  # 보스 레벨인 경우
-                # 모든 효과음 정지함
-                self.app.sound_manager.pause_all_sfx()
                 # 배드 엔딩 컷씬으로 전환함
                 self.app.change_scene("bad_ending_cut_scene")
             else:  # 일반 레벨인 경우
@@ -776,34 +774,18 @@ class MainGameScene(Scene):
     def level_intro(self):
         """
         레벨 시작 시 중앙에 레벨 이름 텍스트 보여주고 서서히 사라지게 처리함
-        
-        수행 작업:
-        - 현재 레벨 이름 가져와서 텍스트 렌더러 생성
-        - 페이드 인 애니메이션 (0 -> 255 알파)
-        - 페이드 아웃 애니메이션 (255 -> 0 알파)
         """
         # 현재 레벨 이름 가져옴
         level_names = LEVEL_NAMES_BY_CHAPTER[str(self.current_chapter)]
         name = level_names[self.current_level]
-        
-        # 레벨 이름 텍스트 렌더러 생성함 (화면 중앙)
-        self.level_name_text = TextRenderer(
-            name,  # 레벨 이름
+    
+        PopupText(name,  # 레벨 이름
             SCREEN_SIZE / 2,  # 위치 (화면 중앙)
-            "bold",  # 굵은 폰트
-            50,  # 폰트 크기
-            anchor=pg.Vector2(0.5, 0.5)  # 앵커 포인트 (중앙 정렬)
+            font_name="bold",  # 굵은 폰트
+            font_size=50,  # 폰트 크기
+            anchor=pg.Vector2(0.5, 0.5),
+            fade_delay=.1, fade_duration=1.5
         )
-        
-        # 페이드 인 애니메이션 생성함 (1초 동안 0에서 255로)
-        fade_in_tween = Tween(self.level_name_text, "alpha", 0, 255, 1, pt.easeInQuad)
-        
-        # 페이드 인 완료 후 페이드 아웃 애니메이션 실행하도록 콜백 연결함
-        def start_fade_out():
-            """페이드 인 완료 후 페이드 아웃 시작하는 함수"""
-            Tween(self.level_name_text, "alpha", 255, 0, 2, pt.easeOutQuad)
-            
-        fade_in_tween.on_complete.append(lambda: start_fade_out())
 
     def on_enemy_died(self, enemy_instance):
         """

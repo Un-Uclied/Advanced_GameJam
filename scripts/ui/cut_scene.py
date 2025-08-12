@@ -46,11 +46,11 @@ class CutScene(GameObject):
         self.text_color = text_color
 
         # 컷씬 데이터 로드 및 초기화
-        self.cut_scene_data = self._load_cut_scene_data()
+        self.cut_scene_data = self.load_cut_scene_data()
         self.current_step = 0
         self.max_steps = len(self.cut_scene_data)
 
-        self._load_current_step()
+        self.load_current_step()
 
         # 이미지 및 텍스트 렌더러 초기화
         self.image_renderer = ImageRenderer(self.current_image, pg.Vector2(SCREEN_SIZE.x / 2, 250))
@@ -61,13 +61,13 @@ class CutScene(GameObject):
         self.current_text = ""
         self.char_timer = Timer(
             TEXT_CHARACTER_SPEED,
-            on_time_out=self._show_next_character,
+            on_time_out=self.show_next_character,
             auto_destroy=False,
             use_unscaled=True
         )
 
         # ESC 스킵 관련 타이머 및 텍스트
-        self.skip_timer = Timer(0.5, on_time_out=self._skip_cut_scene, auto_destroy=False, use_unscaled=True)
+        self.skip_timer = Timer(0.5, on_time_out=self.skip_cut_scene, auto_destroy=False, use_unscaled=True)
         self.skip_timer.active = False
         self.skip_text_renderer = TextRenderer("[ESC] 스킵", pg.Vector2(10, 10), font_name="bold", font_size=20, anchor=pg.Vector2(0, 0), color=self.text_color)
 
@@ -82,19 +82,19 @@ class CutScene(GameObject):
         self.character_next_sound = self.app.ASSETS["sounds"]["ui"]["next"]
         self.next_step_sound = self.app.ASSETS["sounds"]["ui"]["confirm"]
 
-    def _load_cut_scene_data(self):
+    def load_cut_scene_data(self):
         """JSON 파일에서 컷씬 데이터 읽어오기"""
         path = BASE_CUT_SCENE_DATA_PATH + self.cut_scene_name + ".json"
         with open(path, 'r', encoding="utf-8") as f:
             return json.load(f)
 
-    def _load_current_step(self):
+    def load_current_step(self):
         """현재 스텝에 맞는 이미지 및 텍스트 데이터 로드"""
         self.current_data = self.cut_scene_data[self.current_step]
         self.current_image = self.app.ASSETS["cut_scene"][self.cut_scene_name][self.current_data["image"]]
         self.target_text = self.current_data["text"]
 
-    def _show_next_character(self):
+    def show_next_character(self):
         """타자기 효과로 텍스트 한 글자씩 출력"""
         if self.text_index >= len(self.target_text):
             return  # 텍스트 끝까지 출력 완료
@@ -111,7 +111,7 @@ class CutScene(GameObject):
 
         if self.current_step < self.max_steps - 1:
             self.current_step += 1
-            self._load_current_step()
+            self.load_current_step()
 
             # 타자기 효과 초기화
             self.text_index = 0
@@ -120,9 +120,9 @@ class CutScene(GameObject):
             self.image_renderer.image = self.current_image
             self.char_timer.reset()
         else:
-            self._skip_cut_scene()
+            self.skip_cut_scene()
 
-    def _skip_cut_scene(self):
+    def skip_cut_scene(self):
         """컷씬 종료 처리 및 콜백 호출"""
         if self.on_cut_scene_end:
             self.on_cut_scene_end()
@@ -138,6 +138,10 @@ class CutScene(GameObject):
                 elif event.key == pg.K_ESCAPE:
                     self.skip_timer.active = True
                     self.skip_text_renderer.text = "계속 누르고 계세요..."
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    if self.text_index >= len(self.target_text):
+                        self.next_step()
             elif event.type == pg.KEYUP:
                 if event.key == pg.K_ESCAPE:
                     self.skip_text_renderer.text = "[ESC] 스킵"

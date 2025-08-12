@@ -39,6 +39,7 @@ class InfoUI:
         TextRenderer("사용된 무료 에셋", pg.Vector2(SCREEN_SIZE.x / 2, 450), font_name="bold", font_size=60, anchor=pg.Vector2(0.5, 0.5))
         for i, link in enumerate(ASSET_LINKS):
             TextRenderer(link, pg.Vector2(SCREEN_SIZE.x / 2, 500 + i * 30), font_size=15, anchor=pg.Vector2(0.5, 0.5))
+        TextRenderer("SFX 생성 : https://sfxr.me/\nBGM은 팀내에서 제작됨.", pg.Vector2(SCREEN_SIZE.x / 2 + 400, 250), anchor=pg.Vector2(0.5, 0.5))
 
     def connect_events(self):
         """UI 요소에 이벤트 핸들러 연결"""
