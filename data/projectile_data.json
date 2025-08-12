@@ -8,15 +8,15 @@
         "speed" : 450
     },
     "boss_fire" : {
-        "damage" : 20,
+        "damage" : 25,
         "speed" : 800
     },
     "boss_lazer" : {
-        "damage" : 20,
+        "damage" : 40,
         "speed" : 1200
     },
     "boss_knife" : {
-        "damage" : 30,
+        "damage" : 20,
         "speed" : 7000
     },
 

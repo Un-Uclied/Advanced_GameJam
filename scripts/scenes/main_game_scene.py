@@ -835,7 +835,7 @@ class MainGameScene(Scene):
         """
         self.handle_input()  # 입력 처리함
         super().update()  # 부모 클래스 업데이트 호출함
-
+    
     def on_level_end(self):
         """
         레벨 종료 처리함
