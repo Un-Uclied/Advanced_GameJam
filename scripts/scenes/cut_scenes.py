@@ -58,7 +58,7 @@ CUTSCENE_CONFIG = {
     "NoSoulsCutScene": dict(cutscene_name="no_souls", next_chapter=2, next_level=2),
     "GoodEndingCutScene": dict(cutscene_name="good_ending", bg_color=pg.Color("white")),
     "BadEndingCutScene": dict(cutscene_name="bad_ending", next_chapter=4, next_level=0, bg_color=pg.Color("red")),
-    "BossIntroCutScene": dict(cutscene_name="boss_intro", next_chapter=4, next_level=0, bg_color=pg.Color("red")),
+    "BossIntroCutScene": dict(cutscene_name="boss_intro", next_chapter=4, next_level=0),
 }
 
 # 동적으로 클래스 생성하는 꼼수

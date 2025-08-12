@@ -6,7 +6,7 @@ from scripts.core import *
 from scripts.ui import *
 
 BASE_CUT_SCENE_DATA_PATH = "data/cut_scene/"
-TEXT_CHARACTER_SPEED = 0.1  # 한 글자 출력 간격 (초)
+TEXT_CHARACTER_SPEED = 0.05  # 한 글자 출력 간격 (초)
 
 class CutScene(GameObject):
     """
@@ -67,16 +67,12 @@ class CutScene(GameObject):
         )
 
         # ESC 스킵 관련 타이머 및 텍스트
-        self.skip_timer = Timer(0.5, on_time_out=self.skip_cut_scene, auto_destroy=False, use_unscaled=True)
+        self.skip_timer = Timer(1, on_time_out=self.skip_cut_scene, auto_destroy=False, use_unscaled=True)
         self.skip_timer.active = False
         self.skip_text_renderer = TextRenderer("[ESC] 스킵", pg.Vector2(10, 10), font_name="bold", font_size=20, anchor=pg.Vector2(0, 0), color=self.text_color)
 
-        # 다음 컷 진행 안내 텍스트 (페이드 아웃 효과)
-        Tween(
-            TextRenderer("[스페이스 | 엔터 | 마우스 왼 클릭]", pg.Vector2(SCREEN_SIZE.x / 2, SCREEN_SIZE.y - 50), anchor=pg.Vector2(0.5, 0.5)),
-            "alpha", 255, 0, 4,
-            use_unscaled_time=True
-        )
+        # 다음 컷 진행 안내 텍스트
+        PopupText("[스페이스 | 엔터 | 마우스 왼 클릭]", pg.Vector2(SCREEN_SIZE.x / 2, SCREEN_SIZE.y - 50), fade_delay=0, fade_duration=4, anchor=pg.Vector2(0.5, 0.5))
 
         # 사운드 효과
         self.character_next_sound = self.app.ASSETS["sounds"]["ui"]["next"]

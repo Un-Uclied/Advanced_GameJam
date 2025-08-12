@@ -17,7 +17,7 @@
     },
     "boss_knife" : {
         "damage" : 30,
-        "speed" : 5000
+        "speed" : 7000
     },
 
     "player_projectile" : {
