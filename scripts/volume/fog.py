@@ -3,9 +3,6 @@ import pygame as pg
 from scripts.constants import *
 from scripts.core import *
 
-# .light 모듈에서 LightManager를 직접 임포트함.
-from .light import LightManager
-
 class Fog(GameObject):
     """
     씬 내 오브젝트와 엔티티에 안개 효과를 씌우는 클래스.

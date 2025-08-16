@@ -31,7 +31,8 @@ class Cloud:
         self.pos.x += self.speed * dt * 100
 
     def draw(self, camera : Camera2D, surface : pg.Surface):
-        depth_pos = self.pos - (camera.position * self.depth)   #depth에 따라 카메라가 스크롤하는 량이 달라짐. (Parallax 효과 만들기)
+        #depth에 따라 카메라가 스크롤하는 량이 달라짐. (Parallax 효과 만들기)
+        depth_pos = self.pos - (camera.position * self.depth)
 
         #화면 밖으로 나가면 다시 반대편으로 갖고오기
         clamped_x = depth_pos.x % (SCREEN_SIZE.x + self.size.x) - self.size.x
