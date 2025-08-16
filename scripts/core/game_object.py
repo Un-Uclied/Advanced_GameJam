@@ -15,7 +15,7 @@ class GameObject:
         생성 시 App 싱글톤 인스턴스를 참조하고, 현재 씬의 객체 목록에 자신을 등록함.
         """
         from scripts.app import App
-        # App 싱글톤 인스턴스를 참조하여 게임 전체 자원에 접근함.
+        # App 싱글톤 인스턴스를 참조, 매번 임포트하는 수고를 덜음
         self.app = App.singleton
         
         # 씬의 객체 목록에 자신을 등록해서 씬이 객체를 관리하도록 함.
@@ -55,6 +55,3 @@ class GameObject:
         # 앱의 디버그 플래그가 켜져 있으면 디버그용 그리기를 호출함.
         if self.app.is_debug:
             self.draw_debug()
-
-    # 클래스 메서드들은 App.scene이 관리하도록 이동됨.
-    # GameObject 클래스는 더 이상 전역 객체 리스트를 직접 관리하지 않음.
