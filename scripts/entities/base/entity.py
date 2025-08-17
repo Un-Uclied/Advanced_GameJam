@@ -18,7 +18,8 @@ class Entity(GameObject):
         is_being_drawn (bool): 현재 화면에 그려지고 있는지 여부
     """
     
-    def __init__(self, name: str, rect: pg.Rect, start_action: str = "idle", invert_x: bool = False):
+    def __init__(self, name: str, rect: pg.Rect,
+                 start_action: str = "idle", invert_x: bool = False):
         super().__init__()
         
         self.name = name
@@ -48,7 +49,9 @@ class Entity(GameObject):
         if self.current_action == action_name:
             return
         self.current_action = action_name
-        self.anim = self.app.ASSETS["animations"]["entities"][self.name][action_name].copy()
+        
+        self.anim = self.app.ASSETS["animations"]["entities"]\
+        [self.name][action_name].copy()
 
     def get_rect_points(self) -> list[pg.Vector2]:
         """

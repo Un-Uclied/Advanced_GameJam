@@ -22,7 +22,8 @@ class PhysicsEntity(Entity):
         current_gravity (float): 현재 중력값 (시간에 따라 증가 가능)
     """
 
-    def __init__(self, name, rect: pg.Rect, start_action: str = "idle", invert_x: bool = False):
+    def __init__(self, name, rect: pg.Rect,
+                 start_action: str = "idle", invert_x: bool = False):
         super().__init__(name, rect, start_action, invert_x)
 
         self.collisions = {"left": False, "right": False, "up": False, "down": False}
