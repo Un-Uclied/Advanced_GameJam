@@ -35,6 +35,7 @@ class PlayerInput:
     def update(self):
         """입력 처리 및 방향 업데이트"""
         if self.player.app.transition or self.player.app.scene.player_status.health <= 0:
+            self.direction = pg.Vector2()
             return
             
         self._handle_keyboard_input()

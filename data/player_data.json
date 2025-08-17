@@ -1,36 +1,36 @@
 {
-    "is_first_start": true,
+    "is_first_start": false,
     "progress": {
         "1": [
             true,
-            false,
-            false,
-            false,
-            false
+            true,
+            true,
+            true,
+            true
         ],
         "2": [
-            false,
-            false,
-            false,
-            false,
-            false
+            true,
+            true,
+            true,
+            true,
+            true
         ],
         "3": [
-            false,
-            false,
-            false,
-            false,
-            false
+            true,
+            true,
+            true,
+            true,
+            true
         ],
         "4": [
-            false
+            true
         ]
     },
     "scores": {
         "1": [
-            0,
-            0,
-            0,
+            820,
+            5065,
+            15920,
             0,
             0
         ],
