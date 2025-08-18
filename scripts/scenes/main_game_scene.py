@@ -633,9 +633,6 @@ class MainGameScene(Scene):
         
         super().on_scene_start()  # 부모 클래스 씬 시작 처리함
 
-        # 다음 진행상황 미리 업데이트함
-        self.update_next_progress()
-
         # 플레이어 상태 초기화 (체력 100으로 시작)
         self.player_status = PlayerStatus(start_health=100)
         self._score = 0  # 점수 내부 변수 초기화함
@@ -659,8 +656,9 @@ class MainGameScene(Scene):
         # 타일맵 로드 + 엔티티 스폰함
         chapter_str = str(self.current_chapter)  # 챕터 번호를 문자열로 변환함
         file_path = TILEMAP_FILES_BY_CHAPTER[chapter_str][self.current_level]  # 타일맵 파일 경로 가져옴
-        self.tilemap = Tilemap(file_path)  # 타일맵 로드함
-        spawn_all_entities(self.tilemap)  # 타일맵의 모든 엔티티들 스폰함
+        self.tilemap_data = TilemapData(file_path)
+        TilemapRenderer(self.tilemap_data)
+        spawn_all_entities_by_data(self.tilemap_data)  # 타일맵의 모든 엔티티들 스폰함
 
         # 적 죽으면 점수 추가하도록 이벤트 연결함
         def on_enemy_died(instance):
@@ -671,7 +669,7 @@ class MainGameScene(Scene):
         self.event_bus.connect("on_enemy_died", on_enemy_died)
 
         # 플레이어 캐릭터 생성 + 상태 연결함
-        spawn_positions = self.tilemap.get_pos_by_data("spawners_entities", 0)  # 스폰 위치들 가져옴
+        spawn_positions = self.tilemap_data.get_positions_by_types("spawners_entities", 0)  # 스폰 위치들 가져옴
         spawn_pos = spawn_positions[0]  # 첫 번째 스폰 위치 사용함
         pc = PlayerCharacter(spawn_pos)  # 플레이어 캐릭터 생성함
         
@@ -681,6 +679,7 @@ class MainGameScene(Scene):
         
         # 플레이어 죽으면 씬 재시작하도록 이벤트 연결함
         def on_player_died():
+            self.player_status.current_invincible_time += 99
             """플레이어 사망 시 호출되는 콜백 함수"""
             if self.current_chapter == 4 and self.current_level == 0:  # 보스 레벨인 경우
                 # 배드 엔딩 컷씬으로 전환함
@@ -716,6 +715,9 @@ class MainGameScene(Scene):
         Sky()  # 하늘 배경 생성함
         Clouds()  # 구름 이펙트 생성함
         Fog()  # 안개 이펙트 생성함
+
+        # 다음 진행상황 미리 업데이트함
+        self.update_next_progress()
 
     @property
     def score(self):
@@ -767,11 +769,22 @@ class MainGameScene(Scene):
                 # 메인 메뉴로 전환함
                 self.app.change_scene("main_menu_scene")
                 return
+            
+        # 하이스코어 갱신 확인 및 저장함
+        current_high_score = self.app.player_data["scores"][str(self.current_chapter)][self.current_level]
+        if self._score > current_high_score:
+            # 새로운 하이스코어 저장함
+            self.app.player_data["scores"][str(self.current_chapter)][self.current_level] = self._score
+        # 점수 초기화함
+        self._score = 0
 
         # 플레이어 데이터에 진행상황 저장함 (해당 레벨을 클리어했다고 표시)
         progress_data = self.app.player_data["progress"]
         chapter_progress = progress_data[str(self.current_chapter)]
         chapter_progress[self.current_level] = True
+
+        # 플레이어 데이터 저장함
+        self.app.save_player_data()
 
     def level_intro(self):
         """
@@ -844,17 +857,8 @@ class MainGameScene(Scene):
         # 무적 상태 부여 (트랜지션 중 사망 방지용으로 99초 추가)
         self.player_status.current_invincible_time += 99
         
-        # 하이스코어 갱신 확인 및 저장함
-        current_high_score = self.app.player_data["scores"][str(self.current_chapter)][self.current_level]
-        if self._score > current_high_score:
-            # 새로운 하이스코어 저장함
-            self.app.player_data["scores"][str(self.current_chapter)][self.current_level] = self._score
-        
-        # 점수 초기화함
-        self._score = 0
-        
-        # 다음 레벨로 진행함
         self.current_level += 1
+        self.update_next_progress()
 
         # 기본적으로 메인 게임 씬으로 전환함
         target_scene_name = "main_game_scene"
@@ -866,6 +870,3 @@ class MainGameScene(Scene):
             
         # 대상 씬으로 전환함
         self.app.change_scene(target_scene_name)
-        
-        # 플레이어 데이터 저장함
-        self.app.save_player_data()

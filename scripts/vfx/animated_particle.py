@@ -23,10 +23,6 @@ class AnimatedParticle(GameObject):
 
         # 애니메이션 복사본 생성 (원본 공유 X)
         self.anim = anim.copy()
-        
-        # 애니메이션 끝나면 자동 제거 플래그 세팅
-        self.anim.auto_destroy = True
-        self.anim.owner = self  # 애니메이션이 이 객체 소유임을 표시
 
         self.position = position
         self.anchor = anchor
@@ -35,6 +31,9 @@ class AnimatedParticle(GameObject):
         super().update()
         # 프레임마다 애니메이션 상태 업데이트 (프레임 넘김, 시간 계산 등)
         self.anim.update(self.app.dt)
+
+        if self.anim.done:
+            self.destroy()
 
     def draw(self):
         super().draw()

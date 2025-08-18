@@ -93,7 +93,7 @@ class PlayerAbilities:
         """대시 실행"""
         input_dir = self.player.input_handler.direction
         
-        if input_dir.x == 0 or self.dash_timer.current_time > 0:
+        if input_dir.x == 0 or self.dash_timer.get_time() > 0:
             return
             
         self.dash_timer.reset()
@@ -112,7 +112,7 @@ class PlayerAbilities:
     def attack(self):
         """공격 실행"""
         ps = self.player.app.scene.player_status
-        if ps.attack_cooltime.current_time > 0:
+        if ps.attack_cooltime.get_time() > 0:
             return
             
         ps.attack_cooltime.reset()
@@ -254,12 +254,12 @@ class PlayerCharacter(PhysicsEntity):
         event_bus.connect("on_player_hurt", self.on_player_hurt)
 
     def get_direction_from(self, point: pg.Vector2):
-        """적이 사용하는 헬퍼 함수 (적과 플레이어의 방향)"""
+        """적이 사용하는 헬퍼 메소드 (적과 플레이어의 방향)"""
         to_plr_dir = pg.Vector2(self.rect.center) - pg.Vector2(point)
         return to_plr_dir.normalize() if to_plr_dir.length_squared() > 0 else pg.Vector2(0, 0)
         
     def get_distance_from(self, point: pg.Vector2):
-        """적이 사용하는 헬퍼 함수 (적과 플레이어의 거리)"""
+        """적이 사용하는 헬퍼 메소드 (적과 플레이어의 거리)"""
         to_plr_dir = pg.Vector2(self.rect.center) - pg.Vector2(point)
         return to_plr_dir.length()
 

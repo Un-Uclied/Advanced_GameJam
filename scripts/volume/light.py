@@ -110,11 +110,11 @@ class LightManager:
         # 각 빛 객체를 순회하며 그림.
         for light in all_lights:
             # 카메라 뷰포트 밖의 빛은 그리지 않아서 성능을 최적화함.
-            if not CameraView.is_in_view(self.scene.camera, light.bound_box):
+            if not CameraView.is_rect_in_view(self.scene.camera, light.bound_box):
                 continue
 
-            # 월드 좌표를 화면 좌표로 변환함.
-            screen_rect = CameraView.world_rect_to_screen(self.scene.camera, light.bound_box)
+            # 월드 좌표계의 Rect -> 스크린 좌표계의 Rect
+            screen_rect = CameraView.world_rect_to_screen_rect(self.scene.camera, light.bound_box)
             # BLEND_RGBA_SUB 모드로 빛 이미지를 그림.
             surface.blit(light.surface, screen_rect.topleft, special_flags=pg.BLEND_RGBA_SUB)
 

@@ -45,9 +45,9 @@ class EnemyUI(GameObject):
         self.enemy = enemy  # 적 객체 참조 저장함
         self.soul_type = soul_type  # 영혼 타입 저장함  
         self.max_health = max_health  # 최대 체력 저장함
-        self.create_ui_elements()  # UI 요소들 생성함
+        self.make_ui()  # UI 요소들 생성함
 
-    def create_ui_elements(self):
+    def make_ui(self):
         """
         UI 텍스트, 아이콘, 체력바 생성 및 초기 위치 세팅함
         

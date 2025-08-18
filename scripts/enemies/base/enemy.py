@@ -145,7 +145,7 @@ class ProjectileEnemy(PhysicsEnemy):
         pc = self.app.scene.player_status.player_character
         dist = pg.Vector2(self.rect.center).distance_to(pg.Vector2(pc.rect.center))
 
-        if dist <= self.fire_range and self.cooldown.current_time <= 0:
+        if dist <= self.fire_range and self.cooldown.get_time() <= 0:
             self.fire()
             self.cooldown.reset()
 

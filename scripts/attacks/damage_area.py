@@ -58,4 +58,4 @@ class DamageArea(GameObject):
 
     def draw_debug(self):
         super().draw_debug()
-        pg.draw.rect(self.app.surfaces[LAYER_INTERFACE], self.color, CameraView.world_rect_to_screen(self.app.scene.camera, self.rect), width=2)
+        pg.draw.rect(self.app.surfaces[LAYER_INTERFACE], self.color, CameraView.world_rect_to_screen_rect(self.app.scene.camera, self.rect), width=2)

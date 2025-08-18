@@ -134,7 +134,6 @@ class PlayerStatus(GameObject):
             on_time_out=None,
             auto_destroy=False,
         )
-        self.attack_cooltime.current_time = 0
         self.attack_cooltime.active = True # 타이머가 동작하도록 활성화
 
         self.player_character = None

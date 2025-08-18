@@ -26,17 +26,11 @@ class ChapterSelectScene(Scene):
     def on_scene_start(self):
         super().on_scene_start()
         
-        self.tilemap = Tilemap(random.choice(TILEMAP_DATA["main_menu_maps"]))
-        spawn_all_entities(self.tilemap)
-        ImageRenderer(self.app.ASSETS["ui"]["vignette"]["black"], pg.Vector2(0, 0), anchor=pg.Vector2(0, 0))
-
-        TextRenderer("[ESC]", pg.Vector2(10, 10), font_name="bold", font_size=20, anchor=pg.Vector2(0, 0))
-        TextRenderer("챕터 선택", pg.Vector2(SCREEN_SIZE.x / 2, 150), font_name="bold", font_size=100, anchor=pg.Vector2(0.5, 0.5))
-
-        ImageButton("select_one", pg.Vector2(450, 270), self.on_chapter_click, None)
-        ImageButton("select_two", pg.Vector2(570, 270), self.on_chapter_click, None)
-        ImageButton("select_three", pg.Vector2(690, 270), self.on_chapter_click, None)
-        ImageButton("select_boss", pg.Vector2(810, 270), self.on_chapter_click, None)
+        self.tilemap_data = TilemapData(random.choice(TILEMAP_DATA["main_menu_maps"]))
+        TilemapRenderer(self.tilemap_data)
+        spawn_all_entities_by_data(self.tilemap_data)
+        
+        self.make_ui()
 
         self.selected_chapter = 0
         self.buttons = []
@@ -46,6 +40,17 @@ class ChapterSelectScene(Scene):
         Sky()
         Clouds()
         Fog()
+
+    def make_ui(self):
+        ImageRenderer(self.app.ASSETS["ui"]["vignette"]["black"], pg.Vector2(0, 0), anchor=pg.Vector2(0, 0))
+
+        TextRenderer("[ESC]", pg.Vector2(10, 10), font_name="bold", font_size=20, anchor=pg.Vector2(0, 0))
+        TextRenderer("챕터 선택", pg.Vector2(SCREEN_SIZE.x / 2, 150), font_name="bold", font_size=100, anchor=pg.Vector2(0.5, 0.5))
+
+        ImageButton("select_one", pg.Vector2(450, 270), self.on_chapter_click, None)
+        ImageButton("select_two", pg.Vector2(570, 270), self.on_chapter_click, None)
+        ImageButton("select_three", pg.Vector2(690, 270), self.on_chapter_click, None)
+        ImageButton("select_boss", pg.Vector2(810, 270), self.on_chapter_click, None)
 
     def on_chapter_click(self, button: ImageButton):
         name = button.name

@@ -13,7 +13,7 @@ class Sky(GameObject):
 
         #App클래스의 에셋의 ["backgrounds"]["sky"][하늘 이름]은 list[pg.Surface]
         self.surfaces = self.app.ASSETS["backgrounds"]["sky"][sky_name]
-        self.cache = pg.Surface(self.surfaces[0].get_size())
+        self.cache = pg.Surface(self.surfaces[0].get_size(), pg.SRCALPHA)
         for surface in self.surfaces:
             self.cache.blit(surface, (0, 0))
 

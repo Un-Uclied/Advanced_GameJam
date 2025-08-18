@@ -1,7 +1,7 @@
 from scripts.volume import Light
 from scripts.entities import Soul, Portal
 from scripts.enemies import *
-from .tilemap import Tilemap
+from .tilemap import TilemapData
 
 LIGHT_SIZE = 360
 
@@ -24,16 +24,16 @@ SPAWNER_ENEMY_MAP = {
     8: lambda pos: FiveOmega(pos),
 }
 
-def spawn_all_entities(tilemap: Tilemap):
+def spawn_all_entities_by_data(tilemap_data : TilemapData):
     """타일맵에서 적과 엔티티 스폰 (플레이어 제외)"""
     # 적 먼저 생성 (그려지는 순서 문제 때문에)
     for spawner_id, constructor in SPAWNER_ENEMY_MAP.items():
-        for pos in tilemap.get_pos_by_data("spawners_enemies", spawner_id):
+        for pos in tilemap_data.get_positions_by_types("spawners_enemies", spawner_id):
             constructor(pos)
 
     # 그 다음 엔티티 생성
     for spawner_id, constructor in SPAWNER_ENTITY_MAP.items():
         if spawner_id == 0:
             continue  # 플레이어 스폰 스킵
-        for pos in tilemap.get_pos_by_data("spawners_entities", spawner_id):
+        for pos in tilemap_data.get_positions_by_types("spawners_entities", spawner_id):
             constructor(pos)

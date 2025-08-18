@@ -57,7 +57,7 @@ class Projectile(GameObject):
         """
         if not self.destroy_on_tilemap_collision:
             return
-        for rect in self.app.scene.tilemap.physic_tiles_around(self.position):
+        for rect in self.app.scene.tilemap_data.physic_tiles_around(self.position):
             if rect.collidepoint(self.position):
                 self.destroy()
                 break

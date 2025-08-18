@@ -50,9 +50,9 @@ class BossPattern:
         """
         if not self.boss.registered_patterns["wander"].enabled:
             return
-        if self.cooltime and self.cooltime.current_time > 0:
+        if self.cooltime and self.cooltime.get_time() > 0:
             return
-        if self._pattern_timer.current_time > 0:
+        if self._pattern_timer.get_time() > 0:
             return
 
         self._pattern_timer.reset()
@@ -182,7 +182,7 @@ class EyePattern(BossPattern):
         self.boss.registered_patterns["wander"].enabled = False
 
     def _try_fire(self):
-        if self.fire_timer.current_time > 0:
+        if self.fire_timer.get_time() > 0:
             return
         self.fire_timer.reset()
 
@@ -227,7 +227,7 @@ class ProjectilePattern(BossPattern):
         self._rotate()
 
     def _try_fire(self):
-        if self.fire_timer.current_time > 0:
+        if self.fire_timer.get_time() > 0:
             return
         self.fire_timer.reset()
 
@@ -250,7 +250,7 @@ class ProjectilePattern(BossPattern):
                 self.rotate_right = True
 
     def _get_spawn_position(self):
-        return self.app.scene.tilemap.get_pos_by_data("custom_point", 0)[0]
+        return self.app.scene.tilemap_data.get_positions_by_types("custom_point", 0)[0]
 
     def _get_direction_from_angle(self, angle):
         rad = math.radians(angle)
@@ -324,7 +324,7 @@ class KnifePattern(BossPattern):
             self.attack_targets[i] = player_center
 
     def _get_start_positions(self):
-        return self.app.scene.tilemap.get_pos_by_data("custom_point", 1)
+        return self.app.scene.tilemap_data.get_positions_by_types("custom_point", 1)
 
     def end(self):
         self.enabled = False
@@ -363,7 +363,7 @@ class SpawnPattern(BossPattern):
             self.attack_targets[i] = player_center
 
     def _get_start_positions(self):
-        return self.app.scene.tilemap.get_pos_by_data("custom_point", 1)
+        return self.app.scene.tilemap_data.get_positions_by_types("custom_point", 1)
 
     def end(self):
         self.enabled = False

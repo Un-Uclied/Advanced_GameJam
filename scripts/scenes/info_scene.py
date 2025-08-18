@@ -24,10 +24,10 @@ class InfoUI:
     """정보 화면의 모든 UI 요소를 관리하는 클래스"""
     def __init__(self, scene):
         self.scene = scene
-        self.create_ui_elements()
+        self.make_ui()
         self.connect_events()
 
-    def create_ui_elements(self):
+    def make_ui(self):
         """UI 요소 생성 및 초기 설정"""
         TextRenderer("[ESC]", pg.Vector2(10, 10), font_name="bold", font_size=20, anchor=pg.Vector2(0, 0))
         TextRenderer("팀 [후라이맨즈]", pg.Vector2(SCREEN_SIZE.x / 2, 100), font_name="bold", font_size=100, anchor=pg.Vector2(0.5, 0.5))

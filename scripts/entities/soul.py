@@ -111,6 +111,8 @@ class Soul(PhysicsEntity):
         """플레이어가 영혼과 닿았을 때 E키 입력 감지"""
         if not hasattr(self.app.scene, "player_status") or not hasattr(self.app.scene.player_status, "player_character"):
             return
+        if self.app.scene.player_status.health <= 0:
+            return
 
         ps = self.app.scene.player_status
         pc = ps.player_character

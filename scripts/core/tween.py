@@ -4,21 +4,37 @@ import pytweening as pt
 from scripts.constants import *
 from scripts.core import *
 
-def lerp_color(start: pg.Color, end: pg.Color, t: float) -> pg.Color:
-    '''
-    색상 보간 함수
-    start에서 end로 t(0~1)만큼 선형 보간해서 새로운 색 반환
 
-    :param start: 시작 색상 (pg.Color)
-    :param end: 끝 색상 (pg.Color)
-    :param t: 보간 값 (0.0 ~ 1.0)
-    :return: 보간된 색상 (pg.Color)
+class Interpolator:
     '''
-    r = int(start.r + (end.r - start.r) * t)
-    g = int(start.g + (end.g - start.g) * t)
-    b = int(start.b + (end.b - start.b) * t)
-    a = int(start.a + (end.a - start.a) * t)
-    return pg.Color(r, g, b, a)
+    다양한 타입의 값을 보간하는 로직을 담당하는 클래스
+    '''
+    @staticmethod
+    def lerp_color(start: pg.Color, end: pg.Color, t: float) -> pg.Color:
+        '''
+        색상 보간 함수
+        '''
+        r = int(start.r + (end.r - start.r) * t)
+        g = int(start.g + (end.g - start.g) * t)
+        b = int(start.b + (end.b - start.b) * t)
+        a = int(start.a + (end.a - start.a) * t)
+        return pg.Color(r, g, b, a)
+
+    @staticmethod
+    def interpolate(start_value, end_value, t: float, easing) -> any:
+        '''
+        시작 값과 끝 값을 이징 함수에 따라 보간하여 반환
+        '''
+        eased_t = easing(t)
+        
+        # 타입별 보간 함수를 결정
+        if isinstance(start_value, pg.Color):
+            return Interpolator.lerp_color(start_value, end_value, eased_t)
+        elif isinstance(start_value, pg.Vector2):
+            return start_value.lerp(end_value, eased_t)
+        else:
+            # 기본 숫자 타입 보간
+            return start_value + (end_value - start_value) * eased_t
 
 
 class Tween(GameObject):
@@ -38,13 +54,6 @@ class Tween(GameObject):
         use_unscaled_time (bool): 게임 시간 스케일 무시 여부.
         on_complete (list): 트윈 완료 시 호출될 콜백 함수 목록.
     '''
-    
-    # 타입별 보간 함수를 저장하는 딕셔너리
-    _interpolators = {
-        pg.Color: lerp_color,
-        pg.Vector2: lambda start, end, t: start.lerp(end, t),
-        # 숫자 타입 보간은 기본 로직으로 처리
-    }
     
     def __init__(self, target, attr_name: str,
                  start_value, end_value,
@@ -84,7 +93,7 @@ class Tween(GameObject):
                 self.on_complete.append(on_complete)
 
         # 트윈 시작 시점에 대상 속성을 시작 값으로 강제 설정.
-        # 이렇게 하면 트윈이 생성될 때부터 정확한 값을 가집니다.
+        # 이렇게 하면 트윈이 생성될 때부터 정확한 값을 가짐.
         setattr(self.target, self.attr_name, self.start_value)
         
         # duration이 0일 경우, 즉시 완료 처리
@@ -120,17 +129,10 @@ class Tween(GameObject):
 
         # 경과 시간 대비 진행률 (0~1)
         t = min(self.elapsed / self.duration, 1.0)
-        eased_t = self.easing(t)
 
-        # 보간 함수 딕셔너리를 사용하여 값 타입에 맞는 보간을 처리함.
-        interpolator = self._interpolators.get(type(self.start_value))
+        # Interpolator 클래스를 사용하여 값 보간 로직을 위임
+        value = Interpolator.interpolate(self.start_value, self.end_value, t, self.easing)
         
-        if interpolator:
-            value = interpolator(self.start_value, self.end_value, eased_t)
-        else:
-            # 기본 숫자 타입 보간
-            value = self.start_value + (self.end_value - self.start_value) * eased_t
-
         # 보간된 값을 타겟 속성에 할당
         setattr(self.target, self.attr_name, value)
 

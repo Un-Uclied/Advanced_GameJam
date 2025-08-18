@@ -205,7 +205,7 @@ class TextRenderer(GameObject):
         if self.scale != 1.0:
             scaled_size = (round(self._base_surface.get_width() * self.scale),
                            round(self._base_surface.get_height() * self.scale))
-            self.image = pg.transform.smoothscale(self._base_surface, scaled_size)
+            self.image = pg.transform.scale(self._base_surface, scaled_size)
         # 스케일이 1인 경우 원본 서피스를 그대로 사용함.
         else:
             self.image = self._base_surface.copy()

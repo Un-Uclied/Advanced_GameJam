@@ -26,10 +26,10 @@ class MainMenuUI:
     def __init__(self, scene):
         self.scene = scene
         self._buttons : list[ImageButton] = []
-        self._create_ui_elements()
+        self._make_ui()
         self._connect_events()
 
-    def _create_ui_elements(self):
+    def _make_ui(self):
         """UI 컴포넌트 생성 및 화면 위치 세팅"""
         # 버튼들 생성, 화면 가운데 수평 정렬, Y 좌표만 다름
         self._buttons.extend(
@@ -92,8 +92,9 @@ class MainMenuScene(Scene):
         super().on_scene_start()
 
         # 랜덤으로 메인 메뉴용 타일맵 불러와 씬에 생성
-        self.tilemap = Tilemap(random.choice(TILEMAP_DATA["main_menu_maps"]))
-        spawn_all_entities(self.tilemap)
+        self.tilemap_data = TilemapData(random.choice(TILEMAP_DATA["main_menu_maps"]))
+        TilemapRenderer(self.tilemap_data)
+        spawn_all_entities_by_data(self.tilemap_data)
 
         # UI 생성
         self.main_menu_ui = MainMenuUI(self)

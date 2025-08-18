@@ -78,6 +78,8 @@ class Portal(Entity):
 
     def handle_input(self):
         """포탈 상호작용 입력 처리 (F키)"""
+        if self.app.scene.player_status.health <= 0:
+            return
         for event in self.app.events:
             if event.type == pg.KEYDOWN and event.key == pg.K_f:
                 if self.is_player_inside and not self.interacted:

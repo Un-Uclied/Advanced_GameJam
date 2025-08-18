@@ -28,19 +28,19 @@ class WanderAI:
     def check_floor(self):
         '''내 위치 왼쪽 아래/오른쪽 아래 타일 없으면 떨어짐으로 판단, 방향 전환'''
         entity = self.entity
-        tilemap = entity.app.scene.tilemap
-        tile_size = tilemap.tile_size
+        tilemap_data = entity.app.scene.tilemap_data
+        tile_size = tilemap_data.tile_size
         check_w = 4
 
         left_check = pg.Vector2(entity.rect.midbottom[0] - tile_size // 2 + check_w, entity.rect.bottom + 1)
         right_check = pg.Vector2(entity.rect.midbottom[0] + tile_size // 2 - check_w, entity.rect.bottom + 1)
 
         # 왼쪽 바닥 없으면 오른쪽으로 방향 고정
-        if not any(r.collidepoint(left_check) for r in tilemap.physic_tiles_around(left_check)):
+        if not any(r.collidepoint(left_check) for r in tilemap_data.physic_tiles_around(left_check)):
             self.handle_collision_or_fall("fall_left")
 
         # 오른쪽 바닥 없으면 왼쪽으로 방향 고정
-        elif not any(r.collidepoint(right_check) for r in tilemap.physic_tiles_around(right_check)):
+        elif not any(r.collidepoint(right_check) for r in tilemap_data.physic_tiles_around(right_check)):
             self.handle_collision_or_fall("fall_right")
 
     def check_wall(self):

@@ -97,7 +97,7 @@ class Entity(GameObject):
         pg.draw.rect(
             self.app.surfaces[LAYER_INTERFACE],
             "yellow",
-            CameraView.world_rect_to_screen(self.app.scene.camera, self.rect),
+            CameraView.world_rect_to_screen_rect(self.app.scene.camera, self.rect),
             width=2
         )
 
@@ -114,7 +114,7 @@ class Entity(GameObject):
         img_rect = pg.Rect(world_pos, img.get_size())
 
         self.is_being_drawn = True
-        if not CameraView.is_in_view(cam, img_rect):
+        if not CameraView.is_rect_in_view(cam, img_rect):
             self.is_being_drawn = False
             return
 

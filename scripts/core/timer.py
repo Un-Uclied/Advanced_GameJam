@@ -1,5 +1,23 @@
 from .game_object import GameObject
 
+class TimerCore:
+    '''
+    타이머의 핵심 로직(시간 계산)을 담당하는 클래스
+    '''
+    def __init__(self, time: float, use_unscaled: bool):
+        self.max_time = time
+        self.current_time = time
+        self.use_unscaled = use_unscaled
+
+    def update(self, dt: float, unscaled_dt: float):
+        # dt 계산: 게임 시간 스케일 적용 여부를 결정
+        delta_time = unscaled_dt if self.use_unscaled else dt
+        self.current_time -= delta_time
+
+    def reset(self):
+        self.current_time = self.max_time
+
+
 class Timer(GameObject):
     '''
     간단한 타이머 클래스.
@@ -29,9 +47,8 @@ class Timer(GameObject):
         '''
         super().__init__()
         
-        self.max_time = time
-        self.current_time = time
-
+        self.timer_core = TimerCore(time, use_unscaled)
+        
         # 콜백을 리스트로 관리해서 여러 함수를 등록할 수 있게 함.
         self.on_time_out = []
         if on_time_out:
@@ -40,7 +57,6 @@ class Timer(GameObject):
             else:
                 self.on_time_out.append(on_time_out)
 
-        self.use_unscaled = use_unscaled
         self.auto_destroy = auto_destroy
         self.active = True
 
@@ -48,7 +64,7 @@ class Timer(GameObject):
         '''
         타이머 시간을 `max_time`으로 리셋하고 다시 활성화.
         '''
-        self.current_time = self.max_time
+        self.timer_core.reset()
         self.active = True
 
     def update(self):
@@ -59,14 +75,18 @@ class Timer(GameObject):
         if not self.active:
             return
         
-        # dt 계산: 게임 시간 스케일 적용 여부를 결정.
-        dt = self.app.unscaled_dt if self.use_unscaled else self.app.dt
-        self.current_time -= dt
+        # 타이머 코어의 update 메서드를 호출하여 시간 계산을 위임함.
+        self.timer_core.update(self.app.dt, self.app.unscaled_dt)
 
         # 시간이 0 이하가 되면 타임아웃을 처리.
-        if self.current_time <= 0:
+        if self.timer_core.current_time <= 0:
             # 타임아웃 처리 로직을 별도 메서드로 분리했음.
             self.time_out()
+
+        print(self)
+
+    def get_time(self):
+        return self.timer_core.current_time
 
     def time_out(self):
         '''
