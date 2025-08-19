@@ -199,7 +199,7 @@ class AttackController:
         
     def calculate_attack_direction(self):
         """마우스 위치 기반 공격 방향 계산"""
-        camera = self.player.scene.camera
+        camera = self.player.camera
         player_pos = pg.Vector2(self.player.rect.center)
         mouse_pos = pg.Vector2(pg.mouse.get_pos())
         direction = CameraMath.screen_to_world(camera, mouse_pos) - player_pos
@@ -385,7 +385,7 @@ class CameraController:
         
     def update_camera_position(self):
         """카메라 위치를 플레이어 위치로 부드럽게 이동"""
-        camera = self.player.scene.camera
+        camera = self.player.camera
         target_pos = self.player.rect.center
         dt = self.player.app.dt
         

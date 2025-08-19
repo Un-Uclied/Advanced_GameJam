@@ -53,7 +53,7 @@ class EnemyBase:
         self.enemy.app.sound_manager.play_sfx(self.attack_sound)
 
         if shake:
-            cam = self.enemy.scene.camera
+            cam = self.enemy.camera
             cam.shake_amount += shake
 
         direction = pg.Vector2(pc.rect.center) - pos

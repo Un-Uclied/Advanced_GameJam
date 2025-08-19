@@ -85,7 +85,7 @@ class Projectile(GameObject):
         super().draw()
 
         surface = self.app.surfaces[LAYER_DYNAMIC]
-        camera = self.scene.camera
+        camera = self.camera
 
         image = self.anim.img()
 

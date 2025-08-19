@@ -74,7 +74,7 @@ class Portal(Entity):
         self.scene.on_level_end()
         self.app.sound_manager.play_sfx(self.interact_sound)
         AnimatedParticle(self.interact_particle_anim, pg.Vector2(self.rect.center))
-        self.scene.camera.shake_amount += 25
+        self.camera.shake_amount += 25
 
     def handle_input(self):
         """포탈 상호작용 입력 처리 (F키)"""

@@ -73,7 +73,7 @@ class MainMenuUI:
             app.window_should_be_closed = True
 
         # 버튼 클릭 시 약간의 화면 흔들림 효과로 타격감 추가
-        app.scene.camera.shake_amount += 15
+        self.scene.camera.shake_amount += 15
 
 class MainMenuScene(Scene):
     """

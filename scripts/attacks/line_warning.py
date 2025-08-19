@@ -13,8 +13,8 @@ class LineWarning(GameObject):
     
     def draw(self):
         # 월드좌표 -> 화면좌표 변환
-        draw_start = CameraMath.world_to_screen(self.scene.camera, self.start)
-        draw_end = CameraMath.world_to_screen(self.scene.camera, self.end)
+        draw_start = CameraMath.world_to_screen(self.camera, self.start)
+        draw_end = CameraMath.world_to_screen(self.camera, self.end)
 
         # 방향벡터
         dir_vec = pg.Vector2(draw_end) - pg.Vector2(draw_start)

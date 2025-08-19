@@ -53,6 +53,6 @@ class ImageRenderer(GameObject):
 
         draw_pos = self.screen_pos
         if self.use_camera:
-            draw_pos = CameraMath.world_to_screen(self.scene.camera, draw_pos)
+            draw_pos = CameraMath.world_to_screen(self.camera, draw_pos)
 
         surface.blit(scaled_img, draw_pos)

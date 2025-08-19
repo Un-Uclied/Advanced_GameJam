@@ -42,6 +42,9 @@ class SoundManager:
         # 일시정지된 채널들을 저장할 큐를 초기화함.
         self.paused_channels = []
 
+        self.set_sfx_volume(app.player_data["sfx_volume"])
+        self.set_bgm_volume(app.player_data["bgm_volume"])
+
     def play_sfx(self, sound: pg.mixer.Sound, volume: float = 1.0):
         """
         사용 가능한 채널에서 효과음을 재생함.
@@ -88,7 +91,8 @@ class SoundManager:
         재생되고 있는 모든 효과음들 다 없애기
         """
         
-        # 모든 채널을 순회하며 재생 중인 채널을 다 페이드아웃 -> milliseconds후 자동으로 stop()
+        # 모든 채널을 순회하며 재생 중인 채널을 
+        # 다 페이드아웃 -> milliseconds후 자동으로 stop()
         for channel in self.sfx_channels:
             if channel.get_busy():
                 channel.fadeout(milliseconds)
@@ -130,6 +134,18 @@ class SoundManager:
         # 모든 효과음 채널의 볼륨을 설정함.
         for channel in self.sfx_channels:
             channel.set_volume(safe_volume)
+
+    def set_bgm_volume(self, volume: float):
+        """
+        배경음악 채널의 볼륨을 설정함.
+        
+        Args:
+            volume (float): 0.0~1.0 사이 값.
+        """
+        # 볼륨 값을 0.0에서 1.0 사이로 제한함.
+        safe_volume = max(0.0, min(1.0, volume))
+        
+        pg.mixer.music.set_volume(safe_volume)
             
 class App:
     """
@@ -176,7 +192,7 @@ class App:
         App 초기화 및 첫 씬 설정.
         
         Args:
-            start_scene_name (str): 처음 시작할 씬 키 (run_game.py에선 "main_menu_scene").
+            start_scene_name (str): 처음 시작할 씬 키
         """
         # 이미 초기화된 인스턴스라면 다시 초기화하지 않음.
         if hasattr(self, 'initialized'):
@@ -195,8 +211,8 @@ class App:
         # 데이터 및 에셋 로드 로직을 분리함.
         self.load_data_and_assets()
 
-        # 시간 관련 변수들을 초기화함.
-        self.initialize_time()
+        # 외부에서 많이 접근하는 변수들을 초기화함.
+        self.initialize_status()
 
         # 사운드 매니저를 초기화하고 앱 인스턴스를 전달함.
         self.sound_manager = SoundManager(self)
@@ -204,9 +220,8 @@ class App:
         # 씬 등록 및 초기 씬 설정 로직을 분리함.
         self.initialize_scenes(start_scene_name)
 
-        # FPS 텍스트 렌더러를 한 번만 생성함.
+        # FPS 텍스트 렌더러를 생성함.
         self.create_fps_renderer()
-
         # 화면 페이드인 효과를 줌.
         ScreenFader(1, False)
         
@@ -232,9 +247,35 @@ class App:
         """플레이어 데이터와 모든 게임 에셋을 로드함."""
         self.load_assets()
         self.load_player_data()
-        
-    def initialize_time(self):
-        """시간 관련 변수들을 초기화함."""
+
+    def load_assets(self):
+        """모든 게임 에셋을 로드하고 클래스 변수에 할당함."""
+        self.ASSETS = load_all_assets()
+
+    def load_player_data(self):
+        """JSON 파일에서 플레이어 데이터를 로드함."""
+        try:
+            with open("data/player_data.json", "r", encoding="utf-8") as f:
+                self.player_data = json.load(f)
+        except FileNotFoundError:
+            # 파일이 없을 경우 초기 데이터를 로드함.
+            self.reset_player_data()
+
+    def save_player_data(self):
+        """플레이어 데이터를 JSON 파일에 저장함."""
+        with open('data/player_data.json', 'w', encoding="utf-8") as f:
+            json.dump(self.player_data, f, ensure_ascii=False, indent=4)
+
+    def reset_player_data(self):
+        """초기 플레이어 데이터로 리셋하고 저장함."""
+        with open("data/inital_player_data.json", "r", encoding="utf-8") as f:
+            initial_data = json.load(f)
+        with open('data/player_data.json', 'w', encoding="utf-8") as f:
+            json.dump(initial_data, f, ensure_ascii=False, indent=4)
+        self.load_player_data()
+
+    def initialize_status(self):
+        """외부에서 많이 접근하는 변수들을 초기화함."""
         self.clock = pg.time.Clock()
         self.window_should_be_closed = False
         self.events: list[pg.event.Event] = []
@@ -279,32 +320,6 @@ class App:
         fps_text = TextRenderer("??", pg.Vector2(SCREEN_SIZE.x, 0), color="green", anchor=pg.Vector2(1, 0))
         # 람다 함수로 FPS 업데이트 로직을 덮어씀.
         fps_text.update = lambda: setattr(fps_text, "text", str(int(self.clock.get_fps())))
-
-    def load_player_data(self):
-        """JSON 파일에서 플레이어 데이터를 로드함."""
-        try:
-            with open("data/player_data.json", "r", encoding="utf-8") as f:
-                self.player_data = json.load(f)
-        except FileNotFoundError:
-            # 파일이 없을 경우 초기 데이터를 로드함.
-            self.reset_player_data()
-
-    def save_player_data(self):
-        """플레이어 데이터를 JSON 파일에 저장함."""
-        with open('data/player_data.json', 'w', encoding="utf-8") as f:
-            json.dump(self.player_data, f, ensure_ascii=False, indent=4)
-
-    def reset_player_data(self):
-        """초기 플레이어 데이터로 리셋하고 저장함."""
-        with open("data/inital_player_data.json", "r", encoding="utf-8") as f:
-            initial_data = json.load(f)
-        with open('data/player_data.json', 'w', encoding="utf-8") as f:
-            json.dump(initial_data, f, ensure_ascii=False, indent=4)
-        self.load_player_data()
-
-    def load_assets(self):
-        """모든 게임 에셋을 로드하고 클래스 변수에 할당함."""
-        self.ASSETS = load_all_assets()
 
     def update_time(self):
         """델타 타임 및 스케일이 적용된 시간을 업데이트함."""

@@ -37,7 +37,7 @@ class AnimatedParticle(GameObject):
 
     def draw(self):
         super().draw()
-        camera = self.scene.camera
+        camera = self.camera
         surface = self.app.surfaces[LAYER_DYNAMIC]
 
         image = self.anim.img()

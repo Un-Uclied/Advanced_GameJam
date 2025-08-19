@@ -24,11 +24,14 @@ class Scene:
         self.event_bus: EventBus | None = None
         self._scene_paused = False
 
-    # ──────────────────────────────
+    # -------------------------------------------------
     # 씬 라이프사이클
-    # ──────────────────────────────
+    # -------------------------------------------------
     def on_scene_start(self):
-        """씬이 시작될때 호출되고, 여기서 게임오브젝트, 등등을 생성해야함. 절대 생성자에서 게임오브젝트 생성하지 말것."""
+        """
+        씬이 시작될때 호출되고, 여기서 게임오브젝트, 등등을 생성해야함.
+        절대 생성자에서 게임오브젝트 생성하지 말것.
+        """
         self.camera = Camera2D(position=pg.Vector2(0, 0))
         self.event_bus = EventBus()
         self.scene_paused = False
@@ -43,9 +46,9 @@ class Scene:
 
         self.app.sound_manager.fade_all_sfx()
 
-    # ──────────────────────────────
+    # -------------------------------------------------
     # 일시정지 관리
-    # ──────────────────────────────
+    # -------------------------------------------------
     @property
     def scene_paused(self) -> bool:
         return self._scene_paused
@@ -68,22 +71,22 @@ class Scene:
     def on_pause_end(self):
         self.app.sound_manager.resume_all_sfx()
 
-    # ──────────────────────────────
+    # -------------------------------------------------
     # 오브젝트 관리
-    # ──────────────────────────────
-    def add_object(self, obj: "GameObject"):
+    # -------------------------------------------------
+    def add_object(self, obj: GameObject):
         self.objects.append(obj)
 
-    def remove_object(self, obj: "GameObject"):
+    def remove_object(self, obj: GameObject):
         if obj in self.objects:
             self.objects.remove(obj)
 
-    def get_objects_by_types(self, target_classes: type | tuple[type]) -> list["GameObject"]:
+    def get_objects_by_types(self, target_classes: type | tuple[type]) -> list[GameObject]:
         return [obj for obj in self.objects if isinstance(obj, target_classes)]
 
-    # ──────────────────────────────
+    # -------------------------------------------------
     # 메인 루프
-    # ──────────────────────────────
+    # -------------------------------------------------
     def update(self):
         self.camera.update_shake_amount(self.app.dt)
 

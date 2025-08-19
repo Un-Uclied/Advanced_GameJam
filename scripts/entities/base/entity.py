@@ -97,7 +97,7 @@ class Entity(GameObject):
         pg.draw.rect(
             self.app.surfaces[LAYER_INTERFACE],
             "yellow",
-            CameraView.world_rect_to_screen_rect(self.scene.camera, self.rect),
+            CameraView.world_rect_to_screen_rect(self.camera, self.rect),
             width=2
         )
 
@@ -108,7 +108,7 @@ class Entity(GameObject):
         """
         super().draw()
 
-        cam = self.scene.camera
+        cam = self.camera
         img = self.anim.img()
         world_pos = pg.Vector2(self.rect.topleft) + self.flip_offset[self.anim.flip_x]
         img_rect = pg.Rect(world_pos, img.get_size())

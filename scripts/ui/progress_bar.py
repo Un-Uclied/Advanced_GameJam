@@ -94,8 +94,8 @@ class ProgressBar(GameObject):
         fg_rect = self.fg_rect.copy()
 
         if self.use_camera:
-            bg_rect.topleft = CameraMath.world_to_screen(self.scene.camera, pg.Vector2(bg_rect.topleft))
-            fg_rect.topleft = CameraMath.world_to_screen(self.scene.camera, pg.Vector2(fg_rect.topleft))
+            bg_rect.topleft = CameraMath.world_to_screen(self.camera, pg.Vector2(bg_rect.topleft))
+            fg_rect.topleft = CameraMath.world_to_screen(self.camera, pg.Vector2(fg_rect.topleft))
 
         pg.draw.rect(surface, self.bg_color, bg_rect)
         pg.draw.rect(surface, self.fg_color, fg_rect)

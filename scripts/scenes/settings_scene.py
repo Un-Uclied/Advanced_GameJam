@@ -81,9 +81,11 @@ class SettingsUI:
 
     def change_vfx(self):
         self.scene.app.player_data["sfx_volume"] = round(self.ui_elements["sfx_volume_slider"].value, 2)
+        self.scene.app.sound_manager.set_sfx_volume(self.scene.app.player_data["sfx_volume"])
 
     def change_bgm(self):
         self.scene.app.player_data["bgm_volume"] = round(self.ui_elements["bgm_volume_slider"].value, 2)
+        self.scene.app.sound_manager.set_bgm_volume(self.scene.app.player_data["bgm_volume"])
 
     def on_reset_button_click(self, _):
         if self.button_click_stack >= len(RESET_MSGS):
@@ -93,6 +95,8 @@ class SettingsUI:
             self.ui_elements["bgm_volume_slider"].value = self.scene.app.player_data["bgm_volume"]
             self.ui_elements["sfx_volume_slider"].update_rects()
             self.ui_elements["bgm_volume_slider"].update_rects()
+            self.scene.app.sound_manager.set_sfx_volume(self.scene.app.player_data["sfx_volume"])
+            self.scene.app.sound_manager.set_bgm_volume(self.scene.app.player_data["bgm_volume"])
             self.scene.app.sound_manager.play_sfx(self.scene.app.ASSETS["sounds"]["ui"]["reset"])
             self.scene.app.change_scene("main_menu_scene")
         else:

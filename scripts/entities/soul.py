@@ -81,7 +81,7 @@ class Soul(PhysicsEntity):
         """플레이어가 E키로 상호작용 했을 때 실행"""
         AnimatedParticle(self.collect_particle_anim, pg.Vector2(self.rect.center))
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["soul"]["interact"])
-        self.scene.camera.shake_amount += 10
+        self.camera.shake_amount += 10
 
         self.scene.event_bus.emit("on_soul_interact", self.soul_type)
 

@@ -38,7 +38,7 @@ class Cloud(GameObject):
         super().draw()
         
         # depth에 따라 카메라가 스크롤하는 량이 달라짐. (Parallax 효과 만들기)
-        depth_pos = self.pos - (self.scene.camera.position * self.depth)
+        depth_pos = self.pos - (self.camera.position * self.depth)
 
         # 화면 밖으로 나가면 다시 반대편으로 갖고오기
         clamped_x = depth_pos.x % (SCREEN_SIZE.x + self.size.x) - self.size.x

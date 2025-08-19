@@ -129,7 +129,7 @@ class TilemapRenderer(GameObject):
         super().draw()
 
         surface = self.app.surfaces[LAYER_OBJ]
-        camera = self.scene.camera
+        camera = self.camera
 
         # 캐시 서피스의 월드 시작점 (-오프셋)을 스크린 좌표로 변환
         cache_screen_pos = CameraMath.world_to_screen(camera, -self.cache_surface_size / 2)
