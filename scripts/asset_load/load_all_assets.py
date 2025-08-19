@@ -1,6 +1,6 @@
 import pygame as pg
 
-from scripts.core import *
+from scripts.utils import *
 from scripts.constants import *
 from .load_image import *
 

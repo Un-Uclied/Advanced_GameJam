@@ -47,13 +47,13 @@ class FourAlpha(PhysicsEnemy):
 
     def do_attack(self, damage, pos, shake=0):
         super().do_attack(damage, pos, shake)
-        ps = self.app.scene.player_status
+        ps = self.scene.player_status
 
         # # 무적이 아니고, 큐가 비어있지 않고, 전부 DEFAULT가 아닐 때만 실행
         if ps.current_invincible_time <= 0 and ps.soul_queue and not all(soul == SOUL_DEFAULT for soul in ps.soul_queue):
             for i in range(len(ps.soul_queue)):
                 ps.soul_queue[i] = SOUL_DEFAULT  # 값 교체
-            self.app.scene.event_bus.emit("on_player_soul_changed")
+            self.scene.event_bus.emit("on_player_soul_changed")
             AnimatedParticle(self.app.ASSETS["animations"]["vfxs"]["darkness"], pg.Vector2(ps.player_character.rect.center))
             PopupText(
                 "혼이 감염되어 소멸해버렸다...",
@@ -64,10 +64,10 @@ class FourAlpha(PhysicsEnemy):
 
     @property
     def is_player_nearby(self):
-        if not hasattr(self.app.scene, "player_status") or not hasattr(self.app.scene.player_status, "player_character"):
+        if not hasattr(self.scene, "player_status") or not hasattr(self.scene.player_status, "player_character"):
             return False
 
-        ps = self.app.scene.player_status
+        ps = self.scene.player_status
         pc = ps.player_character
         entity_center = pg.Vector2(self.rect.center)
         player_center = pg.Vector2(pc.rect.center)

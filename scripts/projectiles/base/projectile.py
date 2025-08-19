@@ -2,7 +2,7 @@ import pygame as pg
 import json
 
 from scripts.constants import *
-from scripts.core import *
+from scripts.utils import *
 from scripts.camera import *
 from scripts.vfx import *
 from scripts.ui import *
@@ -57,7 +57,7 @@ class Projectile(GameObject):
         """
         if not self.destroy_on_tilemap_collision:
             return
-        for rect in self.app.scene.tilemap_data.physic_tiles_around(self.position):
+        for rect in self.scene.tilemap_data.physic_tiles_around(self.position):
             if rect.collidepoint(self.position):
                 self.destroy()
                 break
@@ -85,7 +85,7 @@ class Projectile(GameObject):
         super().draw()
 
         surface = self.app.surfaces[LAYER_DYNAMIC]
-        camera = self.app.scene.camera
+        camera = self.scene.camera
 
         image = self.anim.img()
 
@@ -113,13 +113,13 @@ class EnemyProjectile(Projectile):
         if not self.corrupt_on_attack:
             return
         
-        ps = self.app.scene.player_status
+        ps = self.scene.player_status
 
         # 무적이 아니고, 큐가 비어있지 않고, 전부 DEFAULT가 아닐 때만 실행
         if ps.current_invincible_time <= 0 and ps.soul_queue and not all(soul == SOUL_DEFAULT for soul in ps.soul_queue):
             for i in range(len(ps.soul_queue)):
                 ps.soul_queue[i] = SOUL_DEFAULT  # 값 교체
-            self.app.scene.event_bus.emit("on_player_soul_changed")
+            self.scene.event_bus.emit("on_player_soul_changed")
             AnimatedParticle(self.app.ASSETS["animations"]["vfxs"]["darkness"], pg.Vector2(ps.player_character.rect.center))
             PopupText(
                 "혼이 감염되어 소멸해버렸다...",
@@ -129,19 +129,19 @@ class EnemyProjectile(Projectile):
             )
 
     def update_player_collision(self):
-        ps = self.app.scene.player_status
+        ps = self.scene.player_status
         pc = ps.player_character
 
         if pc.rect.collidepoint(self.position):
             ps.health -= self.data["damage"]
-            self.app.scene.event_bus.emit("on_player_hurt", self.data["damage"])
+            self.scene.event_bus.emit("on_player_hurt", self.data["damage"])
             self.attack_corruption()
 
             if self.destroy_on_player_collision:
                 self.destroy()
         
     def update(self):
-        if not hasattr(self.app.scene, "player_status"):
+        if not hasattr(self.scene, "player_status"):
             return
         super().update()
         self.update_player_collision()

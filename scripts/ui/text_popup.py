@@ -1,7 +1,7 @@
 import pygame as pg
 
 from scripts.constants import *
-from scripts.core import *
+from scripts.utils import *
 from .text_renderer import TextRenderer
 
 class PopupText(TextRenderer):

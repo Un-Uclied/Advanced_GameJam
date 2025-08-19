@@ -6,7 +6,7 @@ from scripts.scenes import *
 from scripts.asset_load import *
 from scripts.vfx import *
 from scripts.ui import *
-from scripts.core import *
+from scripts.utils import *
 
 class SoundManager:
     """

@@ -38,7 +38,7 @@ class ThreeBeta(GhostEnemy):
 
     def do_attack(self, damage: int, pos: pg.Vector2, shake: int = 0):
         '''공격시 랜덤 위치로 텔레포트'''
-        ps = self.app.scene.player_status
+        ps = self.scene.player_status
         pc = ps.player_character
 
         pc_position = pg.Vector2(pc.rect.center)

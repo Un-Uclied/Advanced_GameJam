@@ -44,7 +44,7 @@ class PhysicsEntity(Entity):
 
         # 각 꼭짓점 주변 타일들과 충돌 체크
         for point in self.get_rect_points():
-            for rect in self.app.scene.tilemap_data.physic_tiles_around(point):
+            for rect in self.scene.tilemap_data.physic_tiles_around(point):
                 if rect.colliderect(self.rect):
                     if self.movement.x > 0:  # 오른쪽 이동 중 충돌
                         self.collisions["right"] = True
@@ -60,7 +60,7 @@ class PhysicsEntity(Entity):
 
         # 각 꼭짓점 주변 타일들과 충돌 체크
         for point in self.get_rect_points():
-            for rect in self.app.scene.tilemap_data.physic_tiles_around(point):
+            for rect in self.scene.tilemap_data.physic_tiles_around(point):
                 if rect.colliderect(self.rect):
                     if self.movement.y > 0:  # 아래쪽 이동 중 충돌 (땅)
                         self.collisions["down"] = True

@@ -1,6 +1,6 @@
 import pygame as pg
 from scripts.constants import *
-from scripts.core import *
+from scripts.utils import *
 
 class Slider(GameObject):
     """

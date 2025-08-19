@@ -2,7 +2,7 @@ import pygame as pg
 import json
 
 from scripts.constants import *
-from scripts.core import *
+from scripts.utils import *
 from scripts.ui import *
 
 BASE_CUT_SCENE_DATA_PATH = "data/cut_scene/"

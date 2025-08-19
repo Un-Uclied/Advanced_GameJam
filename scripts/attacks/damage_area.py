@@ -2,7 +2,7 @@ import pygame as pg
 
 from scripts.constants import *
 from scripts.camera import *
-from scripts.core import *
+from scripts.utils import *
 
 class DamageArea(GameObject):
     """
@@ -39,7 +39,7 @@ class DamageArea(GameObject):
     def update(self):
         super().update()
 
-        ps = self.app.scene.player_status
+        ps = self.scene.player_status
         pc = ps.player_character
 
         if self.rect.colliderect(pc.rect) and not ps.current_invincible_time > 0:
@@ -47,7 +47,7 @@ class DamageArea(GameObject):
                 return
 
             ps.health -= self.damage
-            self.app.scene.event_bus.emit("on_player_hurt", self.damage)
+            self.scene.event_bus.emit("on_player_hurt", self.damage)
             self._has_damaged = True
 
             if self.knockback:
@@ -58,4 +58,8 @@ class DamageArea(GameObject):
 
     def draw_debug(self):
         super().draw_debug()
-        pg.draw.rect(self.app.surfaces[LAYER_INTERFACE], self.color, CameraView.world_rect_to_screen_rect(self.app.scene.camera, self.rect), width=2)
+        pg.draw.rect(self.app.surfaces[LAYER_INTERFACE], self.color, CameraView.world_rect_to_screen_rect(self.scene.camera, self.rect), width=2)
+
+    def draw(self):
+        '''이 오브젝트는 draw메소드를 가지고 있지 않음.'''
+        pass

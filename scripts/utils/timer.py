@@ -80,12 +80,16 @@ class Timer(GameObject):
 
         # 시간이 0 이하가 되면 타임아웃을 처리.
         if self.timer_core.current_time <= 0:
-            # 타임아웃 처리 로직을 별도 메서드로 분리했음.
             self.time_out()
 
-        print(self)
+        super().update()
+
+    def draw(self):
+        '''이 오브젝트는 draw메소드를 가지고 있지 않음.'''
+        pass
 
     def get_time(self):
+        '''현재 타임아웃까지 남은 시간 반환함.'''
         return self.timer_core.current_time
 
     def time_out(self):

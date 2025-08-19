@@ -1,7 +1,7 @@
 import pygame as pg
 
 from scripts.constants import *
-from scripts.core import *
+from scripts.utils import *
 from scripts.vfx import *
 from scripts.entities.base import *
 
@@ -43,17 +43,17 @@ class EnemyBase:
         if self.enemy.status.soul_type == SOUL_EVIL_B:
             damage += ENEMY_EVIL_B_DAMAGE_UP
 
-        ps = self.enemy.app.scene.player_status
+        ps = self.enemy.scene.player_status
         pc = ps.player_character
 
         ps.health -= damage
-        self.enemy.app.scene.event_bus.emit("on_player_hurt", damage)
+        self.enemy.scene.event_bus.emit("on_player_hurt", damage)
 
         AnimatedParticle(self.attack_particle_anim, pos)
         self.enemy.app.sound_manager.play_sfx(self.attack_sound)
 
         if shake:
-            cam = self.enemy.app.scene.camera
+            cam = self.enemy.scene.camera
             cam.shake_amount += shake
 
         direction = pg.Vector2(pc.rect.center) - pos
@@ -85,10 +85,10 @@ class PhysicsEnemy(PhysicsEntity, EnemyBase):
         플레이어랑 충돌하면 공격함  
         '''
         super().update()
-        if not hasattr(self.enemy.app.scene, "player_status") or not hasattr(self.enemy.app.scene.player_status, "player_character"):
+        if not hasattr(self.enemy.scene, "player_status") or not hasattr(self.enemy.scene.player_status, "player_character"):
             return
     
-        ps = self.enemy.app.scene.player_status
+        ps = self.enemy.scene.player_status
         pc = ps.player_character
 
         if self.rect.colliderect(pc.rect) and not ps.current_invincible_time > 0:
@@ -129,7 +129,7 @@ class ProjectileEnemy(PhysicsEnemy):
         플레이어랑 같은 위치면 발사 안 함  
         방향 맞지 않으면 발사 안 함
         '''
-        pc = self.app.scene.player_status.player_character
+        pc = self.scene.player_status.player_character
         plr_dir = pc.get_direction_from(pg.Vector2(self.rect.center))
         
         my_dir = pg.Vector2(1 if not self.anim.flip_x else -1, 0)
@@ -142,7 +142,7 @@ class ProjectileEnemy(PhysicsEnemy):
         플레이어가 사거리 안에 있고  
         발사 쿨타임 끝났으면 발사 실행
         '''
-        pc = self.app.scene.player_status.player_character
+        pc = self.scene.player_status.player_character
         dist = pg.Vector2(self.rect.center).distance_to(pg.Vector2(pc.rect.center))
 
         if dist <= self.fire_range and self.cooldown.get_time() <= 0:
@@ -154,7 +154,7 @@ class ProjectileEnemy(PhysicsEnemy):
         매 프레임 업데이트 + 발사체 공격 체크함  
         '''
         super().update()
-        if not hasattr(self.app.scene, "player_status"):
+        if not hasattr(self.scene, "player_status"):
             return
         self.fire_attack_update()
 
@@ -199,10 +199,10 @@ class GhostEnemy(Entity, EnemyBase):
         매 프레임 업데이트함  
         플레이어 충돌 시 공격 트리거  
         '''
-        if not hasattr(self.app.scene, "player_status"):
+        if not hasattr(self.scene, "player_status"):
             return super().update()
         
-        ps = self.enemy.app.scene.player_status
+        ps = self.enemy.scene.player_status
         pc = ps.player_character
 
         if not self.is_attacking:

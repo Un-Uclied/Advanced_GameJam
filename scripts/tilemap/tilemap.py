@@ -3,7 +3,7 @@ import json
 
 from scripts.constants import *
 from scripts.camera import *
-from scripts.core import *
+from scripts.utils import *
 
 # 타일맵 데이터 기본 경로
 BASE_TILEMAP_PATH = "data/tilemaps/"
@@ -95,12 +95,12 @@ class TilemapRenderer(GameObject):
 
         for data in self.data.off_grid:
             # 렌더링 제외 타일 필터링
-            if data["type"] in self.do_not_render_tiles and not isinstance(self.app.scene, TileMapEditScene):
+            if data["type"] in self.do_not_render_tiles and not isinstance(self.scene, TileMapEditScene):
                 continue
             self.draw_tile(self.cache_surface, data)
 
         for data in self.data.in_grid.values():
-            if data["type"] in self.do_not_render_tiles and not isinstance(self.app.scene, TileMapEditScene):
+            if data["type"] in self.do_not_render_tiles and not isinstance(self.scene, TileMapEditScene):
                 continue
             self.draw_tile(self.cache_surface, data)
 
@@ -129,7 +129,7 @@ class TilemapRenderer(GameObject):
         super().draw()
 
         surface = self.app.surfaces[LAYER_OBJ]
-        camera = self.app.scene.camera
+        camera = self.scene.camera
 
         # 캐시 서피스의 월드 시작점 (-오프셋)을 스크린 좌표로 변환
         cache_screen_pos = CameraMath.world_to_screen(camera, -self.cache_surface_size / 2)

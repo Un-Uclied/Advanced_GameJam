@@ -2,7 +2,7 @@ import pygame as pg
 import pytweening as pt
 
 from scripts.constants import *
-from scripts.core import *
+from scripts.utils import *
 
 
 class Interpolator:
@@ -139,3 +139,9 @@ class Tween(GameObject):
         # 완료 시점이면 콜백 실행 및 자기 자신 제거
         if t >= 1.0:
             self.complete()
+
+        super().update()
+
+    def draw(self):
+        '''이 오브젝트는 draw메소드를 가지고 있지 않음.'''
+        pass

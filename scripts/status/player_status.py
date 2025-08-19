@@ -1,7 +1,7 @@
 from collections import deque
 import pygame as pg
 
-from scripts.core import GameObject, Timer
+from scripts.utils import GameObject, Timer
 from scripts.constants import *
 from scripts.vfx import AnimatedParticle
 from scripts.ui import PopupText
@@ -23,16 +23,17 @@ class PlayerAbilities:
     def __init__(self, status: "PlayerStatus"):
         self.status = status
         self.app = status.app
+        self.scene = status.app.scene
         # player_character는 status에서 직접 참조함.
         
         # 영혼 상호작용 관련 이벤트 리스너 등록
-        self.app.scene.event_bus.connect("on_soul_interact", self.on_soul_interact)
+        self.scene.event_bus.connect("on_soul_interact", self.on_soul_interact)
         
         # 능력치 업데이트 이벤트 리스너 등록
-        self.app.scene.event_bus.connect("on_player_soul_changed", self.update_stats_by_soul_type)
+        self.scene.event_bus.connect("on_player_soul_changed", self.update_stats_by_soul_type)
         
         # 피격 이벤트 리스너 등록
-        self.app.scene.event_bus.connect("on_player_damaged", self.on_player_damaged)
+        self.scene.event_bus.connect("on_player_damaged", self.on_player_damaged)
         
         # 사운드 & 파티클 준비
         self.hurt_sound = self.app.ASSETS["sounds"]["player"]["hurt"]
@@ -53,7 +54,7 @@ class PlayerAbilities:
         
         # 이벤트 버스를 통해 카메라, 사운드, 파티클 처리를 분리함.
         # 이렇게 하면 `PlayerAbilities`가 직접적으로 다른 객체에 의존하지 않게 됨.
-        self.app.scene.event_bus.emit("on_camera_shake", damage * 2)
+        self.scene.event_bus.emit("on_camera_shake", damage * 2)
         self.app.sound_manager.play_sfx(self.hurt_sound)
         
         if self.status.player_character:
@@ -66,7 +67,7 @@ class PlayerAbilities:
             return
 
         self.status.soul_queue.append(soul_type)
-        self.app.scene.event_bus.emit("on_player_soul_changed")
+        self.scene.event_bus.emit("on_player_soul_changed")
 
     def update_stats_by_soul_type(self):
         """영혼 상태에 따른 능력치 업데이트."""
@@ -101,7 +102,7 @@ class PlayerAbilities:
             # Kind A 영혼 보유 시 빛 안에서 추가 회복
             if SOUL_KIND_A in self.status.soul_queue and self.status.player_character:
                 # `LightManager`를 사용해 충돌 검사
-                if self.app.scene.light_manager.is_rect_in_light(self.status.player_character.rect):
+                if self.scene.light_manager.is_rect_in_light(self.status.player_character.rect):
                     heal_amount += KIND_A_HEALTH_UP
             
             # `PlayerStatus`의 `health` setter를 통해 체력 회복
@@ -157,17 +158,17 @@ class PlayerStatus(GameObject):
                 return
             
             damage_amount = prev_health - self._health
-            self.app.scene.event_bus.emit("on_player_health_changed", False)
+            self.scene.event_bus.emit("on_player_health_changed", False)
             # 대미지 처리 로직을 `PlayerAbilities`로 옮기고 이벤트로 호출
-            self.app.scene.event_bus.emit("on_player_damaged", damage_amount)
+            self.scene.event_bus.emit("on_player_damaged", damage_amount)
             
         # 회복 처리 로직
         elif self._health > prev_health:
-            self.app.scene.event_bus.emit("on_player_health_changed", True)
+            self.scene.event_bus.emit("on_player_health_changed", True)
 
         # 사망 처리
         if self._health <= 0:
-            self.app.scene.event_bus.emit("on_player_died")
+            self.scene.event_bus.emit("on_player_died")
 
     @property
     def current_invincible_time(self) -> float:
@@ -180,9 +181,9 @@ class PlayerStatus(GameObject):
 
         # 무적 상태 변화 시 이벤트 발생
         if self._current_invincible_time > 0 and prev <= 0:
-            self.app.scene.event_bus.emit("on_player_invincible", True)
+            self.scene.event_bus.emit("on_player_invincible", True)
         elif self._current_invincible_time <= 0 and prev > 0:
-            self.app.scene.event_bus.emit("on_player_invincible", False)
+            self.scene.event_bus.emit("on_player_invincible", False)
 
     def update(self):
         # `Timer` 객체들이 `GameObject`이므로 `GameObject.update_all()`을 통해

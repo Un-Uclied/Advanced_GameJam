@@ -28,7 +28,7 @@ class WanderAI:
     def check_floor(self):
         '''내 위치 왼쪽 아래/오른쪽 아래 타일 없으면 떨어짐으로 판단, 방향 전환'''
         entity = self.entity
-        tilemap_data = entity.app.scene.tilemap_data
+        tilemap_data = entity.scene.tilemap_data
         tile_size = tilemap_data.tile_size
         check_w = 4
 
@@ -101,10 +101,10 @@ class ChaseAI:
         entity = self.entity
 
         # 씬에 플레이어 상태 없으면 그냥 리턴 (예: 메인 메뉴)
-        if not hasattr(entity.app.scene, "player_status"):
+        if not hasattr(entity.scene, "player_status"):
             return
 
-        ps = entity.app.scene.player_status
+        ps = entity.scene.player_status
         pc = ps.player_character
 
         entity_center = pg.Vector2(entity.rect.center)

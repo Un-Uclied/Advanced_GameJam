@@ -1,7 +1,7 @@
 import pygame as pg
 
 from scripts.constants import *
-from scripts.core import *
+from scripts.utils import *
 
 class Fog(GameObject):
     """
@@ -45,8 +45,8 @@ class Fog(GameObject):
         
         # 씬에 플레이어 상태 객체가 있을 경우에만 효과를 적용함.
         # hasattr 체크 대신, 메인 게임 씬에서만 Fog를 생성하도록 디자인을 변경하는 것이 더 좋음.
-        if hasattr(self.app.scene, "player_status"):
-            player_status = self.app.scene.player_status
+        if hasattr(self.scene, "player_status"):
+            player_status = self.scene.player_status
             
             # 특정 소울 효과가 있으면 안개 투명도를 낮춤.
             if SOUL_KIND_B in player_status.soul_queue:
@@ -65,7 +65,7 @@ class Fog(GameObject):
         volume_surface.fill(self.fog_color)
         
         # 라이트매니저를 통해 빛 효과를 적용해서 어두운 배경에 구멍을 뚫음.
-        self.app.scene.light_manager.draw_lights(volume_surface)
+        self.scene.light_manager.draw_lights(volume_surface)
         
     def draw_multiply(self):
         """
@@ -86,7 +86,7 @@ class Fog(GameObject):
         self.fog_surface.fill(self.fog_color, special_flags=pg.BLEND_RGBA_MULT)
 
         # 빛 효과를 임시 안개 Surface에 적용해서 어두워진 부분에 밝은 구멍을 만듦.
-        self.app.scene.light_manager.draw_lights(self.fog_surface)
+        self.scene.light_manager.draw_lights(self.fog_surface)
 
         # 최종적으로 완성된 안개 Surface를 볼륨 레이어에 그림.
         self.app.surfaces[LAYER_VOLUME].blit(self.fog_surface, (0, 0))
@@ -98,8 +98,8 @@ class Fog(GameObject):
         super().draw()
         
         # 씬에 플레이어 상태 객체가 있는지 확인해서 모드를 결정함.
-        if hasattr(self.app.scene, "player_status"):
-            player_status = self.app.scene.player_status
+        if hasattr(self.scene, "player_status"):
+            player_status = self.scene.player_status
             
             # 특정 소울 효과가 있으면 저사양 fill 방식으로 시야를 완전히 가림.
             if SOUL_EVIL_C in player_status.soul_queue:

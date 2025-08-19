@@ -2,7 +2,7 @@ import pygame as pg
 
 from scripts.ui import TextRenderer
 from scripts.vfx import *
-from scripts.core import Tween
+from scripts.utils import Tween
 from .base import Entity
 
 HIT_BOX_SIZE = (180, 190)
@@ -44,7 +44,7 @@ class Portal(Entity):
     @property
     def is_player_inside(self) -> bool:
         """플레이어가 포탈 영역 안에 있는지 체크"""
-        ps = self.app.scene.player_status
+        ps = self.scene.player_status
         pc = ps.player_character
         return self.rect.colliderect(pc.rect)
 
@@ -71,14 +71,14 @@ class Portal(Entity):
 
         self.interacted = True
 
-        self.app.scene.on_level_end()
+        self.scene.on_level_end()
         self.app.sound_manager.play_sfx(self.interact_sound)
         AnimatedParticle(self.interact_particle_anim, pg.Vector2(self.rect.center))
-        self.app.scene.camera.shake_amount += 25
+        self.scene.camera.shake_amount += 25
 
     def handle_input(self):
         """포탈 상호작용 입력 처리 (F키)"""
-        if self.app.scene.player_status.health <= 0:
+        if self.scene.player_status.health <= 0:
             return
         for event in self.app.events:
             if event.type == pg.KEYDOWN and event.key == pg.K_f:

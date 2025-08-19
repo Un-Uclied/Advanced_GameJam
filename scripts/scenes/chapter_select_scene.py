@@ -5,7 +5,7 @@ import random
 from scripts.constants import *
 from scripts.backgrounds import *
 from scripts.ui import *
-from scripts.core import *
+from scripts.utils import *
 from scripts.volume import *
 from scripts.tilemap import *
 from .base import Scene
@@ -95,7 +95,7 @@ class ChapterSelectScene(Scene):
             )
             self.buttons.append(btn)
 
-        self.app.scene.camera.shake_amount += 15
+        self.camera.shake_amount += 15
 
     def on_world_start_click(self, button: TextButton):
         chapter = self.selected_chapter

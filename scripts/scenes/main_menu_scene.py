@@ -5,7 +5,7 @@ import random
 from scripts.constants import *
 from scripts.backgrounds import *
 from scripts.ui import *
-from scripts.core import *
+from scripts.utils import *
 from scripts.volume import *
 from scripts.tilemap import *
 from .base import Scene

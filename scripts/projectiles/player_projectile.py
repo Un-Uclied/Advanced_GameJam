@@ -1,6 +1,6 @@
 import pygame as pg
 
-from scripts.core import *
+from scripts.utils import *
 from scripts.constants import *
 from scripts.vfx import AnimatedParticle
 from .base import Projectile
@@ -61,7 +61,7 @@ class PlayerProjectile(Projectile):
         """
         super().update()
 
-        ps = self.app.scene.player_status
+        ps = self.scene.player_status
         
         # SOUL_EVIL_A 효과로 탄환 추가 이동
         if SOUL_EVIL_A in ps.soul_queue:
@@ -69,7 +69,7 @@ class PlayerProjectile(Projectile):
         
         from scripts.enemies import ALL_ENEMY_TYPE  # 순환 참조 회피용 임포트
         
-        all_enemies = self.app.scene.get_objects_by_types(ALL_ENEMY_TYPE)
+        all_enemies = self.scene.get_objects_by_types(ALL_ENEMY_TYPE)
 
         for enemy in all_enemies:
             if enemy.rect.collidepoint(self.position):

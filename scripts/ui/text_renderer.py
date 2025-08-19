@@ -2,7 +2,7 @@ import pygame as pg
 
 from scripts.constants import *
 from scripts.camera import *
-from scripts.core import *
+from scripts.utils import *
 
 BASE_FONT_PATH = "assets/fonts/"
 
@@ -231,8 +231,8 @@ class TextRenderer(GameObject):
         draw_pos = self.screen_pos
         
         # use_camera가 True일 경우 월드 좌표를 화면 좌표로 변환함.
-        if self.use_camera and self.app.scene.camera:
-            draw_pos = CameraMath.world_to_screen(self.app.scene.camera, draw_pos)
+        if self.use_camera and self.scene.camera:
+            draw_pos = CameraMath.world_to_screen(self.scene.camera, draw_pos)
 
         # 최종 계산된 위치에 텍스트 이미지를 그림.
         surface.blit(self.image, draw_pos)

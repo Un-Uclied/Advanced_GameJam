@@ -1,21 +1,20 @@
 from scripts.constants import *
 from scripts.camera import *
-from scripts.core import *
+from scripts.utils import *
 
 class LineWarning(GameObject):
     def __init__(self, start : pg.Vector2, end : pg.Vector2, thickness : int, warn_color : pg.Color = pg.Color("red")):
         super().__init__()
+        
         self.start = start
         self.end = end
         self.thickness = thickness
         self.warn_color = warn_color
     
     def draw(self):
-        super().draw()
-
-        # 월드좌표 → 화면좌표 변환
-        draw_start = CameraMath.world_to_screen(self.app.scene.camera, self.start)
-        draw_end = CameraMath.world_to_screen(self.app.scene.camera, self.end)
+        # 월드좌표 -> 화면좌표 변환
+        draw_start = CameraMath.world_to_screen(self.scene.camera, self.start)
+        draw_end = CameraMath.world_to_screen(self.scene.camera, self.end)
 
         # 방향벡터
         dir_vec = pg.Vector2(draw_end) - pg.Vector2(draw_start)
@@ -35,3 +34,5 @@ class LineWarning(GameObject):
             p1, p2,
             self.thickness
         )
+
+        super().draw()

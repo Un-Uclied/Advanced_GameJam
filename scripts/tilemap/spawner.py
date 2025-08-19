@@ -33,7 +33,5 @@ def spawn_all_entities_by_data(tilemap_data : TilemapData):
 
     # 그 다음 엔티티 생성
     for spawner_id, constructor in SPAWNER_ENTITY_MAP.items():
-        if spawner_id == 0:
-            continue  # 플레이어 스폰 스킵
         for pos in tilemap_data.get_positions_by_types("spawners_entities", spawner_id):
             constructor(pos)

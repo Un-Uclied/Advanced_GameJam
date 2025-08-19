@@ -2,7 +2,7 @@ import pygame as pg
 import pytweening as pt
 import json
 
-from scripts.core import *
+from scripts.utils import *
 from scripts.constants import *
 from scripts.status import PlayerStatus
 from scripts.enemies import SCORE_UP_MAP, FiveOmega
@@ -48,7 +48,7 @@ class GameUI:
         score_text: 점수 텍스트 렌더러
     """
     
-    def __init__(self, scene, player_status, vignette):
+    def __init__(self, scene, player_status):
         """
         게임 UI 초기화 및 모든 UI 요소 생성함
         
@@ -57,9 +57,9 @@ class GameUI:
             player_status: 플레이어 상태 관리자
             vignette: 비네팅 이미지 렌더러
         """
+        self.app = scene.app
         self.scene = scene  # 씬 참조 저장함
         self.player_status = player_status  # 플레이어 상태 참조 저장함
-        self.vignette = vignette  # 비네팅 렌더러 참조 저장함
         self.create_all_player_ui()  # 모든 플레이어 UI 생성함
 
     def create_all_player_ui(self):
@@ -73,11 +73,20 @@ class GameUI:
         - 점수 UI
         - 체력 경고 UI
         """
-        self.create_health_ui()  # 체력 UI 생성함
+        self.create_vignette()          # 비네트 이미지
+        self.create_health_ui()         # 체력 UI 생성함
         self.create_invincibility_ui()  # 무적 상태 UI 생성함
-        self.create_soul_ui()  # 영혼 슬롯 UI 생성함
-        self.create_score_ui()  # 점수 UI 생성함
-        self.create_health_warning_ui()  # 체력 경고 UI 생성함
+        self.create_soul_ui()           # 영혼 슬롯 UI 생성함
+        self.create_score_ui()          # 점수 UI 생성함
+        self.create_health_warning_ui() # 체력 경고 UI 생성함
+
+    def create_vignette(self):
+        vignette_image = self.app.ASSETS["ui"]["vignette"]["black"]  # 검은 비네팅 이미지
+        self.vignette = ImageRenderer(
+            vignette_image,  # 비네팅 이미지
+            pg.Vector2(0, 0),  # 위치 (좌상단)
+            anchor=pg.Vector2(0, 0)  # 앵커 포인트
+        )
 
     def create_health_ui(self):
         """
@@ -292,7 +301,6 @@ class GameUI:
 
         # 점수 변경 이벤트에 콜백 연결함
         self.scene.event_bus.connect("on_score_changed", score_changed)
-
 
 class PauseUI:
     """
@@ -612,7 +620,6 @@ class MainGameScene(Scene):
         씬 시작 시 모든 게임 요소들을 초기화함
         
         수행 작업들:
-        - 비네팅 이미지 생성
         - 진행상황 업데이트
         - 플레이어 상태 초기화
         - 점수 시스템 설정
@@ -623,13 +630,6 @@ class MainGameScene(Scene):
         - 레벨 인트로
         - 배경 이펙트 생성
         """
-        # 씬 시작 시 비네팅 이미지 미리 깔아둠
-        vignette_image = self.app.ASSETS["ui"]["vignette"]["black"]  # 검은 비네팅 이미지
-        self.vignette = ImageRenderer(
-            vignette_image,  # 비네팅 이미지
-            pg.Vector2(0, 0),  # 위치 (좌상단)
-            anchor=pg.Vector2(0, 0)  # 앵커 포인트
-        )
         
         super().on_scene_start()  # 부모 클래스 씬 시작 처리함
 
@@ -700,7 +700,7 @@ class MainGameScene(Scene):
             self.app.sound_manager.play_bgm("main_game")
             
         # 게임 UI 생성함
-        self.game_ui = GameUI(self, self.player_status, self.vignette)
+        self.game_ui = GameUI(self, self.player_status)
         # 일시정지 UI 생성함
         self.pause_ui = PauseUI(self, self.player_status)
 

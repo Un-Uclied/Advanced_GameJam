@@ -39,7 +39,7 @@ class CameraView:
         '''
         주어진 월드 Rect가 카메라 뷰포트(화면)에 보이는지 체크
 
-        :param camera: 현재 카메라 객체 (보통 self.app.scene.camera)
+        :param camera: 현재 카메라 객체 (보통 self.scene.camera)
         :param rect: 월드 좌표 기준 Rect (절대 좌표)
         :return: 화면에 보이면 True, 아니면 False
         '''

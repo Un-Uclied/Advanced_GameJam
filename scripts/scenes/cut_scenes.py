@@ -1,6 +1,6 @@
 import pygame as pg
 from scripts.constants import *
-from scripts.core import *
+from scripts.utils import *
 from scripts.ui import *
 from .base import Scene
 
@@ -60,13 +60,12 @@ class CutSceneBase(Scene):
         """
         씬 시작 시 호출됨. 컷씬 UI를 생성하고 재생
         """
+        super().on_scene_start()
         # 텍스트 색상 설정
         text_color = pg.Color("white") if self.bg_color == pg.Color("black") else pg.Color("black")
         
         # 컷씬 재생을 담당하는 객체 생성
         self._cutscene_player = CutScenePlayer(self, self.cutscene_name, self.cut_scene_end, text_color)
-        
-        super().on_scene_start()
 
     def cut_scene_end(self):
         '''

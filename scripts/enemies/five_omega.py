@@ -2,7 +2,7 @@ import pygame as pg
 import random
 import math
 
-from scripts.core import *
+from scripts.utils import *
 from scripts.attacks import *
 from scripts.vfx import *
 from scripts.constants import *
@@ -36,6 +36,7 @@ class BossPattern:
     def __init__(self, boss: "FiveOmega", enabled=False):
         self.boss = boss
         self.app = boss.app
+        self.scene = boss.app.scene
         self.enabled = enabled
         self.cooltime = None
         self._pattern_timer = Timer(BossPattern.PATTERN_INTERVAL, auto_destroy=False)
@@ -96,7 +97,7 @@ class ScythePattern(BossPattern):
         self.boss.set_action("scythe_attack")
 
         # 카메라 흔들림 & 효과음
-        self.app.scene.camera.shake_amount += 30
+        self.scene.camera.shake_amount += 30
         self.app.sound_manager.play_sfx(self.attack_sfx)
 
         # 폭발 이펙트 위치 계산
@@ -119,7 +120,7 @@ class ScythePattern(BossPattern):
         self.boss.registered_patterns["wander"].enabled = True
 
     def on_disabled_update(self):
-        player = self.app.scene.player_status.player_character
+        player = self.scene.player_status.player_character
         boss_center = pg.Vector2(self.boss.rect.center)
         direction_to_player = player.get_direction_from(boss_center)
         distance_to_player = player.get_distance_from(boss_center)
@@ -178,7 +179,7 @@ class EyePattern(BossPattern):
     def on_enabled_update(self):
         if self.can_lazer:
             self._try_fire()
-            self.app.scene.camera.shake_amount = self.CAMERA_SHAKE
+            self.scene.camera.shake_amount = self.CAMERA_SHAKE
         self.boss.registered_patterns["wander"].enabled = False
 
     def _try_fire(self):
@@ -188,7 +189,7 @@ class EyePattern(BossPattern):
 
         direction = pg.Vector2(1 if self.boss.anim.flip_x else -1, 0)
         spawn_pos = pg.Vector2(self.boss.rect.center) + pg.Vector2(0, 30)
-        if hasattr(self.app.scene, "player_status"):
+        if hasattr(self.scene, "player_status"):
             LazerBoss(spawn_pos, direction)
 
     def end(self):
@@ -233,7 +234,7 @@ class ProjectilePattern(BossPattern):
 
         spawn_pos = self._get_spawn_position()
         direction = self._get_direction_from_angle(self.current_angle)
-        if hasattr(self.app.scene, "player_status"):
+        if hasattr(self.scene, "player_status"):
             FireBoss(spawn_pos, direction)
 
     def _rotate(self):
@@ -250,7 +251,7 @@ class ProjectilePattern(BossPattern):
                 self.rotate_right = True
 
     def _get_spawn_position(self):
-        return self.app.scene.tilemap_data.get_positions_by_types("custom_point", 0)[0]
+        return self.scene.tilemap_data.get_positions_by_types("custom_point", 0)[0]
 
     def _get_direction_from_angle(self, angle):
         rad = math.radians(angle)
@@ -285,7 +286,7 @@ class KnifePattern(BossPattern):
     def start(self):
         self.enabled = True
         self.cooltime.reset()
-        self.app.scene.camera.shake_amount += 20
+        self.scene.camera.shake_amount += 20
 
         start_positions = self._get_start_positions()
         self.warning_lines = [
@@ -305,26 +306,26 @@ class KnifePattern(BossPattern):
 
     def _attack(self):
         self.app.sound_manager.play_sfx(self.sfx_throw)
-        self.app.scene.camera.shake_amount += 50
+        self.scene.camera.shake_amount += 50
 
         for start_pos, target in zip(self._get_start_positions(), self.attack_targets):
             start_pos -= self.FIRE_OFFSET
             direction = target - start_pos
             if direction.length_squared() > 0:
                 direction.normalize_ip()
-            if hasattr(self.app.scene, "player_status"):
+            if hasattr(self.scene, "player_status"):
                 KnifeBoss(start_pos, direction)
 
         self.end()
 
     def on_enabled_update(self):
-        player_center = pg.Vector2(self.app.scene.player_status.player_character.rect.center)
+        player_center = pg.Vector2(self.scene.player_status.player_character.rect.center)
         for i, line in enumerate(self.warning_lines):
             line.end = player_center
             self.attack_targets[i] = player_center
 
     def _get_start_positions(self):
-        return self.app.scene.tilemap_data.get_positions_by_types("custom_point", 1)
+        return self.scene.tilemap_data.get_positions_by_types("custom_point", 1)
 
     def end(self):
         self.enabled = False
@@ -348,7 +349,7 @@ class SpawnPattern(BossPattern):
     def start(self):
         self.enabled = True
         self.cooltime.reset()
-        self.app.scene.camera.shake_amount += 20
+        self.scene.camera.shake_amount += 20
 
         spawn_position = random.choice(self._get_start_positions())
         spawn_class = random.choice(self.CAN_SPAWN_CLASS)
@@ -357,13 +358,13 @@ class SpawnPattern(BossPattern):
         self.end()
 
     def on_enabled_update(self):
-        player_center = pg.Vector2(self.app.scene.player_status.player_character.rect.center)
+        player_center = pg.Vector2(self.scene.player_status.player_character.rect.center)
         for i, line in enumerate(self.warning_lines):
             line.end = player_center
             self.attack_targets[i] = player_center
 
     def _get_start_positions(self):
-        return self.app.scene.tilemap_data.get_positions_by_types("custom_point", 1)
+        return self.scene.tilemap_data.get_positions_by_types("custom_point", 1)
 
     def end(self):
         self.enabled = False
@@ -382,8 +383,8 @@ class WanderPattern(BossPattern):
         self.is_moving = False
 
     def on_enabled_update(self):
-        direction = self.app.scene.player_status.player_character.get_direction_from(pg.Vector2(self.boss.rect.center))
-        distance = self.app.scene.player_status.player_character.get_distance_from(pg.Vector2(self.boss.rect.center))
+        direction = self.scene.player_status.player_character.get_direction_from(pg.Vector2(self.boss.rect.center))
+        distance = self.scene.player_status.player_character.get_distance_from(pg.Vector2(self.boss.rect.center))
         self.is_overriding = distance < self.DIRECTION_OVERRIDE_RANGE
 
         self.is_moving = False
@@ -491,17 +492,17 @@ class FiveOmega(PhysicsEnemy):
         모든 라이트를 제거하고, 화면을 흔들고, 효과음과 파티클 효과를 재생.
         플레이어에게 고정된 새로운 라이트를 생성.
         """
-        lights = self.app.scene.get_objects_by_types(Light)
+        lights = self.scene.get_objects_by_types(Light)
         for light in lights[:]:
             light.destroy()
-        self.app.scene.camera.shake_amount += 200
+        self.scene.camera.shake_amount += 200
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["enemy"]["boss"]["scream"])
         for _ in range(5):
             AnimatedParticle(
                 self.app.ASSETS["animations"]["vfxs"]["darkness_big"],
                 pg.Vector2(self.rect.center) + pg.Vector2(random.randint(-15, 15), random.randint(-15, 15))
             )
-        pc = self.app.scene.player_status.player_character
+        pc = self.scene.player_status.player_character
         self.player_light = Light(400, pg.Vector2(pc.rect.center))
 
     def phase_3_start(self):
@@ -510,10 +511,10 @@ class FiveOmega(PhysicsEnemy):
         모든 Soul 객체를 제거하고, 화면을 흔들고, 효과음과 파티클 효과를 재생.
         새로운 SpawnPattern을 등록.
         """
-        souls = self.app.scene.get_objects_by_types(Soul)
+        souls = self.scene.get_objects_by_types(Soul)
         for soul in souls[:]:
             soul.destroy()
-        self.app.scene.camera.shake_amount += 200
+        self.scene.camera.shake_amount += 200
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["enemy"]["boss"]["scream"])
         for _ in range(5):
             AnimatedParticle(
@@ -533,7 +534,7 @@ class FiveOmega(PhysicsEnemy):
         페이즈 2 동안 매 프레임마다 실행될 업데이트 로직.
         플레이어 캐릭터의 위치에 따라 라이트 위치를 업데이트.
         """
-        pc = self.app.scene.player_status.player_character
+        pc = self.scene.player_status.player_character
         self.player_light.position = pg.Vector2(pc.rect.center)
 
     def phase_3_update(self):
@@ -541,7 +542,7 @@ class FiveOmega(PhysicsEnemy):
         페이즈 3 동안 매 프레임마다 실행될 업데이트 로직.
         플레이어 캐릭터의 위치에 따라 라이트 위치를 업데이트.
         """
-        pc = self.app.scene.player_status.player_character
+        pc = self.scene.player_status.player_character
         self.player_light.position = pg.Vector2(pc.rect.center)
 
     def phase_update(self):

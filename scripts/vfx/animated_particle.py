@@ -2,7 +2,7 @@ import pygame as pg
 
 from scripts.constants import *
 from scripts.camera import *
-from scripts.core import *
+from scripts.utils import *
 
 class AnimatedParticle(GameObject):
     """
@@ -37,7 +37,7 @@ class AnimatedParticle(GameObject):
 
     def draw(self):
         super().draw()
-        camera = self.app.scene.camera
+        camera = self.scene.camera
         surface = self.app.surfaces[LAYER_DYNAMIC]
 
         image = self.anim.img()

@@ -1,5 +1,5 @@
 from scripts.constants import *
-from scripts.core import *
+from scripts.utils import *
 
 class Sky(GameObject):
     '''

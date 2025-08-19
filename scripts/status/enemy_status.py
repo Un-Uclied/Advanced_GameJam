@@ -4,7 +4,7 @@ import random
 from scripts.constants import *
 from scripts.ui import *
 from scripts.vfx import AnimatedParticle
-from scripts.core import GameObject
+from scripts.utils import GameObject
 
 # UI 아이콘 위치 오프셋 상수 정의함
 ICON_UI_OFFSET = pg.Vector2(40, 0)
@@ -180,10 +180,11 @@ class EnemyStatus:
         """
         self.enemy = enemy  # 적 객체 참조 저장함
         self.app = enemy.app  # 앱 객체 참조 저장함
+        self.scene = enemy.app.scene
 
         # 영혼 타입 결정 (플레이어 존재 여부에 따라)
         self.soul_type = SOUL_DEFAULT  # 기본 영혼 타입으로 초기화함
-        if hasattr(self.app.scene, "player_status"):  # 플레이어 상태 존재 확인함
+        if hasattr(self.scene, "player_status"):  # 플레이어 상태 존재 확인함
             # 악한 영혼 타입 중 랜덤하게 선택함
             self.soul_type = random.choice(ALL_EVIL_SOUL_TYPES)
 
@@ -206,7 +207,7 @@ class EnemyStatus:
 
         # UI 생성 (플레이어 상태 존재할 때만)
         self.enemy_ui = None  # UI 초기값 None으로 설정함
-        if hasattr(self.app.scene, "player_status"):  # 플레이어 상태 존재 확인함
+        if hasattr(self.scene, "player_status"):  # 플레이어 상태 존재 확인함
             # 적 UI 생성함
             self.enemy_ui = EnemyUI(self.enemy, self.soul_type, self.max_health)
 
@@ -222,7 +223,7 @@ class EnemyStatus:
             self.enemy_ui.destroy()  # UI 제거함
             
         # 적 사망 이벤트 발생시킴
-        self.app.scene.event_bus.emit("on_enemy_died", self.enemy)
+        self.scene.event_bus.emit("on_enemy_died", self.enemy)
 
     def on_enemy_hit(self):
         """
@@ -231,7 +232,7 @@ class EnemyStatus:
         피격 시 다른 시스템에 알리기 위한 이벤트 발생시킴
         """
         # 적 피격 이벤트 발생시킴  
-        self.app.scene.event_bus.emit("on_enemy_hit", self.enemy)
+        self.scene.event_bus.emit("on_enemy_hit", self.enemy)
 
     @property
     def health(self):
@@ -266,7 +267,7 @@ class EnemyStatus:
         if before_health > self._health:  # 체력이 감소한 경우만
             # 카메라 흔들림 강도는 입은 대미지만큼 설정함
             damage_taken = before_health - self._health  # 입은 대미지 계산함
-            self.app.scene.camera.shake_amount += damage_taken  # 카메라 흔들림 추가함
+            self.scene.camera.shake_amount += damage_taken  # 카메라 흔들림 추가함
             
             if self.enemy_ui:  # UI가 존재하는 경우
                 # 체력바 업데이트함

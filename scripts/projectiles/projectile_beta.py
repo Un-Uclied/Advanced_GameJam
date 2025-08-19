@@ -1,7 +1,7 @@
 import pygame as pg
 
 from scripts.vfx import *
-from scripts.core import *
+from scripts.utils import *
 from .base import EnemyProjectile
 
 DEFAULT_LIFE_TIME = 5

@@ -6,7 +6,7 @@ from scripts.vfx import *
 from scripts.constants import *
 from scripts.volume import *
 from scripts.ui import *
-from scripts.core import *
+from scripts.utils import *
 from .base import PhysicsEntity
 
 HIT_BOX_SIZE = (40, 50)
@@ -49,7 +49,7 @@ class Soul(PhysicsEntity):
         self.light_follow_speed = 5
 
         # 플레이어 상태가 없으면 기본 타입으로 설정
-        if hasattr(self.app.scene, "player_status"):
+        if hasattr(self.scene, "player_status"):
             self.soul_type = random.choice(ALL_SOUL_TYPES)
             self.type_icon_image = ImageRenderer(
                 self.app.ASSETS["ui"]["soul_icons"][self.soul_type],
@@ -81,9 +81,9 @@ class Soul(PhysicsEntity):
         """플레이어가 E키로 상호작용 했을 때 실행"""
         AnimatedParticle(self.collect_particle_anim, pg.Vector2(self.rect.center))
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["soul"]["interact"])
-        self.app.scene.camera.shake_amount += 10
+        self.scene.camera.shake_amount += 10
 
-        self.app.scene.event_bus.emit("on_soul_interact", self.soul_type)
+        self.scene.event_bus.emit("on_soul_interact", self.soul_type)
 
         # 상호작용 후 타입 랜덤 변경 및 UI 갱신
         self.soul_type = random.choice(ALL_SOUL_TYPES)
@@ -109,12 +109,12 @@ class Soul(PhysicsEntity):
 
     def handle_input(self):
         """플레이어가 영혼과 닿았을 때 E키 입력 감지"""
-        if not hasattr(self.app.scene, "player_status") or not hasattr(self.app.scene.player_status, "player_character"):
+        if not hasattr(self.scene, "player_status") or not hasattr(self.scene.player_status, "player_character"):
             return
-        if self.app.scene.player_status.health <= 0:
+        if self.scene.player_status.health <= 0:
             return
 
-        ps = self.app.scene.player_status
+        ps = self.scene.player_status
         pc = ps.player_character
 
         for event in self.app.events:
@@ -124,13 +124,13 @@ class Soul(PhysicsEntity):
 
     def handle_hint_ui(self):
         """플레이어가 영혼 영역에 들어가거나 나갈 때 힌트 UI 알파 애니메이션"""
-        if not hasattr(self.app.scene, "player_status") or not hasattr(self.app.scene.player_status, "player_character"):
+        if not hasattr(self.scene, "player_status") or not hasattr(self.scene.player_status, "player_character"):
             return
 
         # 힌트 UI 위치 업데이트 (영혼 위치 기준)
         self.hint_ui.pos = pg.Vector2(self.rect.centerx, self.rect.top - 30)
 
-        ps = self.app.scene.player_status
+        ps = self.scene.player_status
         pc = ps.player_character
 
         is_inside = self.rect.colliderect(pc.rect)

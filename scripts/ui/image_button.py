@@ -2,7 +2,7 @@ import pygame as pg
 import pytweening as pt
 
 from scripts.constants import *
-from scripts.core import *
+from scripts.utils import *
 from .image_renderer import ImageRenderer
 
 class ImageButton(GameObject):
