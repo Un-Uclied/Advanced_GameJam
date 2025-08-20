@@ -267,7 +267,7 @@ class EnemyStatus:
         if before_health > self._health:  # 체력이 감소한 경우만
             # 카메라 흔들림 강도는 입은 대미지만큼 설정함
             damage_taken = before_health - self._health  # 입은 대미지 계산함
-            self.camera.shake_amount += damage_taken  # 카메라 흔들림 추가함
+            self.scene.camera.shake_amount += damage_taken  # 카메라 흔들림 추가함
             
             if self.enemy_ui:  # UI가 존재하는 경우
                 # 체력바 업데이트함

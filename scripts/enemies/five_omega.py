@@ -97,7 +97,7 @@ class ScythePattern(BossPattern):
         self.boss.set_action("scythe_attack")
 
         # 카메라 흔들림 & 효과음
-        self.camera.shake_amount += 30
+        self.scene.camera.shake_amount += 30
         self.app.sound_manager.play_sfx(self.attack_sfx)
 
         # 폭발 이펙트 위치 계산
@@ -179,7 +179,7 @@ class EyePattern(BossPattern):
     def on_enabled_update(self):
         if self.can_lazer:
             self._try_fire()
-            self.camera.shake_amount = self.CAMERA_SHAKE
+            self.scene.camera.shake_amount = self.scene.camera_SHAKE
         self.boss.registered_patterns["wander"].enabled = False
 
     def _try_fire(self):
@@ -286,7 +286,7 @@ class KnifePattern(BossPattern):
     def start(self):
         self.enabled = True
         self.cooltime.reset()
-        self.camera.shake_amount += 20
+        self.scene.camera.shake_amount += 20
 
         start_positions = self._get_start_positions()
         self.warning_lines = [
@@ -306,7 +306,7 @@ class KnifePattern(BossPattern):
 
     def _attack(self):
         self.app.sound_manager.play_sfx(self.sfx_throw)
-        self.camera.shake_amount += 50
+        self.scene.camera.shake_amount += 50
 
         for start_pos, target in zip(self._get_start_positions(), self.attack_targets):
             start_pos -= self.FIRE_OFFSET
@@ -349,7 +349,7 @@ class SpawnPattern(BossPattern):
     def start(self):
         self.enabled = True
         self.cooltime.reset()
-        self.camera.shake_amount += 20
+        self.scene.camera.shake_amount += 20
 
         spawn_position = random.choice(self._get_start_positions())
         spawn_class = random.choice(self.CAN_SPAWN_CLASS)
@@ -495,7 +495,7 @@ class FiveOmega(PhysicsEnemy):
         lights = self.scene.get_objects_by_types(Light)
         for light in lights[:]:
             light.destroy()
-        self.camera.shake_amount += 200
+        self.scene.camera.shake_amount += 200
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["enemy"]["boss"]["scream"])
         for _ in range(5):
             AnimatedParticle(
@@ -514,7 +514,7 @@ class FiveOmega(PhysicsEnemy):
         souls = self.scene.get_objects_by_types(Soul)
         for soul in souls[:]:
             soul.destroy()
-        self.camera.shake_amount += 200
+        self.scene.camera.shake_amount += 200
         self.app.sound_manager.play_sfx(self.app.ASSETS["sounds"]["enemy"]["boss"]["scream"])
         for _ in range(5):
             AnimatedParticle(

@@ -633,8 +633,6 @@ class MainGameScene(Scene):
         
         super().on_scene_start()  # 부모 클래스 씬 시작 처리함
 
-        # 플레이어 상태 초기화 (체력 100으로 시작)
-        self.player_status = PlayerStatus(start_health=100)
         self._score = 0  # 점수 내부 변수 초기화함
 
         # 플레이어 체력 깎이면 점수 -250 감소하도록 이벤트 연결함
@@ -673,9 +671,8 @@ class MainGameScene(Scene):
         spawn_pos = spawn_positions[0]  # 첫 번째 스폰 위치 사용함
         pc = PlayerCharacter(spawn_pos)  # 플레이어 캐릭터 생성함
         
-        # 플레이어 상태와 캐릭터 연결함
-        self.player_status.player_character = pc
-        self.player_status.abilities.player_character = pc
+        # 플레이어 상태 초기화 (체력 100으로 시작)
+        self.player_status = PlayerStatus(pc, start_health=100)
         
         # 플레이어 죽으면 씬 재시작하도록 이벤트 연결함
         def on_player_died():
