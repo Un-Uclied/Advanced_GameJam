@@ -45,7 +45,10 @@ class TilemapData:
         """
         
         # 검사할 주변 타일 좌표 오프셋 (현재 타일 중심 좌표 기준)
-        NEIGHBOR_OFFSETS = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (0, 0), (-1, 1), (0, 1), (1, 1)]
+        NEIGHBOR_OFFSETS = [
+            (-1, 0), (-1, -1), (0, -1), (1, -1),
+            (1, 0), (0, 0), (-1, 1), (0, 1), (1, 1)
+        ]
 
         result = []
         tile_loc = (int(pos.x // self.tile_size), int(pos.y // self.tile_size))

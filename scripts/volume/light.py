@@ -84,7 +84,6 @@ class LightManager:
     """
     씬에 존재하는 모든 빛 객체를 관리하고 렌더링하는 클래스.
     
-    이전 `Light` 클래스 메서드들을 `LightManager` 클래스로 옮겨서 역할 분리를 명확히 함.
     """
     def __init__(self, scene):
         """

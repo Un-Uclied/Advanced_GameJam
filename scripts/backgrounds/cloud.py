@@ -86,6 +86,7 @@ class Clouds(GameObject):
         self.all_clouds.sort(key=lambda cloud: cloud.depth)
 
     def destroy(self):
+        # 생성한 구름을 전부 destroy후 자신도 제거
         for cloud in self.all_clouds[:]:
             cloud.destroy()
         self.all_clouds.clear()
