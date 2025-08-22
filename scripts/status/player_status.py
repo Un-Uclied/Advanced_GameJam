@@ -169,7 +169,6 @@ class PlayerStatus(GameObject):
         """이벤트 버스 연결"""
         event_bus = self.scene.event_bus
         event_bus.connect("on_soul_interact", self.handle_soul_interact)
-        event_bus.connect("on_player_damaged", self.handle_damage)
     
     # 편의 속성들 (기존 코드와의 호환성)
     @property
