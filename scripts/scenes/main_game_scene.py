@@ -173,12 +173,12 @@ class GameUI:
 
         def on_player_invincible(is_start):
             """
-            플레이어 무적 상태 변경 시 호출되는 콜백 함수
+            플레이어 무적 상태 시 호출되는 콜백 함수
             
             Args:
-                is_start (bool): 무적 시작 여부 (True: 시작, False: 종료)
+                is_start (bool): 무적 여부 (True: 무적임, False: 무적아님)
             """
-            # 무적 시작 시 텍스트 보이고, 종료 시 숨김
+            # 무적 시 텍스트 보이고, 종료 시 숨김
             self.player_invincible_text.alpha = 255 if is_start else 0
 
         # 플레이어 무적 상태 변경 이벤트에 콜백 연결함

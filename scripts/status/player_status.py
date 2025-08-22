@@ -53,11 +53,6 @@ class HealthSystem:
     def is_alive(self):
         """생존 여부"""
         return self.current > 0
-    
-    def update(self, dt):
-        """무적 시간 업데이트"""
-        if self.invincible_time > 0:
-            self.invincible_time -= dt
 
 
 class SoulManager:
@@ -209,13 +204,12 @@ class PlayerStatus(GameObject):
     
     @current_invincible_time.setter
     def current_invincible_time(self, value):
-        prev = self.health_system.invincible_time
         self.health_system.invincible_time = max(value, 0)
         
         # 무적 상태 변화 이벤트
-        if self.health_system.invincible_time > 0 and prev <= 0:
+        if self.health_system.invincible_time > 0:
             self.scene.event_bus.emit("on_player_invincible", True)
-        elif self.health_system.invincible_time <= 0 and prev > 0:
+        elif self.health_system.invincible_time <= 0:
             self.scene.event_bus.emit("on_player_invincible", False)
     
     @property
@@ -282,4 +276,5 @@ class PlayerStatus(GameObject):
     def update(self):
         """매 프레임 업데이트"""
         super().update()
-        self.health_system.update(self.app.dt)
+        self.current_invincible_time -= self.app.dt
+        print(self.current_invincible_time)

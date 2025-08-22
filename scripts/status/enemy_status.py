@@ -184,7 +184,8 @@ class EnemyStatus:
 
         # 영혼 타입 결정 (플레이어 존재 여부에 따라)
         self.soul_type = SOUL_DEFAULT  # 기본 영혼 타입으로 초기화함
-        if hasattr(self.scene, "player_status"):  # 플레이어 상태 존재 확인함
+        from scripts.scenes import MainGameScene
+        if isinstance(self.scene, MainGameScene):  # 메인게임씬에서만
             # 악한 영혼 타입 중 랜덤하게 선택함
             self.soul_type = random.choice(ALL_EVIL_SOUL_TYPES)
 
@@ -207,7 +208,7 @@ class EnemyStatus:
 
         # UI 생성 (플레이어 상태 존재할 때만)
         self.enemy_ui = None  # UI 초기값 None으로 설정함
-        if hasattr(self.scene, "player_status"):  # 플레이어 상태 존재 확인함
+        if isinstance(self.scene, MainGameScene):  # 메인게임씬에서만
             # 적 UI 생성함
             self.enemy_ui = EnemyUI(self.enemy, self.soul_type, self.max_health)
 

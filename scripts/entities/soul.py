@@ -48,8 +48,9 @@ class Soul(PhysicsEntity):
         self.light = Light(LIGHT_SIZE, pg.Vector2(self.rect.center), LIGHT_STRENGTH)
         self.light_follow_speed = 5
 
-        # 플레이어 상태가 없으면 기본 타입으로 설정
-        if hasattr(self.scene, "player_status"):
+        #메인게임씬에서만
+        from scripts.scenes import MainGameScene
+        if isinstance(self.scene, MainGameScene):
             self.soul_type = random.choice(ALL_SOUL_TYPES)
             self.type_icon_image = ImageRenderer(
                 self.app.ASSETS["ui"]["soul_icons"][self.soul_type],
