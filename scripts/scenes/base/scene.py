@@ -88,8 +88,6 @@ class Scene:
     # 메인 루프
     # -------------------------------------------------
     def update(self):
-        self.camera.update_shake_amount(self.app.dt)
-
         for obj in self.objects[:]:
             if self.scene_paused and isinstance(obj, self.skip_when_paused):
                 continue
