@@ -64,11 +64,7 @@ class SettingsUI:
                 hover_color=hover, not_hover_color=normal
             )
 
-        # ui_elements를 멤버 변수로 꺼내 쓰기
-        globals().update(self.ui_elements)
-
     def connect_events(self):
-        """이벤트 연결"""
         self.ui_elements["sfx_volume_slider"].on_value_changed = self.change_vfx
         self.ui_elements["bgm_volume_slider"].on_value_changed = self.change_bgm
         self.ui_elements["reset_button"].on_click = self.on_reset_button_click

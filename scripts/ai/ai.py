@@ -1,6 +1,8 @@
 import pygame as pg
 import random
 
+from scripts.utils import *
+
 FIX_DIRECTION_TIMER = 0.6  # 충돌/떨어짐 감지 후 방향 고정 시간 (초)
 
 class WanderAI:
@@ -23,7 +25,9 @@ class WanderAI:
         self.max_change_timer = max_change_timer
         self.current_change_timer = random.uniform(min_change_timer, max_change_timer)
 
-        self.fix_direction_timer = 0  # 충돌 감지 후 방향 고정 남은 시간 (초)
+        self.is_direction_fixed = False
+        self.fix_direction_timer = Timer(FIX_DIRECTION_TIMER, lambda: setattr(self, "is_direction_fixed", False), False)
+        self.fix_direction_timer.active = False
 
     def check_floor(self):
         '''내 위치 왼쪽 아래/오른쪽 아래 타일 없으면 떨어짐으로 판단, 방향 전환'''
@@ -51,6 +55,15 @@ class WanderAI:
         elif entity.collisions.get("left", False):
             self.handle_collision_or_fall("hit_left")
 
+    def handle_collision_or_fall(self, event_type):
+        '''충돌 혹은 바닥 없는 이벤트 들어오면 방향 강제 변경'''
+        if event_type in ("fall_left", "hit_left"):
+            self.direction.x = 1  # 오른쪽으로 이동
+        elif event_type in ("fall_right", "hit_right"):
+            self.direction.x = -1  # 왼쪽으로 이동
+        self.is_direction_fixed = True
+        self.fix_direction_timer.reset()  # 방향 고정 타이머 시작
+
     def update(self):
         '''AI 메인 업데이트, 충돌/떨어짐 체크 + 방향 전환 타이머 관리'''
         self.check_floor()
@@ -58,24 +71,12 @@ class WanderAI:
 
         dt = self.entity.app.dt
 
-        if self.fix_direction_timer > 0:
-            self.fix_direction_timer -= dt
-            # 고정 시간 중이므로 방향 바꾸기 안 함
-        else:
-            # 고정 시간이 끝나면 방향 바꿀 수 있음
+        if not self.is_direction_fixed:
             if self.current_change_timer > 0:
                 self.current_change_timer -= dt
             else:
                 self.current_change_timer = random.uniform(self.min_change_timer, self.max_change_timer)
                 self.direction.x = random.choice([-1, 0, 1])  # 새 방향 랜덤 결정
-
-    def handle_collision_or_fall(self, event_type):
-        '''충돌 혹은 바닥 없는 이벤트 들어오면 방향 강제 변경'''
-        if event_type in ("fall_left", "hit_left"):
-            self.direction.x = 1  # 오른쪽으로 이동
-        elif event_type in ("fall_right", "hit_right"):
-            self.direction.x = -1  # 왼쪽으로 이동
-        self.fix_direction_timer = FIX_DIRECTION_TIMER  # 방향 고정 타이머 시작
 
 
 class ChaseAI:

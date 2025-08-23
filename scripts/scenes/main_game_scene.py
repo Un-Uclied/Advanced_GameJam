@@ -594,7 +594,6 @@ class MainGameScene(Scene):
     Attributes:
         current_chapter (int): 현재 챕터 번호 (1 ~ 4)
         current_level (int): 현재 레벨 번호 (0 ~ 4)
-        vignette: 화면 가장자리 비네팅 이미지 렌더러
         player_status: 플레이어 상태 관리자
         score (int): 현재 점수 (프로퍼티)
         score_down_timer: 점수 감소 타이머
@@ -669,10 +668,8 @@ class MainGameScene(Scene):
         # 플레이어 캐릭터 생성 + 상태 연결함
         spawn_positions = self.tilemap_data.get_positions_by_types("spawners_entities", 0)  # 스폰 위치들 가져옴
         spawn_pos = spawn_positions[0]  # 첫 번째 스폰 위치 사용함
-        pc = PlayerCharacter(spawn_pos)  # 플레이어 캐릭터 생성함
-        
         # 플레이어 상태 초기화 (체력 100으로 시작)
-        self.player_status = PlayerStatus(pc, start_health=100)
+        self.player_status = PlayerStatus(PlayerCharacter(spawn_pos), start_health=100)
         
         # 플레이어 죽으면 씬 재시작하도록 이벤트 연결함
         def on_player_died():

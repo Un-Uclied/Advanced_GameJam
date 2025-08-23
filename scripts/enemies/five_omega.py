@@ -179,7 +179,7 @@ class EyePattern(BossPattern):
     def on_enabled_update(self):
         if self.can_lazer:
             self._try_fire()
-            self.scene.camera.shake_amount = self.scene.camera_SHAKE
+            self.scene.camera.shake_amount = EyePattern.CAMERA_SHAKE
         self.boss.registered_patterns["wander"].enabled = False
 
     def _try_fire(self):

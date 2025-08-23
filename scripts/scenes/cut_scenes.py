@@ -108,7 +108,7 @@ CUTSCENE_CONFIG = {
 }
 
 # 동적으로 클래스 생성하는 꼼수
-# type(클래스 이름, 상속할 클래스 튜플, 클래스 속성 딕셔너리) → 새로운 클래스 반환
+# type(클래스 이름, 상속할 클래스 튜플, 클래스 속성 딕셔너리) -> 새로운 클래스 반환
 # 여기서는 CUTSCENE_CONFIG 딕셔너리를 돌면서, 각각에 맞는 CutSceneBase 서브클래스를 자동 생성함
 # globals()에 새로 만든 클래스들을 등록해서, 실제 모듈 전역에 존재하게 함
 globals().update({
@@ -117,7 +117,7 @@ globals().update({
         (CutSceneBase,), # 상속받을 부모 클래스 (CutSceneBase 하나)
         {
             # __init__ 메서드 정의
-            # cfg=cfg는 파이썬 클로저 늪(변수 참조 문제) 방지용 → 현재 반복 중인 cfg 값 고정
+            # cfg=cfg는 파이썬 클로저 늪(변수 참조 문제) 방지용 -> 현재 반복 중인 cfg 값 고정
             "__init__": lambda self, cfg=cfg: CutSceneBase.__init__(self, **cfg)
         }
     )

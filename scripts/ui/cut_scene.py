@@ -91,12 +91,6 @@ class TypewriterEffect:
     def is_typing_complete(self):
         """타자기 효과 완료 여부"""
         return self.text_index >= len(self.target_text)
-    
-    def complete_immediately(self):
-        """즉시 모든 텍스트 출력"""
-        self.text_index = len(self.target_text)
-        self.current_text = self.target_text
-        self.text_renderer.text = self.current_text
 
 class SkipController:
     """ESC 스킵 기능을 담당하는 클래스 (Single Responsibility)"""
@@ -284,7 +278,6 @@ class CutScene(GameObject):
         """매 프레임마다 업데이트"""
         super().update()
         self.input_handler.handle_input()
-        # skip_controller.update() 제거 - Timer가 자동으로 처리
     
     def destroy(self):
         """자원 정리 및 삭제 처리"""
