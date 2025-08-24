@@ -277,4 +277,3 @@ class PlayerStatus(GameObject):
         """매 프레임 업데이트"""
         super().update()
         self.current_invincible_time -= self.app.dt
-        print(self.current_invincible_time)
