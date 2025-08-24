@@ -40,26 +40,38 @@ class EnemyBase:
         if damage <= 0:
             return
         
+        # 적의 소울 타입이 EVIL_B면 추가 대미지 줌
         if self.enemy.status.soul_type == SOUL_EVIL_B:
             damage += ENEMY_EVIL_B_DAMAGE_UP
 
+        # 현재 씬의 플레이어 상태를 가져옴
         ps = self.enemy.scene.player_status
+        # 플레이어 캐릭터 엔티티 참조
         pc = ps.player_character
 
+        # 플레이어 체력을 damage만큼 감소시킴 (property setter 작동)
         ps.health -= damage
+        # 플레이어가 데미지를 입었다는 이벤트 발행
         self.enemy.scene.event_bus.emit("on_player_hurt", damage)
 
+        # 공격 파티클 애니메이션 생성
         AnimatedParticle(self.attack_particle_anim, pos)
+        # 공격 사운드 효과 재생
         self.enemy.app.sound_manager.play_sfx(self.attack_sound)
 
+        # shake 값이 있으면 카메라 흔들림 강도 증가
         if shake:
             cam = self.enemy.camera
             cam.shake_amount += shake
 
+        # 공격 위치(pos)에서 플레이어 중심까지의 방향 벡터 구함
         direction = pg.Vector2(pc.rect.center) - pos
+        # 방향 벡터의 크기가 0보다 크면 정규화 (길이 1로 만듦)
         if direction.length_squared() > 0:
             direction.normalize_ip()
+        # 플레이어에게 넉백 효과 적용 (방향 * 넉백 상수)
         pc.velocity += direction * PLAYER_HIT_KNOCKBACK
+
 
 class PhysicsEnemy(PhysicsEntity, EnemyBase):
     '''
