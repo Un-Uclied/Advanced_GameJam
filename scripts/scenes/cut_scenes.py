@@ -102,7 +102,7 @@ CUTSCENE_CONFIG = {
     "Tutorial2Scene": dict(cutscene_name="tutorial_2", next_chapter=1, next_level=1),
     "NoLightCutScene": dict(cutscene_name="no_lights", next_chapter=3, next_level=4),
     "NoSoulsCutScene": dict(cutscene_name="no_souls", next_chapter=2, next_level=2),
-    "GoodEndingCutScene": dict(cutscene_name="good_ending", bg_color=pg.Color("white")),
+    "GoodEndingCutScene": dict(cutscene_name="good_ending"),
     "BadEndingCutScene": dict(cutscene_name="bad_ending", next_chapter=4, next_level=0, bg_color=pg.Color("red")),
     "BossIntroCutScene": dict(cutscene_name="boss_intro", next_chapter=4, next_level=0),
 }

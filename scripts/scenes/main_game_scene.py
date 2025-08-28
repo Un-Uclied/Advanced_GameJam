@@ -540,7 +540,7 @@ class BossUI:
         """
         # 보스 이름 텍스트 렌더러 생성함
         self.name = TextRenderer(
-            "< ??? >",  # 보스 이름 (미스터리하게 표시)
+            "< 데미우르고스 >",  # 보스 이름 (미스터리하게 표시)
             pg.Vector2(SCREEN_SIZE.x / 2, 70),  # 위치 (화면 상단 중앙)
             anchor=pg.Vector2(0.5, 0)  # 앵커 포인트 (상단 중앙 정렬)
         )
