@@ -1,0 +1,53 @@
+{
+    "is_first_start": true,
+    "progress": {
+        "1": [
+            true,
+            false,
+            false,
+            false,
+            false
+        ],
+        "2": [
+            false,
+            false,
+            false,
+            false,
+            false
+        ],
+        "3": [
+            false,
+            false,
+            false,
+            false,
+            false
+        ],
+        "4": [false]
+    },
+    "scores": {
+        "1": [
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "2": [
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "3": [
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "4": [0]
+    },
+    "sfx_volume": 0.8,
+    "bgm_volume": 0.8
+}
