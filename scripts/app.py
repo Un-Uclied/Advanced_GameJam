@@ -383,7 +383,7 @@ class App:
             self.screen.blit(surface, (0, 0))
 
     def run(self):
-        """메인 게임 루프. 게임 실행 중 프레임마다 호출됨."""
+        """메인 게임 루프. 게임 실행 중 프레임마다 while 루프 속 내용 진행"""
         while not self.window_should_be_closed:
             # 이벤트, 업데이트, 렌더링 순서로 게임 루프를 실행함.
             self.update_event()
